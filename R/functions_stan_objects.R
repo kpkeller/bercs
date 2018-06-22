@@ -32,9 +32,11 @@ add_priors  <- function(standata, ...){
 #' @param corHW Prior mean and standard deviation for the correlation of repeated measures `corHW`.
 ##' @details For \code{add_stan_priors_exposure_model}, the prior distributions are normal distributions parameterixed by (mean, sd).
 ##' @export
-add_priors_exposure_model <- function(standata, etaG=c(0, 1), sigmaG=c(0, 1), reK=0, sigmaK=c(0, 1), reH=0,sigmaH=c(1, 1), sigmaW=c(1, 1),  theta=c(0, 0.5), sigmaTheta=c(0, 1), ...) {
-    standata$prior_etaG_mean <- etaG[[1]]
-    standata$prior_etaG_sd <- etaG[[2]]
+add_priors_exposure_model <- function(standata, etaG=0, sigmaG=c(0, 1), reK=0, sigmaK=c(0, 1), reH=0,sigmaH=c(0, 1), sigmaW=c(0, 1),  theta=0, sigmaTheta=c(0, 1), ...) {
+
+    standata$prior_etaG_mean <- etaG[1]
+    standata$prior_sigmaG_mean <- sigmaG[[1]]
+    standata$prior_sigmaG_sd <- sigmaG[[2]]
 
     standata$prior_sigmaW_mean <- sigmaW[[1]]
     standata$prior_sigmaW_sd <- sigmaW[[2]]
@@ -47,11 +49,7 @@ add_priors_exposure_model <- function(standata, etaG=c(0, 1), sigmaG=c(0, 1), re
     standata$prior_sigmaK_mean <- sigmaK[[1]]
     standata$prior_sigmaK_sd <- sigmaK[[2]]
 
-    standata$prior_sigmaG_mean <- sigmaG[[1]]
-    standata$prior_sigmaG_sd <- sigmaG[[2]]
-
-    standata$prior_theta_mean <- theta[[1]]
-    standata$prior_theta_sd <- theta[[2]]
+    standata$prior_theta_mean <- theta[1]
     standata$prior_sigmaTheta_mean <- sigmaTheta[[1]]
     standata$prior_sigmaTheta_sd <- sigmaTheta[[2]]
 
