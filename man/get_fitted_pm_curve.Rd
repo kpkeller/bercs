@@ -6,9 +6,9 @@
 \title{Extract fitted PM curve}
 \usage{
 get_fitted_pm_curve(standata, stanfit, beta_post, pmrange = c(0, 100),
-  ciband = 0.95)
+  ciband = 0.95, inclInterceptUncertainty = TRUE)
 
-plot_fitted_pm_curve(obj, ylab = "Relative Risk",
+plot_fitted_pm_curve(obj, incS = NULL, ylab = "Relative Risk",
   xlab = "PM Concentration (ug/m3)")
 }
 \arguments{
@@ -22,7 +22,11 @@ plot_fitted_pm_curve(obj, ylab = "Relative Risk",
 
 \item{ciband}{width of credible interval band}
 
+\item{inclInterceptUncertainty}{include intercept uncertainty in the output?}
+
 \item{obj}{Data frame containing \code{pm}, \code{mean}, \code{low}, and \code{high}. Typically generated from \code{\link{get_fitted_pm_curve}}.}
+
+\item{incS}{Which studies to include. Default of NULL plots all studies.}
 
 \item{ylab}{String providing y-axis label.}
 

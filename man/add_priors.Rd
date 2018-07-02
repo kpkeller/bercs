@@ -8,9 +8,9 @@
 \usage{
 add_priors(standata, ...)
 
-add_priors_exposure_model(standata, etaG = c(0, 1), sigmaG = c(0, 1),
-  reK = 0, sigmaK = c(0, 1), reH = 0, sigmaH = c(1, 1), sigmaW = c(1,
-  1), theta = c(0, 0.5), sigmaTheta = c(0, 1), ...)
+add_priors_exposure_model(standata, etaG = 0, sigmaG = c(0, 1), reK = 0,
+  sigmaK = c(0, 1), reH = 0, sigmaH = c(0, 1), sigmaW = c(0, 1),
+  theta = 0, sigmaTheta = c(0, 1), ...)
 
 add_priors_outcome_model(standata, beta = 0, sigmaBeta = c(0, 1),
   gamma = 0, sigmaGam = c(0, 1), delta = 0, sigmaDel = c(0, 1),
