@@ -46,7 +46,7 @@ exposure_pooling_factor <- function(stanfit, standata, level=c("observation", "h
     } else if (level=="household"){
         pm <- extract(stanfit, pars=c("reH", "reK"))
         theta <- pm$reH
-        if ("reK" %in% names(pm)) theta <- theta + pm$reK[, standata$cluster_of_obs]
+        if ("reK" %in% names(pm)) theta <- theta + pm$reK[, get_cluster_of_hh(standata)]
         epsilon <- pm$reH
     }  else if (level=="cluster"){
         pm <- extract(stanfit, pars=c("reK"))
@@ -64,4 +64,14 @@ exposure_pooling_factor <- function(stanfit, standata, level=c("observation", "h
         stop("not supported yet.")
     }
     compute_pooling_metrics(theta=theta, epsilon=epsilon)
+}
+
+
+get_cluster_of_hh <- function(standata){
+    hh_of_obs <- standata$hh_of_obs
+    inds <- !duplicated(hh_of_obs)
+    cluster_of_hh <- standata$cluster_of_obs[inds]
+    hh_of_obs <- hh_of_obs[inds]
+    cluster_of_hh <- cluster_of_hh[order(hh_of_obs)]
+    cluster_of_hh
 }
