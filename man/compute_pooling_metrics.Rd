@@ -13,7 +13,7 @@ prop_var_explained(theta, epsilon)
 pooling_factor(epsilon)
 }
 \arguments{
-\item{theta}{Matrix of the 'outcome' values for the level. Rows represent samples from the 
+\item{theta}{Matrix of the 'outcome' values for the level. Rows represent samples from the
 posterior distribution and columns represent units of the level.}
 
 \item{epsilon}{Matrix of the 'error' values for the level, in the same format as \code{theta}.}

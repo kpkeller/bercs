@@ -4,8 +4,9 @@
 \alias{compute_fitted_mean}
 \title{Compute fitted concentration}
 \usage{
-compute_fitted_mean(stanfit, standata, include_time = TRUE,
-  include_reH = TRUE, exp_transform = FALSE, add = FALSE, ...)
+compute_fitted_mean(stanfit, standata, parvalues = NULL,
+  include_time = TRUE, include_reH = TRUE, exp_transform = FALSE,
+  add = FALSE, ...)
 }
 \arguments{
 \item{stanfit}{Fitted STAN model object containing posterior samples of parameters}

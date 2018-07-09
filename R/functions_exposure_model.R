@@ -143,22 +143,35 @@ sample_exposure_model <- function(standata,
 #' @importFrom rstan extract
 compute_fitted_mean <- function(stanfit,
                                 standata,
+                                parvalues=NULL,
                                 include_time=TRUE,
                                 include_reH=TRUE,
                                 exp_transform=FALSE,
                                 add=FALSE,
                                 ...){
 
-    nocluster <- ifelse("reK[1]" %in% names(stanfit), FALSE, TRUE)
 
-    pars <- "etaG"
-    if (!nocluster) pars <- c(pars, "reK")
-    if(include_reH) pars <- c(pars, "reH")
-    if (include_time) pars <- c(pars, "theta")
+    if (is.null(parvalues)){
+        nocluster <- ifelse("reK[1]" %in% names(stanfit), FALSE, TRUE)
 
-    pm <- rstan::extract(stanfit,
-                         pars=pars, ...)
-    pm <- lapply(pm, colMeans)
+        pars <- "etaG"
+        if (!nocluster) pars <- c(pars, "reK")
+        if(include_reH) pars <- c(pars, "reH")
+        if (include_time) pars <- c(pars, "theta")
+
+        pm <- rstan::extract(stanfit,
+                             pars=pars, ...)
+        pm <- lapply(pm, colMeans)
+    } else {
+        nocluster <- ifelse("reK[1]" %in% names(parvalues), FALSE, TRUE)
+
+        pars <- "etaG"
+        if (!nocluster) pars <- c(pars, "reK")
+        if(include_reH) pars <- c(pars, "reH")
+        if (include_time) pars <- c(pars, "theta")
+        pm <- parvalues
+        if (!all(pars %in% names(pm))) stop("'parvalues' provided, but not all names present.")
+    }
 
     ltmean <- pm$etaG[standata$group_of_obs]
     if (!nocluster){
