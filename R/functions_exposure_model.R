@@ -2,15 +2,10 @@
 #
 # create_standata_exposure()
 # sample_exposure_model()
-# create_and_add_longterm_mean()
-# calculate_longterm_means()
+# compute_fitted_mean()
+# plot_exposure_means_bytime()
+# plot_exposure_means_boxplot()
 
-
-# data -- dataframe of data
-# Ht -- matrix/data frame of time splines to include
-# return_sorted -- returns data frame that has been sorted, with added labels of
-#                   'household_num
-# log_transform -- log the concentrations?
 ##' @title Create List for Fitting Exposure Model via STAN
 ##' @description Creates a list object that follows the structure required by
 ##'  the exposure models that are implemented in STAN.
