@@ -20,3 +20,4 @@ Other exposure simulation functions: \code{\link{create_exposure_simulation_skel
   \code{\link{expsim_update_parameter}},
   \code{\link{sim_update_time_splines}}
 }
+\concept{exposure simulation functions}

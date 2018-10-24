@@ -7,11 +7,11 @@
 \usage{
 create_outcome_simulation_skeleton(design = "parallel", ...)
 
-create_outcome_simulation_skeleton_parallel(nstudies = 1, nclusters = 1,
-  nsubjects = 1, nobs = 1, study_of_cluster, cluster_of_subj, subj_of_obs,
-  beta0 = 0, x = 0, nT = NA, times = NA, verbose = TRUE,
-  xfn = function(x) {     x }, timefn = function(t) {     rep(0, length(t))
-  })
+create_outcome_simulation_skeleton_parallel(nstudies = 1,
+  nclusters = 1, nsubjects = 1, nobs = 1, study_of_cluster,
+  cluster_of_subj, subj_of_obs, beta0 = 0, x = 0, nT = NA,
+  times = NA, verbose = TRUE, xfn = function(x) {     x },
+  timefn = function(t) {     rep(0, length(t)) })
 }
 \arguments{
 \item{design}{String indicating trial design. Currently only 'parallel' is supported.}
@@ -67,3 +67,4 @@ Other outcome simulation functions: \code{\link{outsim_sample_observations}},
   \code{\link{outsim_update_parameter}},
   \code{\link{sim_update_time_splines}}
 }
+\concept{outcome simulation functions}

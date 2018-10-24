@@ -4,9 +4,9 @@
 \alias{expsim_update_parameter}
 \title{Update Exposure Model Parameters}
 \usage{
-expsim_update_parameter(obj, param, level = c("group", "cluster", "household",
-  "instrument", "correlation", "time"), type = c("mean", "sd", "re"),
-  val = NULL, draw = is.null(val))
+expsim_update_parameter(obj, param, level = c("group", "cluster",
+  "household", "instrument", "correlation", "time"), type = c("mean",
+  "sd", "re"), val = NULL, draw = is.null(val))
 }
 \arguments{
 \item{obj}{'expsim' object to update}
@@ -40,3 +40,4 @@ Other exposure simulation functions: \code{\link{create_exposure_simulation_skel
   \code{\link{expsim_sample_observations}},
   \code{\link{sim_update_time_splines}}
 }
+\concept{exposure simulation functions}

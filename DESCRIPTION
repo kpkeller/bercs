@@ -1,5 +1,5 @@
 Package: bercs
-Version: 0.0.0.9013
+Version: 0.0.0.9014
 Title: Bayesian Exposure-Response Curves via Stan
 Description: Implements hierarchical models for modeling exposure concentrations and estimating pooled analyses of expsoure-response curves, using STAN.
 Authors@R: person("Joshua", "Keller", email="jkelle46@jhu.edu", role=c("aut", "cre"))
@@ -15,4 +15,4 @@ Imports: rstan (>= 2.17.3), rstantools (>= 1.5.0),
 LinkingTo: StanHeaders (>= 2.17.2), rstan (>= 2.17.3), BH (>= 1.66.0-1), Rcpp (>= 0.12.17), RcppEigen (>= 0.3.3.4.0)
 SystemRequirements: GNU make
 NeedsCompilation: yes
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

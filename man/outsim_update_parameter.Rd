@@ -15,9 +15,11 @@ outsim_update_parameter(obj, param, level = c("study", "subject", "time",
 outsim_update_atrisk(obj, nT = 1)
 
 outsim_update_covariate(obj, covariate = c("x", "Z"), ncol = 1,
-  val = NULL, draw = is.null(val), verbose = TRUE, mean = 0, sd = 1)
+  val = NULL, draw = is.null(val), verbose = TRUE, mean = 0,
+  sd = 1)
 
-outsim_update_set_parameter(obj, param = c("beta", "gamma"), val = NULL)
+outsim_update_set_parameter(obj, param = c("beta", "gamma"),
+  val = NULL)
 
 outsim_update_exp_splines(obj, df = 1, fn = "ns", ...)
 }
@@ -71,3 +73,4 @@ Other outcome simulation functions: \code{\link{create_outcome_simulation_skelet
   \code{\link{outsim_sample_observations}},
   \code{\link{sim_update_time_splines}}
 }
+\concept{outcome simulation functions}

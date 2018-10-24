@@ -36,3 +36,5 @@ Other outcome simulation functions: \code{\link{create_outcome_simulation_skelet
   \code{\link{outsim_sample_observations}},
   \code{\link{outsim_update_parameter}}
 }
+\concept{exposure simulation functions}
+\concept{outcome simulation functions}

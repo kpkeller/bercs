@@ -19,3 +19,4 @@ Other outcome simulation functions: \code{\link{create_outcome_simulation_skelet
   \code{\link{outsim_update_parameter}},
   \code{\link{sim_update_time_splines}}
 }
+\concept{outcome simulation functions}

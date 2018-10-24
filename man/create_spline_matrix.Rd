@@ -11,8 +11,8 @@ create_spline_matrix(x, df = 1, fn = "ns", ...)
 
 create_spline(x, df = 1, fn = "ns", ...)
 
-create_spline_range(df, xseq = NULL, xrange = NULL, by = 1, fn = "ns",
-  ...)
+create_spline_range(df, xseq = NULL, xrange = NULL, by = 1,
+  fn = "ns", ...)
 
 predict_spline(spline, newx, center = FALSE, scale = FALSE)
 }

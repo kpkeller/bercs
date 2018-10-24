@@ -59,15 +59,15 @@ transformed parameters {
     mui= bS[study_of_obs] + reI[subj_of_obs];
     if (xdf > 0){
         beta = prior_beta_mean + sigmaBeta[1]*beta_raw;
-        mui = mui + Hx*beta;
+        mui += Hx*beta;
     }
     if (p >0 ){
         gamma = prior_gamma_mean + sigmaGam[1]*gamma_raw;
-        mui = mui + Z*gamma;
+        mui += Z*gamma;
     }
     if (timedf > 0){
             delta = prior_delta_mean + sigmaDel[1]*delta_raw;
-        mui = mui  + Ht*delta;
+        mui += Ht*delta;
     }
 }
 model {

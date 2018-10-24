@@ -7,8 +7,8 @@
 \usage{
 create_exposure_simulation_skeleton(design = "parallel", ...)
 
-create_exposure_simulation_skeleton_parallel(ngroups = 1, nclusters = 1,
-  nhouseholds = 1, nobs = 1, verbose = TRUE)
+create_exposure_simulation_skeleton_parallel(ngroups = 1,
+  nclusters = 1, nhouseholds = 1, nobs = 1, verbose = TRUE)
 }
 \arguments{
 \item{design}{String providing the study design. Currently only \code{'parallel'} is implemented.}
@@ -44,3 +44,4 @@ Other exposure simulation functions: \code{\link{expsim_sample_observations}},
   \code{\link{expsim_update_parameter}},
   \code{\link{sim_update_time_splines}}
 }
+\concept{exposure simulation functions}

@@ -20,18 +20,18 @@ data {
     matrix[timedf==0 ? 0 : N,timedf] Ht;  // matrix of time spline values
     real beta_lower_lim;
     int<lower=0> y[N]; // Case indicator
-    int<lower=0> nT[N]; // Time at risk 
+    int<lower=0> nT[N]; // Time at risk
     int<lower=1, upper=n> subj_of_obs[N]; // which subj is this obs?
     int<lower=1, upper=S> study_of_subj[n]; // which study is this subj in?
-    // Hyperparameters 
+    // Hyperparameters
     real prior_sigmaI_mean;  // Prior for SD of subj-level RE
-    real<lower=0> prior_sigmaI_sd; 
+    real<lower=0> prior_sigmaI_sd;
     real prior_delta_mean; // Prior mean for coefs delta (usually zero)
     real prior_sigmaDel_mean; // Prior for SD of coefs delta
-    real<lower=0> prior_sigmaDel_sd; 
+    real<lower=0> prior_sigmaDel_sd;
     real prior_gamma_mean; // Prior mean for coefs gamma (usually zero)
     real prior_sigmaGam_mean; // Prior for SD of coefs gamma
-    real<lower=0> prior_sigmaGam_sd; 
+    real<lower=0> prior_sigmaGam_sd;
     real prior_beta_mean; // Prior mean for coefs beta (usually zero)
     real prior_sigmaBeta_mean; // Prior for SD of coefs beta
     real<lower=0> prior_sigmaBeta_sd;
@@ -46,7 +46,7 @@ parameters {
     real<lower=0> sigmaGam[p==0 ? 0 : 1] ;
     real<lower=0> sigmaDel[timedf==0 ? 0 : 1] ;
     real<lower=0> sigmaBeta;
-    vector[S] bS; // study-level intercept 
+    vector[S] bS; // study-level intercept
     vector[p] gamma_raw; // coefficients for covariates Z
     vector[timedf] delta_raw; // coefficients for time spline Ht
     matrix<lower=(beta_lower_lim - prior_beta_mean)/sigmaBeta>[S, xdf] beta_raw; // Coefficients for exposure spline
@@ -63,19 +63,19 @@ transformed parameters {
     reI = sigmaI*reI_raw;
     beta = prior_beta_mean + L*(sigmaBeta *beta_raw);
     Hxbeta = rows_dot_product(Hx, beta[study_of_obs]);
-    mui= bS[study_of_obs] + Hxbeta + reI[subj_of_obs]; 
+    mui= bS[study_of_obs] + Hxbeta + reI[subj_of_obs];
     if (p >0 ){
         gamma = prior_gamma_mean + sigmaGam[1]*gamma_raw;
-        mui = mui + Z*gamma;
+        mui += Z*gamma;
     }
     if (timedf > 0){
         delta = prior_delta_mean + sigmaDel[1]*delta_raw;
-        mui = mui  + Ht*delta;
+        mui += Ht*delta;
     }
 }
 model {
     if (p >0) {
-        target += normal_lpdf(gamma_raw | 0, 1);    
+        target += normal_lpdf(gamma_raw | 0, 1);
         target += normal_lpdf(sigmaGam | prior_sigmaGam_mean, prior_sigmaGam_sd);
     }
     if (timedf > 0){
@@ -83,12 +83,12 @@ model {
         target += normal_lpdf(delta_raw | 0, 1);
     }
     target += normal_lpdf(to_vector(beta_raw) | 0, 1);
-    target += lkj_corr_cholesky_lpdf(L | beta_nu); 
+    target += lkj_corr_cholesky_lpdf(L | beta_nu);
     target += normal_lpdf(reI_raw | 0, 1);
     target += normal_lpdf(sigmaI | prior_sigmaI_mean, prior_sigmaI_sd);
     target += normal_lpdf(sigmaBeta | prior_sigmaBeta_mean, prior_sigmaBeta_sd);
     target += binomial_logit_lpmf(y | nT, mui);
-} 
+}
 generated quantities {
     matrix[S,S] betaCorr;
     betaCorr = multiply_lower_tri_self_transpose(L);

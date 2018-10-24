@@ -1,6 +1,6 @@
 /*
 Exposure model
- 
+
 --Stove group is fixed effect
 --RE's for cluster and household (which is nested)
 --Includes Time Trend
@@ -8,16 +8,16 @@ Exposure model
   as a function of corHW, the correlation between repeated measures
   at a location.
 
-Note: No checks done for label consistency--user is responsible for this.  
+Note: No checks done for label consistency--user is responsible for this.
 */
 data {
 int<lower=1> G; // total number of trial arms
 int<lower=0> K; // total number of cluster
-int<lower=0> H; // total number of households 
+int<lower=0> H; // total number of households
 int<lower=0> N; //total number of observations
-int<lower=0> timedf; //degrees of freedom for time spline 
+int<lower=0> timedf; //degrees of freedom for time spline
 // Labels
-int<lower=1, upper=G> group_of_obs[N]; // which group is this obs in? 
+int<lower=1, upper=G> group_of_obs[N]; // which group is this obs in?
 int<lower=0, upper=K> cluster_of_obs[N]; // which cluster is this obs in?
 int<lower=1, upper=H> hh_of_obs[N]; // which hh is this obs in?
 // Data
@@ -61,14 +61,14 @@ etaG = prior_etaG_mean + sigmaG * etaG_raw;
 if (K > 0 ){
 }
 reH = prior_reH_mean + sigmaH * reH_raw;
-muWi = etaG[group_of_obs] + reH[hh_of_obs]; 
+muWi = etaG[group_of_obs] + reH[hh_of_obs];
 if (K > 0 ){
     reK = prior_reK_mean + sigmaK[1] * reK_raw;
-    muWi = muWi + reK[cluster_of_obs];
+    muWi += reK[cluster_of_obs];
 }
 if (timedf > 0){
     theta = prior_theta_mean + sigmaTheta[1]*theta_raw;
-    muWi = muWi + Ht*theta;
+    muWi += Ht*theta;
 }
 }
 model {
@@ -88,9 +88,9 @@ target += normal_lpdf(sigmaW | prior_sigmaW_mean, prior_sigmaW_sd);
 target += normal_lpdf(w | muWi, sigmaW);
 }
 generated quantities {
-real<lower=0> sigma2H; 
-real<lower=0> sigma2W; 
-real<lower=0> sigma2G; 
+real<lower=0> sigma2H;
+real<lower=0> sigma2W;
+real<lower=0> sigma2G;
 sigma2H=square(sigmaH);
 sigma2W=square(sigmaW);
 sigma2G=square(sigmaG);
