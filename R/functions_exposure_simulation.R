@@ -254,7 +254,7 @@ expsim_sample_observations <- function(obj){
     obj$structure$meanW <- with(obj$structure, etaG[group_of_obs] + reH[hh_of_obs] + timefn(times))
 
     if (!any(is.na(obj$structure$reK))){
-        obj$structure$meanW <- obj$structure$meanW + obj$structure$reK[cluster_of_obs]
+        obj$structure$meanW <- obj$structure$meanW + obj$structure$reK[obj$structure$cluster_of_obs]
     }
     obj$standata$w=rnorm(n=obj$standata$N, mean=obj$structure$meanW, sd=obj$structure$sigW)
     obj
