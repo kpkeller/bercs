@@ -9,18 +9,17 @@
 ##' @title Create List for Fitting Exposure Model via STAN
 ##' @description Creates a list object that follows the structure required by
 ##'  the exposure models that are implemented in STAN.
-##' @param data Data frame containing data in a long formet
-##' @param Ht Matrix of time splines to include in the model. Defaults to NULL.
+##' @param data Data frame containing data in a long format. Expected to contain columns "group", "conc", "hh_id", and "date". Optional variable is "clust_id".
+##' @param Ht Matrix of time splines to include in the model. Defaults to NULL, and can be added later via \code{\link{add_Ht_standata}}.
 ##' @param log_transform Should the concentration value be log-transformed?
 ##' @param return_addition See 'Value'.
 ##' @details This function takes as input a `wide` data frame and extracts from it the information needed for fitting the exposure model in STAN.
 ##' @return A list of class \code{standata_exposure} that contains the following:
 ##' \itemize{
 ##' \item {\code{G} -- Number of groups}
-##' \item {\code{K} -- Number of cluster *nested within groups*.}
+##' \item {\code{K} -- Number of clusters.}
 ##' \item{\code{H} Number of households}
 ##' \item{\code{N} -- Number of observations}
-##' \item{\code{group_of_cluster} -- Integer providing group number of each cluster}
 ##' \item{\code{cluster_of_obs} -- Integer providing cluster number of each observation}
 ##' \item{\code{group_of_obs} -- Integer providing group number of each observation}
 ##' \item{\code{hh_of_obs} -- Integer providing household number of each observation}
@@ -32,10 +31,10 @@
 ##' @seealso \code{\link{sample_exposure_model}}, \code{\link{create_standata_outcome}}
 ##' @export
 create_standata_exposure <- function(data, Ht=NULL, log_transform=FALSE, return_addition=FALSE){
-    check_names(data, expected_names=c("stove", "conc", "hh_id", "date"))
+    check_names(data, expected_names=c("group", "conc", "hh_id", "date"))
     check_names_to_overwrite(data, expected_names=c("hh_of_obs", "cluster_of_obs", "group_of_obs"))
 
-    data$group_of_obs <- as.numeric(factor(data$stove))
+    data$group_of_obs <- as.numeric(factor(data$group))
     if (!is.null(data$clust_id) && any(data$clust_id!=0)){
         nocluster <- FALSE
         data$cluster_of_obs <- as.numeric(factor(data$clust_id))
@@ -52,13 +51,8 @@ create_standata_exposure <- function(data, Ht=NULL, log_transform=FALSE, return_
     out$K <- max(data$cluster_of_obs)
     out$H <- max(data$hh_of_obs)
     out$N <- nrow(data)
-    if(nocluster){
-        out$group_of_cluster=data$group_of_obs[!duplicated(data$cluster_of_obs)][order(data$cluster_of_obs[!duplicated(data$cluster_of_obs)])]
-    } else {
-        out$group_of_cluster <- 0
-    }
     out$cluster_of_obs <- data$cluster_of_obs
-    out$group_of_obs <-  data$group_of_obs #  out$group_of_cluster[out$cluster_of_obs]
+    out$group_of_obs <-  data$group_of_obs
     out$hh_of_obs <- data$hh_of_obs
 
     if (log_transform){
@@ -67,7 +61,7 @@ create_standata_exposure <- function(data, Ht=NULL, log_transform=FALSE, return_
         out$w <- data$conc
     }
     out$times <- data$date
-
+    out$timedf <- 0
 
     if (!is.null(Ht)){
         out <- add_Ht_standata(out, Ht)

@@ -3,7 +3,7 @@
 \name{create_exposure_simulation_skeleton}
 \alias{create_exposure_simulation_skeleton}
 \alias{create_exposure_simulation_skeleton_parallel}
-\title{Create List Structure for Simulation}
+\title{Create List Structure for Simulations}
 \usage{
 create_exposure_simulation_skeleton(design = "parallel", ...)
 
@@ -11,7 +11,7 @@ create_exposure_simulation_skeleton_parallel(ngroups = 1,
   nclusters = 1, nhouseholds = 1, nobs = 1, verbose = TRUE)
 }
 \arguments{
-\item{design}{String providing the study design. Currently only \code{'parallel'} is implemented.}
+\item{design}{String providing the study design. Currently only \code{"parallel"} is implemented.}
 
 \item{...}{Additional arguments passed to the design-specific functions.}
 
@@ -26,14 +26,14 @@ create_exposure_simulation_skeleton_parallel(ngroups = 1,
 \item{verbose}{Logical indicator for message printing.}
 }
 \value{
-A list containing two sublists: \code{structure}, which contains settings and parameters for generating data, and \code{standata} which contains the study data in a format for sampling via STAN.
+A list containing two sublists: \code{structure}, which contains settings and parameters for generating data, and \code{standata} which contains the study data as a \code{standata_exposure} obejct for sampling via \code{\link{sample_exposure_model}}.
 }
 \description{
-These functions construct lists containing the structure and data for simulating exposure and outcome data.
+These functions construct lists containing the structure for simulating exposure data and the objects needed for fitting the model to the data.
 }
 \details{
 These functions create the blank structure of groups, clusters, households, and subject.
-Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via 
+Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via
 \code{\link{expsim_sample_observations}}
 and posterior parameter estimates obtained from \code{\link{sample_exposure_model}}.
 }

@@ -26,10 +26,13 @@ add_priors  <- function(standata, ...){
 ##' @rdname add_priors
 #' @param etaG Prior mean and standard deviation for the group means parameter `etaG`.
 #' @param sigmaG Prior mean and standard deviation for the group standard deviation parameter `sigmaG`.
+#' @param reK Prior mean for cluster-level random effects.
+#' @param reH Prior mean for household-level random effects.
+#' @param sigmaK Prior mean and standard deviation for the standard deviation of the cluster random effects, `sigmaK`.
+#' @param sigmaH Prior mean and standard deviation for the standard deviation of the household random effects, `sigmaH`.
+#' @param sigmaW Prior mean and standard deviation for the residual standard deviation parameter `sigmaW`.
 #' @param theta Prior mean and standard deviation for the time coefficients `thetaG`.
-#' @param sigmaH Prior mean and standard deviation for the standard deviation of the household random effects `sigmaH`.
-#' @param sigmaW Prior mean and standard deviation for the residual standard deviation paramete `sigmaW`.
-#' @param corHW Prior mean and standard deviation for the correlation of repeated measures `corHW`.
+#' @param sigmaTheta Prior mean and standard deviation for the standard deviation parameter for time trends, `sigmaTheta`.
 ##' @details For \code{add_stan_priors_exposure_model}, the prior distributions are normal distributions parameterixed by (mean, sd).
 ##' @export
 add_priors_exposure_model <- function(standata, etaG=0, sigmaG=c(0, 1), reK=0, sigmaK=c(0, 1), reH=0,sigmaH=c(0, 1), sigmaW=c(0, 1),  theta=0, sigmaTheta=c(0, 1), ...) {

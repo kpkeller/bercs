@@ -1,3 +1,22 @@
+#########################
+# Utility functions
+#
+# create_spline_matrix()
+# create_spline()
+# create_spline_range()
+# predict_spline()
+# add_Ht_standata()
+# add_Hx_standata()
+# add_duplicated_flag()
+#
+# Unexported:
+# check_names()
+# check_names_to_overwrite()
+# check_all_nonnegative_value()
+# check_all_postive_value()
+###############################
+
+
 ##' @title Create spline matrix
 ##' @description Wrapper function for creating a spline matrix
 ##' @param x Variable values for which spline is to be created.
@@ -132,5 +151,10 @@ check_names_to_overwrite <- function(df, expected_names){
     }
 }
 
-
+check_all_nonnegative_value <- function(x){
+    all(is.numeric(x)) && all(x>=0) && any(x>0)
+}
+check_all_postive_value <- function(x){
+    all(is.numeric(x)) && all(x>0)
+}
 

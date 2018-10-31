@@ -1,17 +1,10 @@
 /*
 Exposure model
 
---Stove group is fixed effect
---RE's for cluster and household (which is nested)
---Includes Time Trend
---sigmaH is not fixed, but it is parameterized
-  as a function of corHW, the correlation between repeated measures
-  at a location.
-
 Note: No checks done for label consistency--user is responsible for this.
 */
 data {
-int<lower=1> G; // total number of trial arms
+int<lower=1> G; // total number of treatment arms
 int<lower=0> K; // total number of cluster
 int<lower=0> H; // total number of households
 int<lower=0> N; //total number of observations
@@ -58,8 +51,6 @@ vector[K] reK;
 vector[H] reH;
 vector[timedf] theta;
 etaG = prior_etaG_mean + sigmaG * etaG_raw;
-if (K > 0 ){
-}
 reH = prior_reH_mean + sigmaH * reH_raw;
 muWi = etaG[group_of_obs] + reH[hh_of_obs];
 if (K > 0 ){

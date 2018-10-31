@@ -7,25 +7,18 @@
 # expsim_update_time_splines()
 # expsim_update_time_effect()
 # expsim_update_parameter()
+######################
 
 
-check_all_nonnegative_value <- function(x){
-    all(is.numeric(x)) && all(x>=0) && any(x>0)
-}
-
-check_all_postive_value <- function(x){
-    all(is.numeric(x)) && all(x>0) 
-}
-
-##' @title Create List Structure for Simulation
-##' @description These functions construct lists containing the structure and data for simulating exposure and outcome data.
-##' @param design String providing the study design. Currently only \code{'parallel'} is implemented.
+##' @title Create List Structure for Simulations
+##' @description These functions construct lists containing the structure for simulating exposure data and the objects needed for fitting the model to the data.
+##' @param design String providing the study design. Currently only \code{"parallel"} is implemented.
 ##' @param ... Additional arguments passed to the design-specific functions.
 ##' @details These functions create the blank structure of groups, clusters, households, and subject.
-##' Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via 
+##' Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via
 ##' \code{\link{expsim_sample_observations}}
 ##' and posterior parameter estimates obtained from \code{\link{sample_exposure_model}}.
-##' @return A list containing two sublists: \code{structure}, which contains settings and parameters for generating data, and \code{standata} which contains the study data in a format for sampling via STAN.
+##' @return A list containing two sublists: \code{structure}, which contains settings and parameters for generating data, and \code{standata} which contains the study data as a \code{standata_exposure} obejct for sampling via \code{\link{sample_exposure_model}}.
 #' @family exposure simulation functions
 #' @seealso \code{\link{create_outcome_simulation_skeleton}}
 #' @export
@@ -69,7 +62,7 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
         }
     }
     K <- sum(nclusters)
-    
+
     # Process nhouseholds
     if(!length(nhouseholds) %in% c(1, K)) stop("'nhouseholds' must have length 1 or 'sum(nclusters)'.")
     if (length(nhouseholds)==1) {
@@ -79,7 +72,7 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
         }
     }
     H <- sum(nhouseholds)
-    
+
     # Process nobs
     if(!length(nobs) %in% c(1, K, H)) stop("'nobs' must have length 1, 'sum(nclusters)', or 'sum(nhouseholds)'.")
     if (length(nobs)==1) {
@@ -94,14 +87,14 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
         }
     }
     N <- sum(nobs)
-    
+
     # Defaults
     group_of_cluster <- rep(1:ngroups, times=nclusters)
     cluster_of_hh <- rep(1:K, times=nhouseholds)
     hh_of_obs <- rep(1:H, times=nobs)
     cluster_of_obs <- cluster_of_hh[hh_of_obs]
     group_of_obs <- group_of_cluster[cluster_of_obs]
-    
+
     study_structure <- list(ngroups=ngroups,
                             nclusters=nclusters,
                             nhouseholds=nhouseholds,
@@ -112,8 +105,8 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
                             cluster_of_obs=cluster_of_obs,
                             group_of_obs=group_of_obs,
                             etaG=rep(NA, ngroups), # Group Means
-                            sigG=rep(NA, ngroups), # Group-level standard deviations (for drawing etaK)
-                            etaK=rep(NA, K), # Cluster means (nested within group)
+                            sigK=rep(NA, ngroups), # Group-level standard deviations for drawing reK)
+                            reK=rep(NA, K), # Cluster random effects
                             sigH=NA, # SD for household-level RE's. Not within cluster
                             reH=rep(NA, H), # Household-level random effects
                             sigW=NA, # SD for instrument/residual variation
@@ -126,16 +119,16 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
                            K=K,
                            H=H,
                            N=N,
-                           Ht=NA,
+                           Ht=matrix(0, 0, 0),
                            times=NA,
-                           timedf=NA,
+                           timedf=0,
                            w=rep(NA, N),
                            group_of_cluster=group_of_cluster,
                            group_of_obs=group_of_obs,
                            cluster_of_obs=cluster_of_obs,
                            cluster_of_hh=cluster_of_hh,
                            hh_of_obs=hh_of_obs)
-    
+
     class(study_standata) <- "standata_exposure"
 
     obj <- list(structure=study_structure,
@@ -168,50 +161,56 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 #' @export
 #' @importFrom stats rnorm
 expsim_update_parameter <- function(obj, param, level=c("group", "cluster","household", "instrument", "correlation","time"), type=c("mean", "sd", "re"), val=NULL, draw=is.null(val)){
-    
+
     if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
     if (!missing(param)){
-        param_list <- c("etaG", "etaK", "sigG", "sigK", "sigH", "reH",  "sigW", "corHW", "timefn")
+        param_list <- c("etaG",  "sigG", "sigK","reK", "sigH", "reH",  "sigW", "corHW", "timefn")
         param_check <- param %in% param_list
-        if (!param_check) stop('"param" must be one of c("etaG", "etaK", "sigG", "sigK", "sigH", "reH",  "sigW", "corHW", "timefn")')
+        if (!param_check) stop('"param" must be one of c("etaG", "sigG", "sigK", "reK", "sigH", "reH",  "sigW", "corHW", "timefn")')
     } else {
         level <- match.arg(level)
         type <- match.arg(type)
         param <- switch(paste0(level, "_", type),
                group_mean="etaG",
                group_sd="sigG",
-               cluster_mean="etaK",
+               group_re=NA,
+               cluster_mean=NA,
                cluster_sd="sigK",
+               cluster_re="reK",
                household_mean=NA,
                household_sd="sigH",
                household_re="reH",
                instrument_mean=NA,
                instrument_sd="sigW",
+               instrument_re=NA,
                correlation_mean="corHW",
                correlation_sd=NA,
+               correlation_re=NA,
                time_mean="timefn",
+               time_sd=NA,
+               time_re=NA,
                NA)
         if (is.na(param)) stop(paste0(level, "_", type, " is not a supported parameter."))
     }
-    
+
     # Need to do some error/length checking.
     current_length <- length(obj$structure[[param]])
     if (draw){
         if(!is.null(val)) warning("'val' provided but 'draw=TRUE'. Ignoring provided value of 'val'.")
-        
-        if (!param %in% c("etaK", "reH")) {
+
+        if (!param %in% c("reK", "reH")) {
             stop(paste0(param, " should be set, not drawn from a distribution."))
         }
-        
+
         # Need to check that mean/sd has been set, first.
         cur_mean <- switch(param,
-                           etaK=with(obj$structure, etaG[group_of_cluster]),
+                           reK=0,
                            reH=0)
         cur_sd <- switch(param,
-                         etaK=with(obj$structure, sigG[group_of_cluster]),
+                         reK=obj$structure$sigK,
                          reH=obj$structure$sigH)
         cur_n <- switch(param,
-                        etaK=obj$standata$K,
+                        reK=obj$standata$K,
                         reH=obj$standata$H)
         val <- rnorm(cur_n, cur_mean, cur_sd)
     }
@@ -223,7 +222,7 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","hous
         }
     }
     obj$structure[[param]] <- val
-    
+
     obj
 }
 
@@ -250,17 +249,17 @@ sim_update_time_splines <- function(obj, df=1, fn="ns", ...){
 #' @title Sample Simulated Exposure Observations
 #' @description Draws a sample of exposure observations using the specified model parameters
 #' @param obj exposure simualtion object, created by \code{\link{create_exposure_simulation_skeleton}}.
-#' @details This function assumes that \code{etaK} (or at least \code{etaG}), \code{sigW}, \code{reH}, and \code{timefn} have been set. The latter defaults to zero, but the others must be set with \code{\link{expsim_update_parameter}}. If these have not been set, then this will set \code{w} to a vector of \code{NA}. 
+#' @details This function assumes that \code{etaK} (or at least \code{etaG}), \code{sigW}, \code{reH}, and \code{timefn} have been set. The latter defaults to zero, but the others must be set with \code{\link{expsim_update_parameter}}. If these have not been set, then this will set \code{w} to a vector of \code{NA}.
 #' @family exposure simulation functions
 #' @export
 #' @importFrom stats rnorm
 expsim_sample_observations <- function(obj){
         if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
 
-    if (!any(is.na(obj$structure$etaK))){
-        obj$structure$meanW <- with(obj$structure, etaK[cluster_of_obs] + reH[hh_of_obs] + timefn(times))    
-    } else {
-        obj$structure$meanW <- with(obj$structure, etaG[group_of_obs] + reH[hh_of_obs] + timefn(times))    
+    obj$structure$meanW <- with(obj$structure, etaG[group_of_obs] + reH[hh_of_obs] + timefn(times))
+
+    if (!any(is.na(obj$structure$reK))){
+        obj$structure$meanW <- obj$structure$meanW + obj$structure$reK[cluster_of_obs]
     }
     obj$standata$w=rnorm(n=obj$standata$N, mean=obj$structure$meanW, sd=obj$structure$sigW)
     obj
@@ -272,7 +271,7 @@ expsim_sample_observations <- function(obj){
 ## Essentially same as other function, but kept separate since runif()
 ## Perhaps put into an 'update_data' function in future.
 ##' @rdname sim_update_time_splines
-##' @param times Values to set as the times. 
+##' @param times Values to set as the times.
 ##' @param draw Logical indicating times should be sampled from a Unif(0,1) distribution.
 ##' @export
 ##' @importFrom stats runif
@@ -287,18 +286,18 @@ sim_update_times <- function(obj, times=NULL, draw=is.null(times)){
     if (is.null(times)) {
         stop("'times' is NULL, but 'draw=FALSE'.")
     }
-    obj$structure$times <- times 
-    obj$standata$times <- times 
-    
+    obj$structure$times <- times
+    obj$standata$times <- times
+
     obj
 }
 
 
 
 # Calculates sH and sW
-# given 
+# given
 # corHW = sH^2/(sH^2 + sW^2)
-# and 
+# and
 # sHW = sqrt(sH^2 + sW^2 + sH*sW*corHW)
 expsim_calculate_sHsW <- function(sHW2, sHW=sqrt(sHW), corHW){
     if(corHW==0) {

@@ -8,9 +8,9 @@ create_standata_exposure(data, Ht = NULL, log_transform = FALSE,
   return_addition = FALSE)
 }
 \arguments{
-\item{data}{Data frame containing data in a long formet}
+\item{data}{Data frame containing data in a long format. Expected to contain columns "group", "conc", "hh_id", and "date". Optional variable is "clust_id".}
 
-\item{Ht}{Matrix of time splines to include in the model. Defaults to NULL.}
+\item{Ht}{Matrix of time splines to include in the model. Defaults to NULL, and can be added later via \code{\link{add_Ht_standata}}.}
 
 \item{log_transform}{Should the concentration value be log-transformed?}
 
@@ -20,10 +20,9 @@ create_standata_exposure(data, Ht = NULL, log_transform = FALSE,
 A list of class \code{standata_exposure} that contains the following:
 \itemize{
 \item {\code{G} -- Number of groups}
-\item {\code{K} -- Number of cluster *nested within groups*.}
+\item {\code{K} -- Number of clusters.}
 \item{\code{H} Number of households}
 \item{\code{N} -- Number of observations}
-\item{\code{group_of_cluster} -- Integer providing group number of each cluster}
 \item{\code{cluster_of_obs} -- Integer providing cluster number of each observation}
 \item{\code{group_of_obs} -- Integer providing group number of each observation}
 \item{\code{hh_of_obs} -- Integer providing household number of each observation}

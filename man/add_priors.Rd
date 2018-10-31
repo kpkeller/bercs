@@ -25,13 +25,19 @@ add_priors_outcome_model(standata, beta = 0, sigmaBeta = c(0, 1),
 
 \item{sigmaG}{Prior mean and standard deviation for the group standard deviation parameter `sigmaG`.}
 
-\item{sigmaK}{Prior mean and standard deviation for the standard deviation of the cluster-level random effect.}
+\item{reK}{Prior mean for cluster-level random effects.}
 
-\item{sigmaH}{Prior mean and standard deviation for the standard deviation of the household random effects `sigmaH`.}
+\item{sigmaK}{Prior mean and standard deviation for the standard deviation of the cluster random effects, `sigmaK`.}
 
-\item{sigmaW}{Prior mean and standard deviation for the residual standard deviation paramete `sigmaW`.}
+\item{reH}{Prior mean for household-level random effects.}
+
+\item{sigmaH}{Prior mean and standard deviation for the standard deviation of the household random effects, `sigmaH`.}
+
+\item{sigmaW}{Prior mean and standard deviation for the residual standard deviation parameter `sigmaW`.}
 
 \item{theta}{Prior mean and standard deviation for the time coefficients `thetaG`.}
+
+\item{sigmaTheta}{Prior mean and standard deviation for the standard deviation parameter for time trends, `sigmaTheta`.}
 
 \item{beta}{Prior mean for the exposure coefficient(s).}
 
@@ -49,7 +55,7 @@ add_priors_outcome_model(standata, beta = 0, sigmaBeta = c(0, 1),
 
 \item{beta_nu}{Prior value for the LKJ prior on the correlation between exposure coefficients from different studies.}
 
-\item{corHW}{Prior mean and standard deviation for the correlation of repeated measures `corHW`.}
+\item{sigmaK}{Prior mean and standard deviation for the standard deviation of the cluster-level random effect.}
 }
 \description{
 Sets prior distribution hyperparameters using defaults or provided values
