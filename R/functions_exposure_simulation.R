@@ -294,22 +294,4 @@ sim_update_times <- function(obj, times=NULL, draw=is.null(times)){
 
 
 
-# Calculates sH and sW
-# given
-# corHW = sH^2/(sH^2 + sW^2)
-# and
-# sHW = sqrt(sH^2 + sW^2 + sH*sW*corHW)
-expsim_calculate_sHsW <- function(sHW2, sHW=sqrt(sHW), corHW){
-    if(corHW==0) {
-        sW <- sHW
-        sH <- 0
-    } else {
-        sW <- sHW/sqrt(1 + corHW/(1-corHW) + 2*corHW*sqrt(corHW/(1-corHW)))
-        sH <- sW*sqrt(corHW/(1- corHW))
-    }
-    return(list(sW=sW,
-                sH=sH))
-}
-
-
 
