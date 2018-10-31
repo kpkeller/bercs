@@ -27,11 +27,10 @@ Sets or overwrites data-generating parameters for an exposure model object
 \details{
 Only specific combinations of \code{level} and \code{type} are allowed. They are:
 \itemize{
-\item \code{"group"}: \code{"mean"} and \code{"sd"} set 'etaG' and 'sigG', respectively
-\item \code{"cluster"}: \code{"mean"} and \code{"sd"} set 'etaK' and 'sigK', respectively
+\item \code{"group"}: \code{"mean"} sets 'etaG'
+\item \code{"cluster"}: \code{"sd"} and \code{"re"} set 'sigK' and 'reK', respectively
 \item \code{"household"}: \code{"sd"} and \code{"re"} set 'sigH' and 'reH', respectively
 \item \code{"instrument"}: \code{"sd"} sets 'sigW'.
-\item \code{"correlation"}: \code{"mean"} sets 'corHW'.
 \item \code{"time"}: \code{"mean"} sets 'timefn'.
 }
 }
