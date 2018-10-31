@@ -110,7 +110,6 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
                             sigH=NA, # SD for household-level RE's. Not within cluster
                             reH=rep(NA, H), # Household-level random effects
                             sigW=NA, # SD for instrument/residual variation
-                            corHW=NA, # repeated measures correlation
                             times=NA,
                             timefn=function(t) {rep(0, length(t))},
                             meanW=rep(NA, N), # mean for generating data. will also have time component added.
@@ -150,11 +149,10 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 #' @param draw if \code{TRUE}, then the parameter value is sampled instead of being set to \code{val}
 #' @details Only specific combinations of \code{level} and \code{type} are allowed. They are:
 #' \itemize{
-#' \item \code{"group"}: \code{"mean"} and \code{"sd"} set 'etaG' and 'sigG', respectively
-#' \item \code{"cluster"}: \code{"mean"} and \code{"sd"} set 'etaK' and 'sigK', respectively
+#' \item \code{"group"}: \code{"mean"} sets 'etaG'
+#' \item \code{"cluster"}: \code{"sd"} and \code{"re"} set 'sigK' and 'reK', respectively
 #' \item \code{"household"}: \code{"sd"} and \code{"re"} set 'sigH' and 'reH', respectively
 #' \item \code{"instrument"}: \code{"sd"} sets 'sigW'.
-#' \item \code{"correlation"}: \code{"mean"} sets 'corHW'.
 #' \item \code{"time"}: \code{"mean"} sets 'timefn'.
 #' }
 #' @family exposure simulation functions
@@ -164,15 +162,15 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","hous
 
     if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
     if (!missing(param)){
-        param_list <- c("etaG",  "sigG", "sigK","reK", "sigH", "reH",  "sigW", "corHW", "timefn")
+        param_list <- c("etaG", "sigK","reK", "sigH", "reH",  "sigW", "timefn")
         param_check <- param %in% param_list
-        if (!param_check) stop('"param" must be one of c("etaG", "sigG", "sigK", "reK", "sigH", "reH",  "sigW", "corHW", "timefn")')
+        if (!param_check) stop('"param" must be one of c("etaG","sigK", "reK", "sigH", "reH",  "sigW", "timefn")')
     } else {
         level <- match.arg(level)
         type <- match.arg(type)
         param <- switch(paste0(level, "_", type),
                group_mean="etaG",
-               group_sd="sigG",
+               group_sd=NA,
                group_re=NA,
                cluster_mean=NA,
                cluster_sd="sigK",
@@ -183,9 +181,6 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","hous
                instrument_mean=NA,
                instrument_sd="sigW",
                instrument_re=NA,
-               correlation_mean="corHW",
-               correlation_sd=NA,
-               correlation_re=NA,
                time_mean="timefn",
                time_sd=NA,
                time_re=NA,

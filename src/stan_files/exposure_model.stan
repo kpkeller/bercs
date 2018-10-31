@@ -82,7 +82,11 @@ generated quantities {
 real<lower=0> sigma2H;
 real<lower=0> sigma2W;
 real<lower=0> sigma2G;
+real<lower=0> sigma2K[K==0 ? 0 : 1]; // Var of cluster RE
 sigma2H=square(sigmaH);
 sigma2W=square(sigmaW);
 sigma2G=square(sigmaG);
+if (K > 0){
+    sigma2K=square(sigmaK);
+}
 }
