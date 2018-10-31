@@ -38,7 +38,7 @@ vector[G] etaG_raw; // transformed to etaG
 vector[K] reK_raw; // transformed to etaK
 vector[H] reH_raw; // transform to reH
 vector[timedf] theta_raw;
-real<lower=0> sigmaG; // SD of cluster means within a group
+real<lower=0> sigmaG; // SD of group means
 real<lower=0> sigmaK[K==0 ? 0 : 1]; // SD of cluster RE
 real<lower=0> sigmaH; // SD of household RE
 real<lower=0> sigmaW; // SD of measurements (instrument error)
