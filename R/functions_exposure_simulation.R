@@ -145,7 +145,7 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 #' @param param character string giving name of parameter to update. If not provided, parameter name is taken from \code{level} and \code{type}
 #' @param level character string of model level being updated. See details.
 #' @param type character string giving type of parameter being updated. See Details.
-#' @param val value(s) to which parameter should be set
+#' @param value value(s) to which parameter should be set
 #' @param draw if \code{TRUE}, then the parameter value is sampled instead of being set to \code{val}
 #' @details Only specific combinations of \code{level} and \code{type} are allowed. They are:
 #' \itemize{
@@ -158,7 +158,7 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 #' @family exposure simulation functions
 #' @export
 #' @importFrom stats rnorm
-expsim_update_parameter <- function(obj, param, level=c("group", "cluster","household", "instrument", "correlation","time"), type=c("mean", "sd", "re"), val=NULL, draw=is.null(val)){
+expsim_update_parameter <- function(obj, param, level=c("group", "cluster","household", "instrument", "correlation","time"), type=c("mean", "sd", "re"), value=NULL, draw=is.null(value)){
 
     if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
     if (!missing(param)){
@@ -191,7 +191,7 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","hous
     # Need to do some error/length checking.
     current_length <- length(obj$structure[[param]])
     if (draw){
-        if(!is.null(val)) warning("'val' provided but 'draw=TRUE'. Ignoring provided value of 'val'.")
+        if(!is.null(value)) warning("'value' provided but 'draw=TRUE'. Ignoring provided value of 'value'.")
 
         if (!param %in% c("reK", "reH")) {
             stop(paste0(param, " should be set, not drawn from a distribution."))
@@ -207,16 +207,16 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","hous
         cur_n <- switch(param,
                         reK=obj$standata$K,
                         reH=obj$standata$H)
-        val <- rnorm(cur_n, cur_mean, cur_sd)
+        value <- rnorm(cur_n, cur_mean, cur_sd)
     }
-    if (length(val)!=current_length) {
-        if (length(val)==1){
-            val <- rep(val, current_length)
+    if (length(value)!=current_length) {
+        if (length(value)==1){
+            value <- rep(value, current_length)
         } else {
-            stop(paste0("'val' should have length ", current_length, "."))
+            stop(paste0("'value' should have length ", current_length, "."))
         }
     }
-    obj$structure[[param]] <- val
+    obj$structure[[param]] <- value
 
     obj
 }

@@ -6,7 +6,7 @@
 \usage{
 expsim_update_parameter(obj, param, level = c("group", "cluster",
   "household", "instrument", "correlation", "time"), type = c("mean",
-  "sd", "re"), val = NULL, draw = is.null(val))
+  "sd", "re"), value = NULL, draw = is.null(value))
 }
 \arguments{
 \item{obj}{'expsim' object to update}
@@ -17,7 +17,7 @@ expsim_update_parameter(obj, param, level = c("group", "cluster",
 
 \item{type}{character string giving type of parameter being updated. See Details.}
 
-\item{val}{value(s) to which parameter should be set}
+\item{value}{value(s) to which parameter should be set}
 
 \item{draw}{if \code{TRUE}, then the parameter value is sampled instead of being set to \code{val}}
 }
