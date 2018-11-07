@@ -170,7 +170,7 @@ compute_fitted_mean <- function(stanfit,
         ltmean <- ltmean + pm$reH[standata$hh_of_obs]
     }
     if (include_time){
-        ltmean <- ltmean + standata$Ht %*% pm$theta
+        ltmean <- ltmean + as.vector(standata$Ht %*% pm$theta)
     }
 
     if (exp_transform) ltmean <- exp(ltmean)
