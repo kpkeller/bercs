@@ -54,7 +54,7 @@ These functions construct lists containing the structure and data for simulating
 }
 \details{
 These functions create the blank structure of groups, clusters, households, and subject.
-Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via 
+Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via
 \code{\link{expsim_sample_observations}}
 and posterior parameter estimates obtained from \code{\link{sample_exposure_model}}.
 

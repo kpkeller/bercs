@@ -10,16 +10,16 @@
 \usage{
 outsim_update_parameter(obj, param, level = c("study", "subject", "time",
   "covariate", "exposure"), type = c("mean", "sd", "re", "coef"),
-  val = NULL, draw = is.null(val))
+  value = NULL, draw = is.null(value))
 
 outsim_update_atrisk(obj, nT = 1)
 
 outsim_update_covariate(obj, covariate = c("x", "Z"), ncol = 1,
-  val = NULL, draw = is.null(val), verbose = TRUE, mean = 0,
+  value = NULL, draw = is.null(value), verbose = TRUE, mean = 0,
   sd = 1)
 
 outsim_update_set_parameter(obj, param = c("beta", "gamma"),
-  val = NULL)
+  value = NULL)
 
 outsim_update_exp_splines(obj, df = 1, fn = "ns", ...)
 }
@@ -32,9 +32,9 @@ outsim_update_exp_splines(obj, df = 1, fn = "ns", ...)
 
 \item{type}{character string giving type of parameter being updated. See details.}
 
-\item{val}{value(s) to which parameter should be set}
+\item{value}{value(s) to which parameter should be set}
 
-\item{draw}{if \code{TRUE}, then the parameter value is sampled instead of being set to \code{val}}
+\item{draw}{if \code{TRUE}, then the parameter value is sampled instead of being set to \code{value}}
 
 \item{nT}{time at risk value to set}
 
