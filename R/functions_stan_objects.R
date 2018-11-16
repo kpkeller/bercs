@@ -64,14 +64,13 @@ add_priors_exposure_model <- function(standata, etaG=0, sigmaG=c(0, 1), reK=0, s
 ##' @param beta Prior mean for the exposure coefficient(s).
 ##' @param sigmaBeta Prior mean and standard deviation for the standard deviation of exposure coefficient parameter.
 ##' @param gamma Prior mean for the covariate coefficient(s).
-##' @param sigmaGam Prior mean and standard deviation for the standard deviation of covariate coefficient parameter.
+##' @param sigmaGamma Prior mean and standard deviation for the standard deviation of covariate coefficient parameter.
 ##' @param delta Prior mean fro the time coefficient(s).
-##' @param sigmaDel Prior mean and standard deviation for the standard deviation of time coefficient parameter.
+##' @param sigmaDelta Prior mean and standard deviation for the standard deviation of time coefficient parameter.
 ##' @param sigmaI Prior mean and standard deviation for the standard deviation of the subject-level random effect.
-##' @param sigmaK Prior mean and standard deviation for the standard deviation of the cluster-level random effect.
 ##' @param beta_nu Prior value for the LKJ prior on the correlation between exposure coefficients from different studies.
 ##' @export
-add_priors_outcome_model <- function(standata, beta=0, sigmaBeta=c(0, 1), gamma=0, sigmaGam=c(0 ,1), delta=0, sigmaDel=c(0, 1), sigmaI=c(0, 1), sigmaK=c(0, 1), beta_nu=1, ...) {
+add_priors_outcome_model <- function(standata, beta=0, sigmaBeta=c(0, 1), gamma=0, sigmaGamma=c(0 ,1), delta=0, sigmaDelta=c(0, 1), sigmaI=c(0, 1), beta_nu=1, ...) {
 
     standata$prior_beta_mean <- beta
     standata$prior_sigmaBeta_mean <- sigmaBeta[[1]]
@@ -79,18 +78,15 @@ add_priors_outcome_model <- function(standata, beta=0, sigmaBeta=c(0, 1), gamma=
     standata$beta_nu <- beta_nu
 
     standata$prior_gamma_mean <- gamma
-    standata$prior_sigmaGam_mean <- sigmaGam[[1]]
-    standata$prior_sigmaGam_sd <- sigmaGam[[2]]
+    standata$prior_sigmaGamma_mean <- sigmaGamma[[1]]
+    standata$prior_sigmaGamma_sd <- sigmaGamma[[2]]
 
     standata$prior_delta_mean <- delta
-    standata$prior_sigmaDel_mean <- sigmaDel[[1]]
-    standata$prior_sigmaDel_sd <- sigmaDel[[2]]
+    standata$prior_sigmaDelta_mean <- sigmaDelta[[1]]
+    standata$prior_sigmaDelta_sd <- sigmaDelta[[2]]
 
     standata$prior_sigmaI_mean <- sigmaI[[1]]
     standata$prior_sigmaI_sd <- sigmaI[[2]]
-
-    standata$prior_sigmaK_mean <- sigmaK[[1]]
-    standata$prior_sigmaK_sd <- sigmaK[[2]]
 
     standata
 }

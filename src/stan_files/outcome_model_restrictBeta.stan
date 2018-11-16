@@ -26,11 +26,11 @@ data {
     real prior_sigmaI_mean;  // Prior for SD of subj-level RE
     real<lower=0> prior_sigmaI_sd;
     real prior_delta_mean; // Prior mean for coefs delta (usually zero)
-    real prior_sigmaDel_mean; // Prior for SD of coefs delta
-    real<lower=0> prior_sigmaDel_sd;
+    real prior_sigmaDelta_mean; // Prior for SD of coefs delta
+    real<lower=0> prior_sigmaDelta_sd;
     real prior_gamma_mean; // Prior mean for coefs gamma (usually zero)
-    real prior_sigmaGam_mean; // Prior for SD of coefs gamma
-    real<lower=0> prior_sigmaGam_sd;
+    real prior_sigmaGamma_mean; // Prior for SD of coefs gamma
+    real<lower=0> prior_sigmaGamma_sd;
     real prior_beta_mean; // Prior mean for coefs beta (usually zero)
     real prior_sigmaBeta_mean; // Prior for SD of coefs beta
     real<lower=0> prior_sigmaBeta_sd;
@@ -41,8 +41,8 @@ transformed data {
 }
 parameters {
     real<lower=0> sigmaI;
-    real<lower=0> sigmaGam[p==0 ? 0 : 1] ;
-    real<lower=0> sigmaDel[timedf==0 ? 0 : 1] ;
+    real<lower=0> sigmaGamma[p==0 ? 0 : 1] ;
+    real<lower=0> sigmaDelta[timedf==0 ? 0 : 1] ;
     real<lower=0> sigmaBeta ;
     vector[S] bS; // Study-level intercept
     vector[p] gamma_raw; // Coefficients for covariates Z
@@ -62,21 +62,21 @@ transformed parameters {
     beta = prior_beta_mean + sigmaBeta*beta_raw;
     mui += Hx*beta;
     if (p >0 ){
-        gamma = prior_gamma_mean + sigmaGam[1]*gamma_raw;
+        gamma = prior_gamma_mean + sigmaGamma[1]*gamma_raw;
         mui += Z*gamma;
     }
     if (timedf > 0){
-            delta = prior_delta_mean + sigmaDel[1]*delta_raw;
+            delta = prior_delta_mean + sigmaDelta[1]*delta_raw;
         mui += Ht*delta;
     }
 }
 model {
     if (p >0) {
         target += normal_lpdf(gamma_raw | 0, 1);
-        target += normal_lpdf(sigmaGam | prior_sigmaGam_mean, prior_sigmaGam_sd);
+        target += normal_lpdf(sigmaGamma | prior_sigmaGamma_mean, prior_sigmaGamma_sd);
     }
     if (timedf > 0){
-        target += normal_lpdf(sigmaDel | prior_sigmaDel_mean, prior_sigmaDel_sd);
+        target += normal_lpdf(sigmaDelta | prior_sigmaDelta_mean, prior_sigmaDelta_sd);
         target += normal_lpdf(delta_raw | 0, 1);
     }
     target += normal_lpdf(beta_raw | 0, 1);

@@ -16,7 +16,8 @@ Typically a list of class \code{standata_exposure}. However, it may be any list 
 \code{cluster_of_obs} (if \code{etaK} was sampled in \code{stanfit}), \code{group_of_obs}
 (if \code{etaK} was not sampled in \code{stanfit}),  \code{hh_of_obs} (if \code{include_reH=TRUE}),
  and \code{Ht} (if \code{include_time=TRUE}). This may be useful when calculating fitted means for records
-  at different times from the observations used to fit the model.}
+  at different times from the observations used to fit the model.
+  @param parvalues List of parameter values to use for computing means. Not needed if \code{stanfit} is provided.}
 
 \item{include_time}{Logical indicator of whether time should be included.}
 

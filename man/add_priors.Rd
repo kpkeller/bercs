@@ -13,8 +13,8 @@ add_priors_exposure_model(standata, etaG = 0, sigmaG = c(0, 1),
   sigmaW = c(0, 1), theta = 0, sigmaTheta = c(0, 1), ...)
 
 add_priors_outcome_model(standata, beta = 0, sigmaBeta = c(0, 1),
-  gamma = 0, sigmaGam = c(0, 1), delta = 0, sigmaDel = c(0, 1),
-  sigmaI = c(0, 1), sigmaK = c(0, 1), beta_nu = 1, ...)
+  gamma = 0, sigmaGamma = c(0, 1), delta = 0, sigmaDelta = c(0, 1),
+  sigmaI = c(0, 1), beta_nu = 1, ...)
 }
 \arguments{
 \item{standata}{Either a \code{standata_exposure} or \code{standata_outcome} object. Based on its class, \code{add_priors} calls \code{add_priors_exposure_model} or \code{add_priors_exposure_model}.}
@@ -45,17 +45,15 @@ add_priors_outcome_model(standata, beta = 0, sigmaBeta = c(0, 1),
 
 \item{gamma}{Prior mean for the covariate coefficient(s).}
 
-\item{sigmaGam}{Prior mean and standard deviation for the standard deviation of covariate coefficient parameter.}
+\item{sigmaGamma}{Prior mean and standard deviation for the standard deviation of covariate coefficient parameter.}
 
 \item{delta}{Prior mean fro the time coefficient(s).}
 
-\item{sigmaDel}{Prior mean and standard deviation for the standard deviation of time coefficient parameter.}
+\item{sigmaDelta}{Prior mean and standard deviation for the standard deviation of time coefficient parameter.}
 
 \item{sigmaI}{Prior mean and standard deviation for the standard deviation of the subject-level random effect.}
 
 \item{beta_nu}{Prior value for the LKJ prior on the correlation between exposure coefficients from different studies.}
-
-\item{sigmaK}{Prior mean and standard deviation for the standard deviation of the cluster-level random effect.}
 }
 \description{
 Sets prior distribution hyperparameters using defaults or provided values
