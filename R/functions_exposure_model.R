@@ -122,7 +122,7 @@ sample_exposure_model <- function(standata,
 #'  (if \code{etaK} was not sampled in \code{stanfit}),  \code{hh_of_obs} (if \code{include_reH=TRUE}),
 #'   and \code{Ht} (if \code{include_time=TRUE}). This may be useful when calculating fitted means for records
 #'    at different times from the observations used to fit the model.
-#'    @param parvalues List of parameter values to use for computing means. Not needed if \code{stanfit} is provided.
+#' @param parvalues List of parameter values to use for computing means. Not needed if \code{stanfit} is provided.
 #' @param include_time Logical indicator of whether time should be included.
 #' @param include_reH Logical indicator of whether the household-level random effect should be included.
 #' @param exp_transform Logical indicator of whether concentrations should be exponentiated.
@@ -149,9 +149,9 @@ compute_fitted_mean <- function(stanfit,
         if(include_reH) pars <- c(pars, "reH")
         if (include_time) pars <- c(pars, "theta")
 
-        pm <- rstan::extract(stanfit,
+        postmean <- rstan::extract(stanfit,
                              pars=pars, ...)
-        pm <- lapply(pm, colMeans)
+        postmean <- lapply(postmean, colMeans)
     } else {
         nocluster <- ifelse("reK[1]" %in% names(parvalues), FALSE, TRUE)
 
@@ -159,19 +159,19 @@ compute_fitted_mean <- function(stanfit,
         if (!nocluster) pars <- c(pars, "reK")
         if(include_reH) pars <- c(pars, "reH")
         if (include_time) pars <- c(pars, "theta")
-        pm <- parvalues
-        if (!all(pars %in% names(pm))) stop("'parvalues' provided, but not all names present.")
+        postmean <- parvalues
+        if (!all(pars %in% names(postmean))) stop("'parvalues' provided, but not all names present.")
     }
 
-    ltmean <- pm$etaG[standata$group_of_obs]
+    ltmean <- postmean$etaG[standata$group_of_obs]
     if (!nocluster){
-        ltmean <- ltmean + pm$reK[standata$cluster_of_obs]
+        ltmean <- ltmean + postmean$reK[standata$cluster_of_obs]
     }
     if (include_reH){
-        ltmean <- ltmean + pm$reH[standata$hh_of_obs]
+        ltmean <- ltmean + postmean$reH[standata$hh_of_obs]
     }
     if (include_time){
-        ltmean <- ltmean + as.vector(standata$Ht %*% pm$theta)
+        ltmean <- ltmean + as.vector(standata$Ht %*% postmean$theta)
     }
 
     if (exp_transform) ltmean <- exp(ltmean)

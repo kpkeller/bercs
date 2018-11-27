@@ -200,21 +200,26 @@ sample_outcome_model <- function(standata,
 
 # Functions for post-processing outcome model results
 
-##' @title Extract fitted PM curve
-##' @description Computes the concentration-response curve from a fitted outcome model
+##' @title Extract fitted Exposure-Response Curve (ERC)
+##' @description Computes the exposure-response curve from a fitted outcome model
 ##' @param standata \code{standata_outcome} object used to fit the model
 ##' @param stanfit fitted outcome model from \code{\link{sample_outcome_model}}. Posterior samples of 'beta' are extracted from this object.
 ##' @param beta_post vector or matrix of posterior samples for 'beta' parameter. Only needed if \code{stanfit} not provided.
-##' @param pmrange range of values over which to compute the curve
+##' @param exprange range of exposure values over which to compute the curve
 ##' @param ciband width of credible interval band
-##' @param inclInterceptUncertainty include intercept uncertainty in the output?
+##' @param inclInterceptUncertainty Should intercept uncertainty be included uncertainty estimates? See details for more informat.
+##' @param exp_seq_length Length of the exposure sequence. Passed to \code{\link{seq}}.
+##'
+##' @details This function creates a data frame containing the values of the exposure-response curve over a given range of values. The output is designed for easy plotting.
+##' Currently, the fitted curve is plotted based upon the posterior means of the parameters, with the uncertainty bands based upon quantiles.
+##'
 ##' @seealso \code{\link{sample_outcome_model}}
 ##' @export
 #' @importFrom stats quantile
 #' @importFrom utils getS3method
 #' @importFrom rstan extract
-get_fitted_pm_curve <- function (standata, stanfit, beta_post, pmrange = c(0, 100),
-                                 ciband = 0.95, inclInterceptUncertainty=TRUE)
+get_fitted_ERC <- function (standata, stanfit, beta_post, exprange = c(0, 100),
+                                 ciband = 0.95, inclInterceptUncertainty=TRUE, exp_seq_length=100)
 {
     nS <- standata$S
     if (ciband < 0 || ciband > 1)
@@ -222,7 +227,7 @@ get_fitted_pm_curve <- function (standata, stanfit, beta_post, pmrange = c(0, 10
     if (missing(beta_post)) {
         beta_post <- extract(stanfit, pars = "beta")$beta
     }
-    pm_seq <- seq(pmrange[1], pmrange[2], length = 100)
+    exposure_seq <- seq(exprange[1], exprange[2], length = exp_seq_length)
 
     # if (inclInterceptUncertainty){
     bs_post <- extract(stanfit, pars="bS")$bS
@@ -236,58 +241,55 @@ get_fitted_pm_curve <- function (standata, stanfit, beta_post, pmrange = c(0, 10
         }
         beta_post <- beta_post2
     }
-    bs_post <- rep(1, length(pm_seq)) %o% bs_post
+    bs_post <- rep(1, length(exposure_seq)) %o% bs_post
     # }
 
     if (standata$xdf == 1) {
         if (!is.null(standata$Hx_attributes$`scaled:center`)) {
-            pm_seq_scaled <- (pm_seq - standata$Hx_attributes$`scaled:center`)/standata$Hx_attributes$`scaled:scale`
+            exposure_seq_scaled <- (exposure_seq - standata$Hx_attributes$`scaled:center`)/standata$Hx_attributes$`scaled:scale`
         }
         else {
-            pm_seq_scaled <- pm_seq
+            exposure_seq_scaled <- exposure_seq
         }
-        # pm_fitted_pm_seq <- pm_seq_scaled %o% beta_post
     }
     else {
         Hxtemp <- standata$Hx
         attributes(Hxtemp) <- standata$Hx_attr
-        predfn <- utils::getS3method(f = "predict", class(Hxtemp)[class(Hxtemp) !=
-                                                                      "matrix"][1])
-        # pm_fitted_pm_seq <- predfn(Hxtemp, newx = pm_seq) %*%
-        # t(beta_post)
-        pm_seq_scaled <- predfn(Hxtemp, newx = pm_seq)
+        predfn <- utils::getS3method(f = "predict",
+                                     class(Hxtemp)[class(Hxtemp) !="matrix"][1])
+        exposure_seq_scaled <- predfn(Hxtemp, newx = exposure_seq)
     }
-    pm_fitted_pm_seq <- array(dim=c(length(pm_seq),
+    fitted_seq <- array(dim=c(length(exposure_seq),
                                     dim(beta_post)[1], # B from stan fit
                                     nS))
     for (i in 1:nS){
-        pm_fitted_pm_seq[, , i] <- pm_seq_scaled %*% t(beta_post[, i, ])
+        fitted_seq[, , i] <- exposure_seq_scaled %*% t(beta_post[, i, ])
     }
 
     if (inclInterceptUncertainty){
-        pm_fitted_pm_seq <- pm_fitted_pm_seq + bs_post
+        fitted_seq <- fitted_seq + bs_post
     }
-    pm_fitted_pm_seq_mean <- apply(pm_fitted_pm_seq, c(1, 3), mean)
-    pm_fitted_pm_seq_low <- apply(pm_fitted_pm_seq, c(1,3), stats::quantile,
+    fitted_seq_mean <- apply(fitted_seq, c(1, 3), mean)
+    fitted_seq_low <- apply(fitted_seq, c(1,3), stats::quantile,
                                   probs = (1 - ciband)/2)
-    pm_fitted_pm_seq_high <- apply(pm_fitted_pm_seq, c(1,3), stats::quantile,
+    fitted_seq_high <- apply(fitted_seq, c(1,3), stats::quantile,
                                    probs = 0.5 + ciband/2)
 
-    obj <- list(mean = pm_fitted_pm_seq_mean,
-                low = pm_fitted_pm_seq_low,
-                high = pm_fitted_pm_seq_high,
-                pm = pm_seq)
+    obj <- list(mean = fitted_seq_mean,
+                low = fitted_seq_low,
+                high = fitted_seq_high,
+                exposure = exposure_seq)
     obj
 }
 
-##' @rdname get_fitted_pm_curve
-##' @param obj Data frame containing \code{pm}, \code{mean}, \code{low}, and \code{high}. Typically generated from \code{\link{get_fitted_pm_curve}}.
+##' @rdname get_fitted_ERC
+##' @param obj Data frame containing \code{exposure}, \code{mean}, \code{low}, and \code{high}. Typically generated from \code{\link{get_fitted_ERC}}.
 ##' @param incS Which studies to include. Default of NULL plots all studies.
 ##' @param ylab String providing y-axis label.
 ##' @param xlab String providing x-axis label.
 ##' @export
 ##' @import ggplot2
-plot_fitted_pm_curve <- function (obj, incS=NULL, ylab = "Relative Risk", xlab = "PM Concentration (ug/m3)")
+plot_fitted_ERC <- function (obj, incS=NULL, ylab = "Relative Risk", xlab = "Exposure")
 {
     nS <- ncol(obj$mean)
     dflist <- vector("list", nS)
@@ -295,7 +297,7 @@ plot_fitted_pm_curve <- function (obj, incS=NULL, ylab = "Relative Risk", xlab =
         dflist[[j]] <- data.frame(mean=obj$mean[, j],
                                   low=obj$low[, j],
                                   high=obj$high[, j],
-                                  pm=obj$pm,
+                                  exposure=obj$exposure,
                                   study=j)
     }
     fulldf <- do.call(rbind, dflist)
@@ -303,14 +305,12 @@ plot_fitted_pm_curve <- function (obj, incS=NULL, ylab = "Relative Risk", xlab =
     if(!is.null(incS)){
         fulldf <- subset(fulldf, study %in% incS)
     }
-    # check_names(obj, expected_names = c("pm", "low", "high",
-    # "mean", "study"))
     ggplot(fulldf) + theme_bw() +
-        geom_ribbon(aes(x = pm,
+        geom_ribbon(aes(x = exposure,
                         ymin = exp(low),
                         ymax = exp(high),
                         group=factor(study)), fill = "grey80") +
-        geom_line(aes(x = pm,
+        geom_line(aes(x = exposure,
                       y = exp(mean),
                       group=factor(study),
                       col=factor(study)),
