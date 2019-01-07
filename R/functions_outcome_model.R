@@ -208,7 +208,7 @@ sample_outcome_model <- function(standata,
 ##' @param exprange range of exposure values over which to compute the curve
 ##' @param ciband width of credible interval band
 ##' @param inclInterceptUncertainty Should intercept uncertainty be included uncertainty estimates? See details for more informat.
-##' @param exp_seq_length Length of the exposure sequence. Passed to \code{\link{seq}}.
+##' @param ... Passed to \code{\link{seq}} to control sequence of exposure values.
 ##'
 ##' @details This function creates a data frame containing the values of the exposure-response curve over a given range of values. The output is designed for easy plotting.
 ##' Currently, the fitted curve is plotted based upon the posterior means of the parameters, with the uncertainty bands based upon quantiles.
@@ -218,8 +218,13 @@ sample_outcome_model <- function(standata,
 #' @importFrom stats quantile
 #' @importFrom utils getS3method
 #' @importFrom rstan extract
-get_fitted_ERC <- function (standata, stanfit, beta_post, exprange = c(0, 100),
-                                 ciband = 0.95, inclInterceptUncertainty=TRUE, exp_seq_length=100)
+get_fitted_ERC <- function (standata,
+                            stanfit,
+                            beta_post,
+                            exprange = c(0, 100),
+                            ciband = 0.95,
+                            inclInterceptUncertainty=TRUE,
+                            ...)
 {
     nS <- standata$S
     if (ciband < 0 || ciband > 1)
@@ -227,7 +232,7 @@ get_fitted_ERC <- function (standata, stanfit, beta_post, exprange = c(0, 100),
     if (missing(beta_post)) {
         beta_post <- extract(stanfit, pars = "beta")$beta
     }
-    exposure_seq <- seq(exprange[1], exprange[2], length = exp_seq_length)
+    exposure_seq <- seq(exprange[1], exprange[2],...)
 
     # if (inclInterceptUncertainty){
     bs_post <- extract(stanfit, pars="bS")$bS

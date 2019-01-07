@@ -6,8 +6,7 @@
 \title{Extract fitted Exposure-Response Curve (ERC)}
 \usage{
 get_fitted_ERC(standata, stanfit, beta_post, exprange = c(0, 100),
-  ciband = 0.95, inclInterceptUncertainty = TRUE,
-  exp_seq_length = 100)
+  ciband = 0.95, inclInterceptUncertainty = TRUE, ...)
 
 plot_fitted_ERC(obj, incS = NULL, ylab = "Relative Risk",
   xlab = "Exposure")
@@ -25,7 +24,7 @@ plot_fitted_ERC(obj, incS = NULL, ylab = "Relative Risk",
 
 \item{inclInterceptUncertainty}{Should intercept uncertainty be included uncertainty estimates? See details for more informat.}
 
-\item{exp_seq_length}{Length of the exposure sequence. Passed to \code{\link{seq}}.}
+\item{...}{Passed to \code{\link{seq}} to control sequence of exposure values.}
 
 \item{obj}{Data frame containing \code{exposure}, \code{mean}, \code{low}, and \code{high}. Typically generated from \code{\link{get_fitted_ERC}}.}
 
