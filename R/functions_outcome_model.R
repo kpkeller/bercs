@@ -232,14 +232,20 @@ get_fitted_ERC <- function (standata,
     if (missing(beta_post)) {
         beta_post <- extract(stanfit, pars = "beta")$beta
     }
+    # If multiple studies, will add column with "average" intercept
+    nSout <- ifelse(nS>1 & length(dim(beta_post))==2, nS+1, nS)
     exposure_seq <- seq(exprange[1], exprange[2],...)
 
     # if (inclInterceptUncertainty){
     bs_post <- extract(stanfit, pars="bS")$bS
+    if (nSout > nS){
+        # Add column that has "average" intercept, if there are multiple studies
+        bs_post <- cbind(bs_post, bs_post %*% table(standata$study_of_obs)/standata$N)
+    }
     bs_post <- sweep(bs_post, 2, colMeans(bs_post), FUN="-")
     if (length(dim(beta_post))==2) {
         beta_post2 <- array(dim=c(nrow(beta_post),
-                                  nS,
+                                  nSout,
                                   ncol(beta_post)))
         for (j in 1:dim(beta_post2)[2]){
             beta_post2[, j, ] <-beta_post
@@ -265,9 +271,9 @@ get_fitted_ERC <- function (standata,
         exposure_seq_scaled <- predfn(Hxtemp, newx = exposure_seq)
     }
     fitted_seq <- array(dim=c(length(exposure_seq),
-                                    dim(beta_post)[1], # B from stan fit
-                                    nS))
-    for (i in 1:nS){
+                              dim(beta_post)[1], # B from stan fit
+                              nSout))
+    for (i in 1:nSout){
         fitted_seq[, , i] <- exposure_seq_scaled %*% t(beta_post[, i, ])
     }
 
