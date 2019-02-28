@@ -153,7 +153,7 @@ compute_fitted_mean <- function(stanfit,
                              pars=pars, ...)
         postmean <- lapply(postmean, colMeans)
     } else {
-        nocluster <- ifelse("reK[1]" %in% names(parvalues), FALSE, TRUE)
+        nocluster <- ifelse("reK" %in% names(parvalues), FALSE, TRUE)
 
         pars <- "etaG"
         if (!nocluster) pars <- c(pars, "reK")
