@@ -6,7 +6,8 @@
 \title{Extract fitted Exposure-Response Curve (ERC)}
 \usage{
 get_fitted_ERC(standata, stanfit, beta_post, exprange = c(0, 100),
-  ciband = 0.95, inclInterceptUncertainty = TRUE, ...)
+  ciband = 0.95, inclInterceptUncertainty = TRUE,
+  inclIntercept = FALSE, ...)
 
 plot_fitted_ERC(obj, incS = NULL, ylab = "Relative Risk",
   xlab = "Exposure")
@@ -22,7 +23,9 @@ plot_fitted_ERC(obj, incS = NULL, ylab = "Relative Risk",
 
 \item{ciband}{width of credible interval band}
 
-\item{inclInterceptUncertainty}{Should intercept uncertainty be included uncertainty estimates? See details for more informat.}
+\item{inclInterceptUncertainty}{Should intercept uncertainty be included uncertainty estimates? See details for more information.}
+
+\item{inclIntercept}{Should the intercept term be included in the curve?}
 
 \item{...}{Passed to \code{\link{seq}} to control sequence of exposure values.}
 

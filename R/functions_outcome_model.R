@@ -207,7 +207,8 @@ sample_outcome_model <- function(standata,
 ##' @param beta_post vector or matrix of posterior samples for 'beta' parameter. Only needed if \code{stanfit} not provided.
 ##' @param exprange range of exposure values over which to compute the curve
 ##' @param ciband width of credible interval band
-##' @param inclInterceptUncertainty Should intercept uncertainty be included uncertainty estimates? See details for more informat.
+##' @param inclInterceptUncertainty Should intercept uncertainty be included uncertainty estimates? See details for more information.
+##' @param inclIntercept Should the intercept term be included in the curve?
 ##' @param ... Passed to \code{\link{seq}} to control sequence of exposure values.
 ##'
 ##' @details This function creates a data frame containing the values of the exposure-response curve over a given range of values. The output is designed for easy plotting.
@@ -224,6 +225,7 @@ get_fitted_ERC <- function (standata,
                             exprange = c(0, 100),
                             ciband = 0.95,
                             inclInterceptUncertainty=TRUE,
+                            inclIntercept=FALSE,
                             ...)
 {
     nS <- standata$S
@@ -236,13 +238,10 @@ get_fitted_ERC <- function (standata,
     nSout <- ifelse(nS>1 & length(dim(beta_post))==2, nS+1, nS)
     exposure_seq <- seq(exprange[1], exprange[2],...)
 
-    # if (inclInterceptUncertainty){
-    bs_post <- extract(stanfit, pars="bS")$bS
     if (nSout > nS){
         # Add column that has "average" intercept, if there are multiple studies
         bs_post <- cbind(bs_post, bs_post %*% table(standata$study_of_obs)/standata$N)
     }
-    bs_post <- sweep(bs_post, 2, colMeans(bs_post), FUN="-")
     if (length(dim(beta_post))==2) {
         beta_post2 <- array(dim=c(nrow(beta_post),
                                   nSout,
@@ -252,8 +251,6 @@ get_fitted_ERC <- function (standata,
         }
         beta_post <- beta_post2
     }
-    bs_post <- rep(1, length(exposure_seq)) %o% bs_post
-    # }
 
     if (standata$xdf == 1) {
         if (!is.null(standata$Hx_attributes$`scaled:center`)) {
@@ -277,7 +274,20 @@ get_fitted_ERC <- function (standata,
         fitted_seq[, , i] <- exposure_seq_scaled %*% t(beta_post[, i, ])
     }
 
-    if (inclInterceptUncertainty){
+    if (inclIntercept & !inclInterceptUncertainty) {
+        inclInterceptUncertainty <- TRUE
+        warning("inclIntercept set to TRUE. This requires inclInterceptUncertainty to be TRUE.")
+    }
+    if (inclInterceptUncertainty) {
+        bs_post <- extract(stanfit, pars = "bS")$bS
+        if (nSout > nS) {
+            bs_post <- cbind(bs_post, bs_post %*% table(standata$study_of_obs)/standata$N)
+        }
+        if (!inclIntercept){
+            bs_post <- sweep(bs_post, 2, colMeans(bs_post), FUN = "-")
+        }
+        bs_post <- rep(1, length(exposure_seq)) %o% bs_post
+
         fitted_seq <- fitted_seq + bs_post
     }
     fitted_seq_mean <- apply(fitted_seq, c(1, 3), mean)
