@@ -237,6 +237,7 @@ get_fitted_ERC <- function (standata,
     # If multiple studies, will add column with "average" intercept
     nSout <- ifelse(nS>1 & length(dim(beta_post))==2, nS+1, nS)
     exposure_seq <- seq(exprange[1], exprange[2],...)
+    bs_post <- extract(stanfit, pars = "bS")$bS
 
     if (nSout > nS){
         # Add column that has "average" intercept, if there are multiple studies
@@ -279,7 +280,6 @@ get_fitted_ERC <- function (standata,
         warning("inclIntercept set to TRUE. This requires inclInterceptUncertainty to be TRUE.")
     }
     if (inclInterceptUncertainty) {
-        bs_post <- extract(stanfit, pars = "bS")$bS
         if (nSout > nS) {
             bs_post <- cbind(bs_post, bs_post %*% table(standata$study_of_obs)/standata$N)
         }
