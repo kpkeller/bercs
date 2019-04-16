@@ -280,9 +280,6 @@ get_fitted_ERC <- function (standata,
         warning("inclIntercept set to TRUE. This requires inclInterceptUncertainty to be TRUE.")
     }
     if (inclInterceptUncertainty) {
-        if (nSout > nS) {
-            bs_post <- cbind(bs_post, bs_post %*% table(standata$study_of_obs)/standata$N)
-        }
         if (!inclIntercept){
             bs_post <- sweep(bs_post, 2, colMeans(bs_post), FUN = "-")
         }
