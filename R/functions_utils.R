@@ -5,8 +5,8 @@
 # create_spline()
 # create_spline_range()
 # predict_spline()
-# add_Ht_standata()
-# add_Hx_standata()
+# add_spline_time()
+# add_spline_exposure()
 # add_duplicated_flag()
 #
 # Unexported:
@@ -27,14 +27,14 @@
 create_spline_matrix <- function(x, df=1, fn="ns",...){
     if (!is.numeric(df) || df<1) stop("'df' must be postive integer.")
     if (df==1){
-        Hx <- matrix(x)
+        Mx <- matrix(x)
     } else {
         fn <- get(fn)
-        Hx <- fn(x=x,
+        Mx <- fn(x=x,
                  df=df,
                  ...)
     }
-    Hx
+    Mx
 }
 
 #' @rdname create_spline_matrix
@@ -91,28 +91,28 @@ predict_spline <- function(spline, newx, center=FALSE, scale=FALSE){
 }
 
 
-##' @title Add time spline to a standata object
+##' @title Add spline to a standata object
 ##' @description Updates a standata object with a matrix of time or exposure splines
 ##' @param standata the standata object to be updated
-##' @param Ht,Hx the matrix of time or exposure splines to be added
-##' @details \code{add_Ht_standata} updates the \code{Ht}, \code{timedf}, and \code{Ht_attr} elements of \code{standata}. \code{add_Hx_standata} updates the \code{Hx}, \code{xdf}, and \code{Hx_attr} elements of \code{standata}.
+##' @param Mt,Mx the matrix of time or exposure splines to be added
+##' @details \code{add_spline_time} updates the \code{Mt}, \code{timedf}, and \code{Mt_attributes} elements of \code{standata}. \code{add_spline_exposure} updates the \code{Mx}, \code{xdf}, and \code{Mx_attributes} elements of \code{standata}.
 ##' @seealso \code{\link{create_standata_exposure}}, \code{\link{create_standata_outcome}}, \code{\link{expsim_update_parameter}}, \code{\link{outsim_update_parameter}}, \code{\link{create_spline_range}}
 ##' @export
-add_Ht_standata <- function(standata, Ht){
-    if(!inherits(Ht, c("matrix","numeric", "integer"))) stop("'Ht' should be a matrix or vector.")
-    standata$Ht <- as.matrix(Ht)
-    standata$timedf <- ncol(standata$Ht)
-    standata$Ht_attributes <- attributes(Ht)
+add_spline_time <- function(standata, Mt){
+    if(!inherits(Mt, c("matrix","numeric", "integer"))) stop("'Mt' should be a matrix or vector.")
+    standata$Mt <- as.matrix(Mt)
+    standata$timedf <- ncol(standata$Mt)
+    standata$Mt_attributes <- attributes(Mt)
     standata
 }
 
-#' @rdname add_Ht_standata
+#' @rdname add_spline_time
 #' @export
-add_Hx_standata <- function(standata, Hx){
-    if(!inherits(Hx, c("matrix","numeric", "integer"))) stop("'Hx' should be a matrix or vector.")
-    standata$Hx <- as.matrix(Hx)
-    standata$xdf <- ncol(standata$Hx)
-    standata$Hx_attributes <- attributes(Hx)
+add_spline_exposure <- function(standata, Mx){
+    if(!inherits(Mx, c("matrix","numeric", "integer"))) stop("'Mx' should be a matrix or vector.")
+    standata$Mx <- as.matrix(Mx)
+    standata$xdf <- ncol(standata$Mx)
+    standata$Mx_attributes <- attributes(Mx)
     standata
 }
 

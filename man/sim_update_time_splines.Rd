@@ -7,20 +7,20 @@
 \usage{
 sim_update_time_splines(obj, df = 1, fn = "ns", ...)
 
-sim_update_times(obj, times = NULL, draw = is.null(times))
+sim_update_times(obj, time = NULL, draw = is.null(time))
 }
 \arguments{
 \item{obj}{Simualtion object, created by \code{\link{create_exposure_simulation_skeleton}} or \code{\link{create_outcome_simulation_skeleton}}.}
 
 \item{df}{degrees of freedom for the time spline used in model estimation.}
 
-\item{fn}{function for generating splines. Defaults to \code{\link{ns}}}
+\item{fn}{function for generating splines. Defaults to \code{\link{ns}}.}
 
-\item{...}{Additional arguments passed to \code{}}
-
-\item{times}{Values to set as the times.}
+\item{...}{Additional arguments passed to \code{fn()} via \code{\link{create_spline_matrix}}.}
 
 \item{draw}{Logical indicating times should be sampled from a Unif(0,1) distribution.}
+
+\item{times}{Values to set as the times.}
 }
 \description{
 Creates times and splines of time for simulations
@@ -28,13 +28,15 @@ Creates times and splines of time for simulations
 \seealso{
 \code{\link{create_spline_range}} \code{\link{add_Ht_standata}}
 
-Other exposure simulation functions: \code{\link{create_exposure_simulation_skeleton}},
-  \code{\link{expsim_sample_observations}},
-  \code{\link{expsim_update_parameter}}
+Other exposure simulation functions: 
+\code{\link{create_exposure_simulation_skeleton}()},
+\code{\link{expsim_sample_observations}()},
+\code{\link{expsim_update_parameter}()}
 
-Other outcome simulation functions: \code{\link{create_outcome_simulation_skeleton}},
-  \code{\link{outsim_sample_observations}},
-  \code{\link{outsim_update_parameter}}
+Other outcome simulation functions: 
+\code{\link{create_outcome_simulation_skeleton}()},
+\code{\link{outsim_sample_observations}()},
+\code{\link{outsim_update_parameter}()}
 }
 \concept{exposure simulation functions}
 \concept{outcome simulation functions}

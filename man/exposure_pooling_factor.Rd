@@ -4,8 +4,11 @@
 \alias{exposure_pooling_factor}
 \title{Compute pooling factors for exposure model levels}
 \usage{
-exposure_pooling_factor(stanfit, standata, level = c("observation",
-  "household", "cluster", "group", "time"))
+exposure_pooling_factor(
+  stanfit,
+  standata,
+  level = c("observation", "household", "cluster", "group", "time")
+)
 }
 \arguments{
 \item{stanfit}{The fitted model object from \code{\link{sample_exposure_model}}.}

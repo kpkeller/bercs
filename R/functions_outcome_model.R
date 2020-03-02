@@ -1,49 +1,59 @@
 # Functions to support fitting of the outcome models
 
-# data -- dataframe of data
-# Ht -- matrix/data frame of time splines to include
+
 # return_sorted -- returns data frame that has been sorted, with added labels of
 #                   'household_num
 # log_transform -- log the concentrations?
 ##' create_standata_outcome()
 ##' @title Create List for Fitting Outcome Model via STAN
-##' @description Generates a 'standata_outcome' object from a 'wide' data frame of outcome data
-##' @param data data frame, or list of data frames, containg the data in 'wide' format. Expected to include (at least) "clust_id", "conc", "id", and "study"
-##' @param xdf degrees of freedom to use in exposure spline.
-##' @param Ht time spline matrix, or a list of such matrices.
+##' @description Generates a 'standata_outcome' object from a 'long' data frame of outcome data
+##' @param datalist List of data frames, containg the data in 'long' format.
+##' @param Mtlist time spline matrix, or a list of such matrices.
 ##' @param ... arguments passed to \code{create_standata_outcome_singlestudy}
 ##' @seealso \code{\link{create_standata_exposure}}
 ##' @export
 ##' @importFrom Matrix bdiag
-create_standata_outcome <- function(data, xdf=1, Ht=NULL,...) {
-    if (length(data)>1 && class(data)=="list"){
-        for (i in 1:length(data)){
-            data[[i]]$clust_id <- paste0(data[[i]]$study, data[[i]]$clust_id)
-            data[[i]]$id <- paste0(data[[i]]$study, data[[i]]$id)
-        }
-        data.new <- do.call(rbind, data)
-        if (!is.null(Ht)){
-            if (!all(sapply(Ht, inherits, "matrix"))) stop("'Ht' should be list of matrices.")
-            for (i in 1:length(Ht)){
-                class(Ht[[i]]) <- "matrix"
+create_standata_outcome <- function(datalist=NULL,
+                                    Mtlist=NULL,
+                                    ...) {
+    if (!is.null(datalist)){
+        if (length(data)>1 && class(data)=="list"){
+            for (i in 1:length(data)){
+                data[[i]]$clust_id <- paste0(data[[i]]$study, data[[i]]$clust_id)
+                data[[i]]$id <- paste0(data[[i]]$study, data[[i]]$id)
             }
-            Ht.new <- Matrix::bdiag(Ht)
-            Ht.new <- as.matrix(Ht.new)
-        } else {
-            Ht.new <- NULL
+            data.new <- do.call(rbind, data)
+            if (!is.null(Mtlist)){
+                if (!all(sapply(Mtlist, inherits, "matrix"))) stop("'Mtlist' should be list of matrices.")
+                # for (i in 1:length(Mtlist)){
+                #     class(Mtlist[[i]]) <- "matrix"
+                # }
+                Mt.new <- Matrix::bdiag(Mtlist)
+                Mt.new <- as.matrix(Mt.new)
+            } else {
+                Mt.new <- NULL
+            }
         }
+        out <- create_standata_outcome_singlestudy(data=data.new, Mt=Mt.new,...)
     } else {
-        data.new <- data
-        Ht.new <- Ht
+        out <- create_standata_outcome_singlestudy(...)
     }
-    out <- create_standata_outcome_singlestudy(data=data.new, xdf=xdf, Ht=Ht.new,...)
     out
 }
 
-##' @rdname create_standata_outcome
-##' @param covars character vector of variables to include as covariates, or a vector/matrix of covariate values. Should not include an intercept. If a character vector, this intercept is automatically removed (so default of "1" leads to no covariates).
+##' @title create_standata_outcome
 ##'
 ##' @param return_addition should the modified version of \code{data} be returned in addition to the \code{standata_outcome} object?
+##' @param data Optional data frame containing data in a long format.
+##' @param unit_id Vector identifying the distinct unit (e.g. person) for each observation.
+##' @param conc Vector of exposure concentrations for each observation.
+##' @param study Vector identifying the study of each observation.
+##' @param clust_id Optional vector identifying cluster membership for each observation.
+##' @param case Count of cases for the observations. In most cases, this is a 0/1 indicator.
+##' @param at_risk Time at risk for the observation
+##' @param covars character vector of variables to include as covariates, or a vector/matrix of covariate values. Should not include an intercept. If a character vector, this intercept is automatically removed (so default of "1" leads to no covariates).
+##' @param xdf Degrees of freedom for exposure splines
+##' @param Mt Optional matrix of time splines
 ##' @param xfn name of function used to generate exposure splines
 ##' @param xfnargs named list of additional arguments for \code{xfn}
 ##' @param timefn name of function used to generate time splines
@@ -52,47 +62,78 @@ create_standata_outcome <- function(data, xdf=1, Ht=NULL,...) {
 ##' @export
 ##' @importFrom splines2 iSpline
 ##' @importFrom stats model.matrix formula
-create_standata_outcome_singlestudy <- function(data, xdf=1, Ht=NULL, covars="1",
-                                                return_addition=FALSE,
-                                                xfn="iSpline",xfnargs=list(),
-                                                timefn="ns", timedf=0, timefnargs=list()){
-    check_names(data, expected_names=c("clust_id", "conc", "id", "study"))
-    check_names_to_overwrite(data, expected_names=c("subj_num", "cluster_num", "study_num"))
+create_standata_outcome_singlestudy <- function(data=NULL,
+                                                unit_id=data$unit_id,
+                                                conc=data$conc,
+                                                study=data$study,
+                                                clust_id=data$clust_id,
+                                                case=data$case,
+                                                at_risk=data$at_risk,
+                                                covars="1",
+                                                xdf=1,
+                                                xfn="iSpline",
+                                                xfnargs=list(),
+                                                Mt=NULL,
+                                                timefn="ns",
+                                                timedf=0,
+                                                timefnargs=list(),
+                                                return_addition=FALSE){
 
-    out <- list()
-
+    N <- length(conc)
+    if(!all(length(unit_id)==N,
+            length(case)==N)) stop("The lengths of 'unit_id', 'case', and 'conc' must be equal")
+    if (xdf < 0) stop("'xdf' must be a non-negative integer.")
+    # Create data frame
     # Relabel ids into integer indicators
     # This facilitates linking back to original data and labels
-    data$study_of_obs <- as.numeric(factor(data$study))
-    data$cluster_of_obs <- as.numeric(factor(data$clust_id))
-    data$subj_of_obs <- as.numeric(factor(data$id))
+    newdata <- data.frame(conc=conc,
+                          unit_of_obs=as.numeric(factor(unit_id)),
+                          case=case)
+    if (is.null(at_risk)){
+        newdata$at_risk <- rep(1, N)
+    } else {
+        newdata$at_risk <- at_risk
+    }
+    if (!is.null(clust_id) && any(clust_id!=0)){
+        if (length(clust_id)!=N) stop("The lengths of 'clust_id' and 'conc' must be equal")
+        nocluster <- FALSE
+        newdata$cluster_of_obs <- as.numeric(factor(clust_id))
+    } else {
+        nocluster <- TRUE
+        newdata$cluster_of_obs <- rep(0, N)
+    }
+    if (!is.null(study)){
+        if (length(study)!=N) stop("The lengths of 'study' and 'conc' must be equal")
+        newdata$study_of_obs <- as.numeric(factor(study))
+    } else {
+        newdata$study_of_obs <- rep(1, N)
+    }
 
-    out$S <- max(data$study_of_obs)
-    out$K <- max(data$cluster_of_obs)
-    out$n <- max(data$subj_of_obs)
-    out$N <- nrow(data)
-    out$study_of_obs <- data$study_of_obs
-    out$subj_of_obs <- data$subj_of_obs
-    out$cluster_of_subj <-  data$cluster_of_obs[!duplicated(data$subj_of_obs)][order(data$subj_of_obs[!duplicated(data$subj_of_obs)])]
-    out$study_of_subj <- data$study_of_obs[!duplicated(data$subj_of_obs)][order(data$subj_of_obs[!duplicated(data$subj_of_obs)])]
+    out <- list()
+    out$S <- max(newdata$study_of_obs)
+    out$K <- max(newdata$cluster_of_obs)
+    out$n <- max(newdata$unit_of_obs)
+    out$N <- N
+    out$study_of_obs <- newdata$study_of_obs
+    out$unit_of_obs <- newdata$unit_of_obs
+    out$cluster_of_unit <-  newdata$cluster_of_obs[!duplicated(newdata$unit_of_obs)][order(newdata$unit_of_obs[!duplicated(newdata$unit_of_obs)])]
+    out$study_of_unit <- newdata$study_of_obs[!duplicated(newdata$unit_of_obs)][order(newdata$unit_of_obs[!duplicated(newdata$unit_of_obs)])]
 
     # Exposure values
     if (xdf==0){
         out$x <- 0
-        Hx <- matrix(0, 0, 0)
+        Mx <- matrix(0, 0, 0)
     } else if (xdf==1){
-        Hx <- scale(data$conc)
+        Mx <- scale(data$conc)
         out$x <- data$conc
     } else {
         out$x <- data$conc
-        Hx <- do.call(create_spline_matrix,
+        Mx <- do.call(create_spline_matrix,
                   c(list(x=data$conc,
                         df=xdf,
                         fn=xfn), xfnargs))
     }
-    out$xdf <- xdf
-    out$Hx <- as.matrix(Hx) # needs to be matrix class for STAN
-    out$Hx_attributes <- attributes(Hx)
+    out <- add_spline_exposure(out, Mx=Mx)
 
     # Covariates
     if (inherits(covars, "character")){
@@ -113,24 +154,20 @@ create_standata_outcome_singlestudy <- function(data, xdf=1, Ht=NULL, covars="1"
     out$p <- ncol(Z)
 
     # Outcome
-    out$y <- data$case
-    if (!is.null(data$at_risk)){
-        out$nT <- data$at_risk
-    } else {
-        out$nT <- rep(1, nrow(data))
-    }
+    out$y <- newdata$case
+    out$nT <- newdata$at_risk
 
     # Time
-    if (is.null(Ht) && timedf>0){
-        Ht <- do.call(create_spline_matrix,
+    if (is.null(Mt) && timedf>0){
+        Mt <- do.call(create_spline_matrix,
                   c(list(x=data$date,
                         df=timedf,
                         fn=timefn), timefnargs))
     }
-    if (!is.null(Ht)) {
-        out <- add_Ht_standata(out, Ht)
+    if (!is.null(Mt)) {
+        out <- add_Mt_standata(out, Mt)
     } else {
-        out$Ht <- matrix(0, 0, 0)
+        out$Mt <- matrix(0, 0, 0)
         out$timedf <- 0
     }
 
@@ -145,8 +182,6 @@ create_standata_outcome_singlestudy <- function(data, xdf=1, Ht=NULL, covars="1"
 
 
 
-
-
 ##' @title Sample Outcome Model
 ##' @description Samples from the posterior distribution of outcome model parameters, using STAN
 ##' @param standata An object of class `standata_outcome`, typically created from \code{\link{create_standata_outcome}}.
@@ -157,7 +192,7 @@ create_standata_outcome_singlestudy <- function(data, xdf=1, Ht=NULL, covars="1"
 ##' @seealso \link{create_standata_outcome}, \link{outsim_sample_observations}
 ##' @export
 sample_outcome_model <- function(standata,
-                                 B=2000,
+                                 B=1000,
                                  warmup=B,
                                  chains=4,
                                  control=list(adapt_delta=0.9,
@@ -254,19 +289,19 @@ get_fitted_ERC <- function (standata,
     }
 
     if (standata$xdf == 1) {
-        if (!is.null(standata$Hx_attributes$`scaled:center`)) {
-            exposure_seq_scaled <- (exposure_seq - standata$Hx_attributes$`scaled:center`)/standata$Hx_attributes$`scaled:scale`
+        if (!is.null(standata$Mx_attributes$`scaled:center`)) {
+            exposure_seq_scaled <- (exposure_seq - standata$Mx_attributes$`scaled:center`)/standata$Mx_attributes$`scaled:scale`
         }
         else {
             exposure_seq_scaled <- exposure_seq
         }
     }
     else {
-        Hxtemp <- standata$Hx
-        attributes(Hxtemp) <- standata$Hx_attr
+        Mxtemp <- standata$Mx
+        attributes(Mxtemp) <- standata$Mx_attr
         predfn <- utils::getS3method(f = "predict",
-                                     class(Hxtemp)[class(Hxtemp) !="matrix"][1])
-        exposure_seq_scaled <- predfn(Hxtemp, newx = exposure_seq)
+                                     class(Mxtemp)[class(Mxtemp) !="matrix"][1])
+        exposure_seq_scaled <- predfn(Mxtemp, newx = exposure_seq)
     }
     fitted_seq <- array(dim=c(length(exposure_seq),
                               dim(beta_post)[1], # B from stan fit

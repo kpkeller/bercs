@@ -8,18 +8,29 @@
 \alias{outsim_update_exp_splines}
 \title{Update Outcome model parameters}
 \usage{
-outsim_update_parameter(obj, param, level = c("study", "subject", "time",
-  "covariate", "exposure"), type = c("mean", "sd", "re", "coef"),
-  value = NULL, draw = is.null(value))
+outsim_update_parameter(
+  obj,
+  param,
+  level = c("study", "unit", "time", "covariate", "exposure"),
+  type = c("mean", "sd", "re", "coef"),
+  value = NULL,
+  draw = is.null(value)
+)
 
 outsim_update_atrisk(obj, nT = 1)
 
-outsim_update_covariate(obj, covariate = c("x", "Z"), ncol = 1,
-  value = NULL, draw = is.null(value), verbose = TRUE, mean = 0,
-  sd = 1)
+outsim_update_covariate(
+  obj,
+  covariate = c("x", "Z"),
+  ncol = 1,
+  value = NULL,
+  draw = is.null(value),
+  verbose = TRUE,
+  mean = 0,
+  sd = 1
+)
 
-outsim_update_set_parameter(obj, param = c("beta", "gamma"),
-  value = NULL)
+outsim_update_set_parameter(obj, param = c("beta", "gamma"), value = NULL)
 
 outsim_update_exp_splines(obj, df = 1, fn = "ns", ...)
 }
@@ -69,8 +80,9 @@ Only specific combinations of \code{level} and \code{type} are allowed. They are
 
 \code{\link{create_spline_matrix}}
 
-Other outcome simulation functions: \code{\link{create_outcome_simulation_skeleton}},
-  \code{\link{outsim_sample_observations}},
-  \code{\link{sim_update_time_splines}}
+Other outcome simulation functions: 
+\code{\link{create_outcome_simulation_skeleton}()},
+\code{\link{outsim_sample_observations}()},
+\code{\link{sim_update_time_splines}()}
 }
 \concept{outcome simulation functions}

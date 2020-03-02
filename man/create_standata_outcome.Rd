@@ -2,40 +2,19 @@
 % Please edit documentation in R/functions_outcome_model.R
 \name{create_standata_outcome}
 \alias{create_standata_outcome}
-\alias{create_standata_outcome_singlestudy}
 \title{Create List for Fitting Outcome Model via STAN}
 \usage{
-create_standata_outcome(data, xdf = 1, Ht = NULL, ...)
-
-create_standata_outcome_singlestudy(data, xdf = 1, Ht = NULL,
-  covars = "1", return_addition = FALSE, xfn = "iSpline",
-  xfnargs = list(), timefn = "ns", timedf = 0, timefnargs = list())
+create_standata_outcome(datalist = NULL, Mtlist = NULL, ...)
 }
 \arguments{
-\item{data}{data frame, or list of data frames, containg the data in 'wide' format. Expected to include (at least) "clust_id", "conc", "id", and "study"}
+\item{datalist}{List of data frames, containg the data in 'long' format.}
 
-\item{xdf}{degrees of freedom to use in exposure spline.}
-
-\item{Ht}{time spline matrix, or a list of such matrices.}
+\item{Mtlist}{time spline matrix, or a list of such matrices.}
 
 \item{...}{arguments passed to \code{create_standata_outcome_singlestudy}}
-
-\item{covars}{character vector of variables to include as covariates, or a vector/matrix of covariate values. Should not include an intercept. If a character vector, this intercept is automatically removed (so default of "1" leads to no covariates).}
-
-\item{return_addition}{should the modified version of \code{data} be returned in addition to the \code{standata_outcome} object?}
-
-\item{xfn}{name of function used to generate exposure splines}
-
-\item{xfnargs}{named list of additional arguments for \code{xfn}}
-
-\item{timefn}{name of function used to generate time splines}
-
-\item{timedf}{degrees of freedom for time spline}
-
-\item{timefnargs}{named list of additional arugments to \code{timefn}}
 }
 \description{
-Generates a 'standata_outcome' object from a 'wide' data frame of outcome data
+Generates a 'standata_outcome' object from a 'long' data frame of outcome data
 }
 \details{
 create_standata_outcome()

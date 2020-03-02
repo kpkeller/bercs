@@ -7,8 +7,13 @@
 \usage{
 create_exposure_simulation_skeleton(design = "parallel", ...)
 
-create_exposure_simulation_skeleton_parallel(ngroups = 1,
-  nclusters = 1, nhouseholds = 1, nobs = 1, verbose = TRUE)
+create_exposure_simulation_skeleton_parallel(
+  ngroups = 1,
+  nclusters = 1,
+  nunits = 1,
+  nobs = 1,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{design}{String providing the study design. Currently only \code{"parallel"} is implemented.}
@@ -19,7 +24,7 @@ create_exposure_simulation_skeleton_parallel(ngroups = 1,
 
 \item{nclusters}{Number of clusters. Either a single value or a vector of length \code{ngroups}.}
 
-\item{nhouseholds}{Number of households in each cluster. If length 1, repeated for all clusters.}
+\item{nunits}{Number of households in each cluster. If length 1, repeated for all clusters.}
 
 \item{nobs}{Number of observations in each household. If length 1, repeated for all households and if length \code{sum(nclusters)}, repeated for all households within each cluster.}
 
@@ -37,11 +42,18 @@ Once parameters are set via \code{\link{expsim_update_parameter}} and related fu
 \code{\link{expsim_sample_observations}}
 and posterior parameter estimates obtained from \code{\link{sample_exposure_model}}.
 }
+\examples{
+es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=10)
+es$structure$sigK
+es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
+es$structure$sigK
+}
 \seealso{
 \code{\link{create_outcome_simulation_skeleton}}
 
-Other exposure simulation functions: \code{\link{expsim_sample_observations}},
-  \code{\link{expsim_update_parameter}},
-  \code{\link{sim_update_time_splines}}
+Other exposure simulation functions: 
+\code{\link{expsim_sample_observations}()},
+\code{\link{expsim_update_parameter}()},
+\code{\link{sim_update_time_splines}()}
 }
 \concept{exposure simulation functions}

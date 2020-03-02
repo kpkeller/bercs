@@ -8,13 +8,32 @@
 \usage{
 add_priors(standata, ...)
 
-add_priors_exposure_model(standata, etaG = 0, sigmaG = c(0, 1),
-  reK = 0, sigmaK = c(0, 1), reH = 0, sigmaH = c(0, 1),
-  sigmaW = c(0, 1), theta = 0, sigmaTheta = c(0, 1), ...)
+add_priors_exposure_model(
+  standata,
+  etaG = 0,
+  sigmaG = c(0, 1),
+  reK = 0,
+  sigmaK = c(0, 1),
+  reH = 0,
+  sigmaH = c(0, 1),
+  sigmaW = c(0, 1),
+  theta = 0,
+  sigmaTheta = c(0, 1),
+  ...
+)
 
-add_priors_outcome_model(standata, beta = 0, sigmaBeta = c(0, 1),
-  gamma = 0, sigmaGamma = c(0, 1), delta = 0, sigmaDelta = c(0, 1),
-  sigmaI = c(0, 1), beta_nu = 1, ...)
+add_priors_outcome_model(
+  standata,
+  beta = 0,
+  sigmaBeta = c(0, 1),
+  gamma = 0,
+  sigmaGamma = c(0, 1),
+  delta = 0,
+  sigmaDelta = c(0, 1),
+  sigmaI = c(0, 1),
+  beta_nu = 1,
+  ...
+)
 }
 \arguments{
 \item{standata}{Either a \code{standata_exposure} or \code{standata_outcome} object. Based on its class, \code{add_priors} calls \code{add_priors_exposure_model} or \code{add_priors_exposure_model}.}

@@ -13,11 +13,12 @@ expsim_sample_observations(obj)
 Draws a sample of exposure observations using the specified model parameters
 }
 \details{
-This function assumes that \code{etaK} (or at least \code{etaG}), \code{sigW}, \code{reH}, and \code{timefn} have been set. The latter defaults to zero, but the others must be set with \code{\link{expsim_update_parameter}}. If these have not been set, then this will set \code{w} to a vector of \code{NA}.
+This function assumes that \code{etaK} (or at least \code{etaG}), \code{sigW}, \code{reI}, and \code{timefn} have been set. The latter defaults to zero, but the others must be set with \code{\link{expsim_update_parameter}}. If these have not been set, then this will set \code{w} to a vector of \code{NA}.
 }
 \seealso{
-Other exposure simulation functions: \code{\link{create_exposure_simulation_skeleton}},
-  \code{\link{expsim_update_parameter}},
-  \code{\link{sim_update_time_splines}}
+Other exposure simulation functions: 
+\code{\link{create_exposure_simulation_skeleton}()},
+\code{\link{expsim_update_parameter}()},
+\code{\link{sim_update_time_splines}()}
 }
 \concept{exposure simulation functions}

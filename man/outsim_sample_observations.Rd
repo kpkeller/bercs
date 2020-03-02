@@ -15,8 +15,9 @@ Draws a sample of outcome observations using provided model parameters
 \seealso{
 \code{\link{expsim_sample_observations}}
 
-Other outcome simulation functions: \code{\link{create_outcome_simulation_skeleton}},
-  \code{\link{outsim_update_parameter}},
-  \code{\link{sim_update_time_splines}}
+Other outcome simulation functions: 
+\code{\link{create_outcome_simulation_skeleton}()},
+\code{\link{outsim_update_parameter}()},
+\code{\link{sim_update_time_splines}()}
 }
 \concept{outcome simulation functions}

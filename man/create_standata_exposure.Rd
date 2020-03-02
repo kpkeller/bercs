@@ -4,13 +4,32 @@
 \alias{create_standata_exposure}
 \title{Create List for Fitting Exposure Model via STAN}
 \usage{
-create_standata_exposure(data, Ht = NULL, log_transform = FALSE,
-  return_addition = FALSE)
+create_standata_exposure(
+  data = NULL,
+  group = data$group,
+  conc = data$conc,
+  unit_id = data$unit_id,
+  clust_id = data$clust_id,
+  time = data$time,
+  Mt = NULL,
+  log_transform = FALSE,
+  return_addition = FALSE
+)
 }
 \arguments{
-\item{data}{Data frame containing data in a long format. Expected to contain columns "group", "conc", "hh_id", and "date". Optional variable is "clust_id".}
+\item{data}{Optional data frame containing data in a long format.}
 
-\item{Ht}{Matrix of time splines to include in the model. Defaults to NULL, and can be added later via \code{\link{add_Ht_standata}}.}
+\item{group}{Vector of group assignments. See Details.}
+
+\item{conc}{Vector of exposure concentrations.}
+
+\item{unit_id}{Vector identifying the distinct unit (e.g. person, household) for each observation.}
+
+\item{clust_id}{Vector identifying cluster membership for each observation.}
+
+\item{time}{Vector of times corresponding to \code{conc} values.}
+
+\item{Mt}{Matrix of splines values for time to include in the model. Defaults to NULL, and can be added later via \code{\link{add_spline_time}}.}
 
 \item{log_transform}{Should the concentration value be log-transformed?}
 
@@ -37,7 +56,9 @@ Creates a list object that follows the structure required by
  the exposure models that are implemented in STAN.
 }
 \details{
-This function takes as input a `wide` data frame and extracts from it the information needed for fitting the exposure model in STAN.
+This function takes as input a `long` data frame and extracts from it the information needed for fitting the exposure model in STAN.
+
+The values of \code{group}, \code{unit_id}, and \code{clust_id} are converted to factor and then coerced to integer. The ordering of groups (units, clusters) in the output object will depend on the default ordering introduced by \code{\link{factor}}.
 }
 \seealso{
 \code{\link{sample_exposure_model}}, \code{\link{create_standata_outcome}}

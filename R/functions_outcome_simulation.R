@@ -5,7 +5,7 @@
 ##' @description These functions construct lists containing the structure and data for simulating exposure and outcome data.
 ##' @param design String indicating trial design. Currently only 'parallel' is supported.
 ##' @param ... Additional arguments passed to the design-specific functions.
-##' @details These functions create the blank structure of groups, clusters, households, and subject.
+##' @details These functions create the blank structure of groups, clusters, households, and unit.
 ##' Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via
 ##' \code{\link{expsim_sample_observations}}
 ##' and posterior parameter estimates obtained from \code{\link{sample_exposure_model}}.
@@ -34,36 +34,36 @@ create_outcome_simulation_skeleton <- function(design="parallel",...){
 ##' @rdname create_outcome_simulation_skeleton
 ##' @param nstudies Number of studies.
 ##' @param nclusters Number of clusters per study. If not of length \code{nstudies}, the same value will be used for all studies.
-##' @param nsubjects Number of subjects.
-##' @param nobs Number of observations per subject. If length 1, value is repeated for all subjects. If length \code{sum(nclusters)}, then each element is repeated for all subjects within the corresponding cluster.
+##' @param nunits Number of units.
+##' @param nobs Number of observations per unit. If length 1, value is repeated for all units. If length \code{sum(nclusters)}, then each element is repeated for all units within the corresponding cluster.
 ##' @param study_of_cluster optional vector of positive integers that provide the study number of each cluster. Should have length \code{sum(nclusters)}.
-##' @param cluster_of_subj optional vector that provides the cluster number of each subject. Should have length \code{sum(nsubjects)}.
-##' @param subj_of_obs optional vector that provides the subject number of each observation. Should have length \code{sum(nobs)}.
+##' @param cluster_of_unit optional vector that provides the cluster number of each unit. Should have length \code{sum(nunits)}.
+##' @param unit_of_obs optional vector that provides the unit number of each observation. Should have length \code{sum(nobs)}.
 ##' @param beta0 Study-level intercept, on the logit scale. Defaults to 0 and can be updated later via \code{\link{outsim_update_covariate}}.
 ##' @param x Exposure concentration values. Defaults to 0 and can be updated later via \code{\link{outsim_update_covariate}}.
 ##' @param nT optional time-at-risk value. See \code{\link{outsim_update_atrisk}}
-##' @param times optional times for observations. Can be set later via \code{\link{sim_update_times}}.
+##' @param time optional times for observations. Can be set later via \code{\link{sim_update_times}}.
 ##' @param xfn Exposure-response function. Can be set later via \code{\link{outsim_update_parameter}}.
 ##' @param timefn Function relating time to mean outcome. Can be set later via \code{\link{outsim_update_parameter}}.
 ##' @param verbose should messages be printed.
 ##' @export
 create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
                                                   nclusters=1,
-                                                  nsubjects=1,
+                                                  nunits=1,
                                                   nobs=1,
                                                   study_of_cluster,
-                                                  cluster_of_subj,
-                                                  subj_of_obs,
+                                                  cluster_of_unit,
+                                                  unit_of_obs,
                                                   beta0=0,
                                                   x=0,
                                                   nT=NA,
-                                                  times=NA,
+                                                  time=NA,
                                                   verbose=TRUE,
                                                   xfn=function(x) {x},
                                                   timefn=function(t) {rep(0, length(t))}){
     # Check input
     if(!is.null(nclusters) && !check_all_nonnegative_value(nclusters)) stop("'nclusters' should be a non-negative integer and must have at least one positive element.")
-    if(!check_all_nonnegative_value(nsubjects)) stop("'nsubjects' should be a non-negative integer and must have at least one positive element.")
+    if(!check_all_nonnegative_value(nunits)) stop("'nunits' should be a non-negative integer and must have at least one positive element.")
     if(!check_all_postive_value(nstudies)) stop("'nstudies' should be a positive integer.")
 
     # Process nclusters
@@ -76,59 +76,59 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
     }
     K <- sum(nclusters)
 
-    # Process nsubjects
-    if(!length(nsubjects) %in% c(1, K)) stop("'nsubjects' must have length 1 or 'sum(nclusters)'.")
-    if (length(nsubjects)==1) {
-        nsubjects <- rep(nsubjects, times=K)
+    # Process nunits
+    if(!length(nunits) %in% c(1, K)) stop("'nunits' must have length 1 or 'sum(nclusters)'.")
+    if (length(nunits)==1) {
+        nunits <- rep(nunits, times=K)
         if(verbose) {
-            message("Only one value of 'nsubjects' provided. Applying value to all clusters.")
+            message("Only one value of 'nunits' provided. Applying value to all clusters.")
         }
     }
-    n <- sum(nsubjects)
+    n <- sum(nunits)
 
     # Process nobs
-    if(!length(nobs) %in% c(1, K, n)) stop("'nobs' must have length 1, 'sum(nclusters)', or 'sum(nsubjects)'.")
+    if(!length(nobs) %in% c(1, K, n)) stop("'nobs' must have length 1, 'sum(nclusters)', or 'sum(nunits)'.")
     if (length(nobs)==1) {
         nobs <- rep(nobs, times=n)
         if(verbose) {
-            message("Only one value of 'nobs' provided. Applying value to all subjects.")
+            message("Only one value of 'nobs' provided. Applying value to all units.")
         }
     } else if (length(nobs)==K) {
-        nobs <- rep(nobs, times=nsubjects)
+        nobs <- rep(nobs, times=nunits)
         if(verbose) {
-            message("One value of 'nobs' provided for each cluster. Applying each value to all subjects within corresponding cluster.")
+            message("One value of 'nobs' provided for each cluster. Applying each value to all units within corresponding cluster.")
         }
     }
     N <- sum(nobs)
 
     # Defaults
     if (missing(study_of_cluster)) study_of_cluster <- rep(1:nstudies, times=nclusters)
-    if (missing(cluster_of_subj)) cluster_of_subj <- rep(1:K, times=nsubjects)
-    if (missing(subj_of_obs)) subj_of_obs <- rep(1:n, times=nobs)
-    cluster_of_obs <- cluster_of_subj[subj_of_obs]
-    study_of_subj <- study_of_cluster[cluster_of_subj]
+    if (missing(cluster_of_unit)) cluster_of_unit <- rep(1:K, times=nunits)
+    if (missing(unit_of_obs)) unit_of_obs <- rep(1:n, times=nobs)
+    cluster_of_obs <- cluster_of_unit[unit_of_obs]
+    study_of_unit <- study_of_cluster[cluster_of_unit]
     study_of_obs <- study_of_cluster[cluster_of_obs]
 
     # Defaults
     if (is.na(nT)) nT <- rep(1, N)
     if (length(x)==1) x <- rep(x, N)
-    if (length(times)==1) times <- rep(times, N)
+    if (length(time)==1) time <- rep(time, N)
     if (length(beta0)==1) beta0 <- rep(beta0, nstudies)
 
     study_structure <- list(nstudies=nstudies,
                             nclusters=nclusters,
-                            nsubjects=nsubjects,
+                            nunits=nunits,
                             nobs=nobs,
                             study_of_cluster=study_of_cluster,
                             study_of_obs=study_of_obs,
-                            cluster_of_subj=cluster_of_subj,
-                            subj_of_obs=subj_of_obs,
+                            cluster_of_unit=cluster_of_unit,
+                            unit_of_obs=unit_of_obs,
                             cluster_of_obs=cluster_of_obs,
                             beta0=beta0,
                             gamma=NA,
                             sigI=NA,
                             reI=rep(NA, n),
-                            times=times,
+                            time=time,
                             x=x,
                             xfn=xfn,
                             timefn=timefn,
@@ -149,9 +149,9 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
                            Z=matrix(0, 0, 0),
                            p=0,
                            study_of_cluster=study_of_cluster,
-                           cluster_of_subj=cluster_of_subj,
-                           subj_of_obs=subj_of_obs,
-                           study_of_subj=study_of_subj,
+                           cluster_of_unit=cluster_of_unit,
+                           unit_of_obs=unit_of_obs,
+                           study_of_unit=study_of_unit,
                            study_of_obs=study_of_obs,
                            cluster_of_obs=cluster_of_obs)
 
@@ -184,12 +184,12 @@ outsim_sample_observations <- function(obj){
 # Internal function to update the logitmean
 outsim_update_logitmean <- function(obj){
     if (!inherits(obj, "outsim")) stop("'obj' must be of class 'outsim'.")
-    obj$structure$logitmean <- with(obj$structure, beta0[study_of_obs] + xfn(x) + timefn(times))
+    obj$structure$logitmean <- with(obj$structure, beta0[study_of_obs] + xfn(x) + timefn(time))
     if(!any(is.na(obj$structure$gamma)) && !any(is.na(obj$standata$Z))){
         obj$structure$logitmean <- with(obj$structure, logitmean + obj$standata$Z %*% gamma)
     }
     if (!any(is.na(obj$structure$reI))){
-        obj$structure$logitmean <- with(obj$structure, logitmean + reI[subj_of_obs])
+        obj$structure$logitmean <- with(obj$structure, logitmean + reI[unit_of_obs])
     }
     obj
 }
@@ -212,7 +212,7 @@ outsim_update_logitmean <- function(obj){
 #' @family outcome simulation functions
 #' @seealso \code{\link{expsim_update_parameter}}
 ##' @export
-outsim_update_parameter <- function(obj, param, level=c("study", "subject", "time", "covariate", "exposure"), type=c("mean", "sd", "re", "coef"), value=NULL, draw=is.null(value)){
+outsim_update_parameter <- function(obj, param, level=c("study", "unit", "time", "covariate", "exposure"), type=c("mean", "sd", "re", "coef"), value=NULL, draw=is.null(value)){
     if (!inherits(obj, c("outsim"))) stop("'obj' must be of class 'outsim'.")
 
     if (!missing(param)){
@@ -224,8 +224,8 @@ outsim_update_parameter <- function(obj, param, level=c("study", "subject", "tim
         type <- match.arg(type)
         param <- switch(paste0(level, "_", type),
                         study_mean="beta0",
-                        subject_sd="sigI",
-                        subject_re="reI",
+                        unit_sd="sigI",
+                        unit_re="reI",
                         time_mean="timefn",
                         covariate_coef="gamma",
                         exposure_mean="xfn",

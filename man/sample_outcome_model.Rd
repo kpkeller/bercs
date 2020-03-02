@@ -4,9 +4,16 @@
 \alias{sample_outcome_model}
 \title{Sample Outcome Model}
 \usage{
-sample_outcome_model(standata, B = 2000, warmup = B, chains = 4,
+sample_outcome_model(
+  standata,
+  B = 1000,
+  warmup = B,
+  chains = 4,
   control = list(adapt_delta = 0.9, max_treedepth = 12),
-  multiple_exposure_curves = FALSE, restrictBeta = FALSE, ...)
+  multiple_exposure_curves = FALSE,
+  restrictBeta = FALSE,
+  ...
+)
 }
 \arguments{
 \item{standata}{An object of class `standata_outcome`, typically created from \code{\link{create_standata_outcome}}.}

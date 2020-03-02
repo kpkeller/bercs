@@ -9,11 +9,18 @@
 ##' @title Create List for Fitting Exposure Model via STAN
 ##' @description Creates a list object that follows the structure required by
 ##'  the exposure models that are implemented in STAN.
-##' @param data Data frame containing data in a long format. Expected to contain columns "group", "conc", "hh_id", and "date". Optional variable is "clust_id".
-##' @param Ht Matrix of time splines to include in the model. Defaults to NULL, and can be added later via \code{\link{add_Ht_standata}}.
+##' @param data Optional data frame containing data in a long format.
+##' @param group Vector of group assignments. See Details.
+##' @param conc Vector of exposure concentrations.
+##' @param unit_id Vector identifying the distinct unit (e.g. person, household) for each observation.
+##' @param clust_id Vector identifying cluster membership for each observation.
+##' @param time Vector of times corresponding to \code{conc} values.
+##' @param Mt Matrix of splines values for time to include in the model. Defaults to NULL, and can be added later via \code{\link{add_spline_time}}.
 ##' @param log_transform Should the concentration value be log-transformed?
 ##' @param return_addition See 'Value'.
-##' @details This function takes as input a `wide` data frame and extracts from it the information needed for fitting the exposure model in STAN.
+##' @details This function takes as input a `long` data frame and extracts from it the information needed for fitting the exposure model in STAN.
+##'
+##' The values of \code{group}, \code{unit_id}, and \code{clust_id} are converted to factor and then coerced to integer. The ordering of groups (units, clusters) in the output object will depend on the default ordering introduced by \code{\link{factor}}.
 ##' @return A list of class \code{standata_exposure} that contains the following:
 ##' \itemize{
 ##' \item {\code{G} -- Number of groups}
@@ -30,46 +37,62 @@
 ##' is the \code{standata_exposure} object described above. The second element is a modified version of \code{data}, with the variables \code{group_of_obs}, \code{cluster_of_obs}, \code{hh_of_obs}, and \code{times} added (or overwritten).
 ##' @seealso \code{\link{sample_exposure_model}}, \code{\link{create_standata_outcome}}
 ##' @export
-create_standata_exposure <- function(data, Ht=NULL, log_transform=FALSE, return_addition=FALSE){
-    check_names(data, expected_names=c("group", "conc", "hh_id", "date"))
-    check_names_to_overwrite(data, expected_names=c("hh_of_obs", "cluster_of_obs", "group_of_obs"))
+create_standata_exposure <- function(data=NULL,
+                                     group=data$group,
+                                     conc=data$conc,
+                                     unit_id=data$unit_id,
+                                     clust_id=data$clust_id,
+                                     time=data$time,
+                                     Mt=NULL,
+                                     log_transform=FALSE,
+                                     return_addition=FALSE){
+    N <- length(conc)
+    if(!all(length(group)==N,
+           length(unit_id)==N)) stop("The lengths of 'group', 'unit_id', and 'conc' must be equal")
 
-    data$group_of_obs <- as.numeric(factor(data$group))
-    if (!is.null(data$clust_id) && any(data$clust_id!=0)){
-        nocluster <- FALSE
-        data$cluster_of_obs <- as.numeric(factor(data$clust_id))
+    # Create data frame
+    newdata <- data.frame(group_of_obs=as.numeric(factor(group)),
+                          unit_of_obs=as.numeric(factor(unit_id)),
+                          conc=conc)
+    if (!is.null(clust_id) && any(clust_id!=0)){
+        if (length(clust_id)!=N) stop("The lengths of 'clust_id' and 'conc' must be equal")
+        newdata$cluster_of_obs <- as.numeric(factor(clust_id))
     } else {
-        nocluster <- TRUE
-        data$cluster_of_obs <- rep(0, nrow(data))
+        newdata$cluster_of_obs <- rep(0, N)
     }
-    data$hh_of_obs <- as.numeric(factor(data$hh_id))
-    data$times <- data$date
+    if (!is.null(time)){
+        if (length(time)!=N) stop("The lengths of 'clust_id' and 'conc' must be equal")
+        newdata$time <- time
+    } else {
+        newdata$time <- rep(0, N)
+    }
 
     out <- list()
 
-    out$G <- max(data$group_of_obs)
-    out$K <- max(data$cluster_of_obs)
-    out$H <- max(data$hh_of_obs)
-    out$N <- nrow(data)
-    out$cluster_of_obs <- data$cluster_of_obs
-    out$group_of_obs <-  data$group_of_obs
-    out$hh_of_obs <- data$hh_of_obs
+    out$G <- max(newdata$group_of_obs)
+    out$K <- max(newdata$cluster_of_obs)
+    out$H <- max(newdata$unit_of_obs)
+    out$N <- N
+    out$cluster_of_obs <- newdata$cluster_of_obs
+    out$group_of_obs <-  newdata$group_of_obs
+    out$unit_of_obs <- newdata$hh_of_obs
 
     if (log_transform){
-        out$w <- log(data$conc)
+        out$w <- log(newdata$conc)
     } else {
-        out$w <- data$conc
+        out$w <- newdata$conc
     }
-    out$times <- data$date
+    out$time <- newdata$time
     out$timedf <- 0
-
-    if (!is.null(Ht)){
-        out <- add_Ht_standata(out, Ht)
+    if (!is.null(Mt)){
+        out <- add_spline_time(out, Ht)
+    } else {
+        out <- add_spline_time(out, array(0, dim=c(0, 0)))
     }
     class(out) <- "standata_exposure"
     if (return_addition){
         return(list(standata=out,
-                    df=data))
+                    df=newdata))
     } else {
         return(out)
     }
@@ -89,7 +112,7 @@ create_standata_exposure <- function(data, Ht=NULL, log_transform=FALSE, return_
 ##' @importFrom rstan sampling
 ##' @export
 sample_exposure_model <- function(standata,
-                                  B=2000,
+                                  B=1000,
                                   warmup=B,
                                   chains=4,
                                   control=list(adapt_delta=0.9,
@@ -102,11 +125,10 @@ sample_exposure_model <- function(standata,
     exp_stanfit <- rstan::sampling(stanmodels[[model_name]],
                           data = standata,
                           iter = B + warmup,
-                          warmup=warmup,
+                          warmup = warmup,
                           chains = chains,
-                          control=control,
+                          control = control,
                           ...)
-
     exp_stanfit
 }
 

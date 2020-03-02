@@ -4,22 +4,27 @@
 \alias{expsim_update_parameter}
 \title{Update Exposure Model Parameters}
 \usage{
-expsim_update_parameter(obj, param, level = c("group", "cluster",
-  "household", "instrument", "correlation", "time"), type = c("mean",
-  "sd", "re"), value = NULL, draw = is.null(value))
+expsim_update_parameter(
+  obj,
+  param,
+  level = c("group", "cluster", "household", "observation", "correlation", "time"),
+  type = c("mean", "sd", "re"),
+  value = NULL,
+  draw = is.null(value)
+)
 }
 \arguments{
 \item{obj}{'expsim' object to update}
 
 \item{param}{character string giving name of parameter to update. If not provided, parameter name is taken from \code{level} and \code{type}}
 
-\item{level}{character string of model level being updated. See details.}
+\item{level}{character string of model level being updated. Must be one of "group", "cluster", "unit", "observation", or "time". See Details.}
 
 \item{type}{character string giving type of parameter being updated. See Details.}
 
 \item{value}{value(s) to which parameter should be set}
 
-\item{draw}{if \code{TRUE}, then the parameter value is sampled instead of being set to \code{val}}
+\item{draw}{if \code{TRUE}, then the parameter value is sampled instead of being set to \code{value}}
 }
 \description{
 Sets or overwrites data-generating parameters for an exposure model object
@@ -29,14 +34,15 @@ Only specific combinations of \code{level} and \code{type} are allowed. They are
 \itemize{
 \item \code{"group"}: \code{"mean"} sets 'etaG'
 \item \code{"cluster"}: \code{"sd"} and \code{"re"} set 'sigK' and 'reK', respectively
-\item \code{"household"}: \code{"sd"} and \code{"re"} set 'sigH' and 'reH', respectively
-\item \code{"instrument"}: \code{"sd"} sets 'sigW'.
+\item \code{"unit"}: \code{"sd"} and \code{"re"} set 'sigI' and 'reI', respectively
+\item \code{"observation"}: \code{"sd"} sets 'sigW'.
 \item \code{"time"}: \code{"mean"} sets 'timefn'.
 }
 }
 \seealso{
-Other exposure simulation functions: \code{\link{create_exposure_simulation_skeleton}},
-  \code{\link{expsim_sample_observations}},
-  \code{\link{sim_update_time_splines}}
+Other exposure simulation functions: 
+\code{\link{create_exposure_simulation_skeleton}()},
+\code{\link{expsim_sample_observations}()},
+\code{\link{sim_update_time_splines}()}
 }
 \concept{exposure simulation functions}

@@ -5,14 +5,24 @@
 \alias{plot_exposure_means_boxplot}
 \title{Plot Exposure Model Summaries}
 \usage{
-plot_exposure_means_bytime(stanfit, standata, include_time = TRUE,
-  include_reH = TRUE, exp_transform = FALSE,
-  group_names = paste0("Group ", 1:standata$G))
+plot_exposure_means_bytime(
+  stanfit,
+  standata,
+  include_time = TRUE,
+  include_reH = TRUE,
+  exp_transform = FALSE,
+  group_names = paste0("Group ", 1:standata$G)
+)
 
-plot_exposure_means_boxplot(stanfit, standata, include_time = TRUE,
-  include_reH = TRUE, exp_transform = FALSE,
-  one_per_person = !include_time, group_names = paste0("Group ",
-  1:standata$G))
+plot_exposure_means_boxplot(
+  stanfit,
+  standata,
+  include_time = TRUE,
+  include_reH = TRUE,
+  exp_transform = FALSE,
+  one_per_person = !include_time,
+  group_names = paste0("Group ", 1:standata$G)
+)
 }
 \arguments{
 \item{stanfit}{Fitted STAN model object containing posterior samples of parameters}

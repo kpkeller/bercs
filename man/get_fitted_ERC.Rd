@@ -5,12 +5,18 @@
 \alias{plot_fitted_ERC}
 \title{Extract fitted Exposure-Response Curve (ERC)}
 \usage{
-get_fitted_ERC(standata, stanfit, beta_post, exprange = c(0, 100),
-  ciband = 0.95, inclInterceptUncertainty = TRUE,
-  inclIntercept = FALSE, ...)
+get_fitted_ERC(
+  standata,
+  stanfit,
+  beta_post,
+  exprange = c(0, 100),
+  ciband = 0.95,
+  inclInterceptUncertainty = TRUE,
+  inclIntercept = FALSE,
+  ...
+)
 
-plot_fitted_ERC(obj, incS = NULL, ylab = "Relative Risk",
-  xlab = "Exposure")
+plot_fitted_ERC(obj, incS = NULL, ylab = "Relative Risk", xlab = "Exposure")
 }
 \arguments{
 \item{standata}{\code{standata_outcome} object used to fit the model}

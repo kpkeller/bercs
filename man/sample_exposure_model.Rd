@@ -4,8 +4,14 @@
 \alias{sample_exposure_model}
 \title{Sample Exposure Model}
 \usage{
-sample_exposure_model(standata, B = 2000, warmup = B, chains = 4,
-  control = list(adapt_delta = 0.9, max_treedepth = 12), ...)
+sample_exposure_model(
+  standata,
+  B = 1000,
+  warmup = B,
+  chains = 4,
+  control = list(adapt_delta = 0.9, max_treedepth = 12),
+  ...
+)
 }
 \arguments{
 \item{standata}{An object of class `standata_exposure`, typically created from \code{\link{create_standata_exposure}}.}
