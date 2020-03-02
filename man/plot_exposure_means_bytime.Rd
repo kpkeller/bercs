@@ -9,7 +9,7 @@ plot_exposure_means_bytime(
   stanfit,
   standata,
   include_time = TRUE,
-  include_reH = TRUE,
+  include_reI = TRUE,
   exp_transform = FALSE,
   group_names = paste0("Group ", 1:standata$G)
 )
@@ -18,7 +18,7 @@ plot_exposure_means_boxplot(
   stanfit,
   standata,
   include_time = TRUE,
-  include_reH = TRUE,
+  include_reI = TRUE,
   exp_transform = FALSE,
   one_per_person = !include_time,
   group_names = paste0("Group ", 1:standata$G)
@@ -30,13 +30,13 @@ plot_exposure_means_boxplot(
 \item{standata}{List containing model structure information corresponding to \code{stanfit}.
 Typically a list of class \code{standata_exposure}. However, it may be any list (or data frame) containing
 \code{cluster_of_obs} (if \code{etaK} was sampled in \code{stanfit}), \code{group_of_obs}
-(if \code{etaK} was not sampled in \code{stanfit}),  \code{hh_of_obs} (if \code{include_reH=TRUE}),
- and \code{Ht} (if \code{include_time=TRUE}). This may be useful when calculating fitted means for records
+(if \code{etaK} was not sampled in \code{stanfit}),  \code{unit_of_obs} (if \code{include_reI=TRUE}),
+ and \code{Mt} (if \code{include_time=TRUE}). This may be useful when calculating fitted means for records
   at different times from the observations used to fit the model.}
 
 \item{include_time}{Logical indicator of whether time should be included.}
 
-\item{include_reH}{Logical indicator of whether the household-level random effect should be included.}
+\item{include_reI}{Logical indicator of whether the unit-level random effect should be included.}
 
 \item{exp_transform}{Logical indicator of whether concentrations should be exponentiated.}
 

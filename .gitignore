@@ -5,3 +5,4 @@ exposure_model.hpp
 *.so
 Read-and-delete-me
 .Rhistory
+*.cc

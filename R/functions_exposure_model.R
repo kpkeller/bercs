@@ -141,12 +141,12 @@ sample_exposure_model <- function(standata,
 #' @param standata List containing model structure information corresponding to \code{stanfit}.
 #'  Typically a list of class \code{standata_exposure}. However, it may be any list (or data frame) containing
 #'  \code{cluster_of_obs} (if \code{etaK} was sampled in \code{stanfit}), \code{group_of_obs}
-#'  (if \code{etaK} was not sampled in \code{stanfit}),  \code{hh_of_obs} (if \code{include_reH=TRUE}),
-#'   and \code{Ht} (if \code{include_time=TRUE}). This may be useful when calculating fitted means for records
+#'  (if \code{etaK} was not sampled in \code{stanfit}),  \code{unit_of_obs} (if \code{include_reI=TRUE}),
+#'   and \code{Mt} (if \code{include_time=TRUE}). This may be useful when calculating fitted means for records
 #'    at different times from the observations used to fit the model.
 #' @param parvalues List of parameter values to use for computing means. Not needed if \code{stanfit} is provided.
 #' @param include_time Logical indicator of whether time should be included.
-#' @param include_reH Logical indicator of whether the household-level random effect should be included.
+#' @param include_reI Logical indicator of whether the unit-level random effect should be included.
 #' @param exp_transform Logical indicator of whether concentrations should be exponentiated.
 #' @param add Logical indicator of whether the modeled means should be added to \code{standata} or just returned directly (the default).
 #' @param ... Additional arugments passed to \code{\link[rstan]{extract}}.
@@ -157,7 +157,7 @@ compute_fitted_mean <- function(stanfit,
                                 standata,
                                 parvalues=NULL,
                                 include_time=TRUE,
-                                include_reH=TRUE,
+                                include_reI=TRUE,
                                 exp_transform=FALSE,
                                 add=FALSE,
                                 ...){
@@ -168,7 +168,7 @@ compute_fitted_mean <- function(stanfit,
 
         pars <- "etaG"
         if (!nocluster) pars <- c(pars, "reK")
-        if(include_reH) pars <- c(pars, "reH")
+        if(include_reI) pars <- c(pars, "reI")
         if (include_time) pars <- c(pars, "theta")
 
         postmean <- rstan::extract(stanfit,
@@ -179,7 +179,7 @@ compute_fitted_mean <- function(stanfit,
 
         pars <- "etaG"
         if (!nocluster) pars <- c(pars, "reK")
-        if(include_reH) pars <- c(pars, "reH")
+        if(include_reI) pars <- c(pars, "reI")
         if (include_time) pars <- c(pars, "theta")
         postmean <- parvalues
         if (!all(pars %in% names(postmean))) stop("'parvalues' provided, but not all names present.")
@@ -189,11 +189,11 @@ compute_fitted_mean <- function(stanfit,
     if (!nocluster){
         ltmean <- ltmean + postmean$reK[standata$cluster_of_obs]
     }
-    if (include_reH){
-        ltmean <- ltmean + postmean$reH[standata$hh_of_obs]
+    if (include_reI){
+        ltmean <- ltmean + postmean$reH[standata$unit_of_obs]
     }
     if (include_time){
-        ltmean <- ltmean + as.vector(standata$Ht %*% postmean$theta)
+        ltmean <- ltmean + as.vector(standata$Mt %*% postmean$theta)
     }
 
     if (exp_transform) ltmean <- exp(ltmean)
@@ -216,14 +216,14 @@ compute_fitted_mean <- function(stanfit,
 plot_exposure_means_bytime <- function(stanfit,
                                   standata,
                                   include_time=TRUE,
-                                include_reH=TRUE,
+                                  include_reI=TRUE,
                                   exp_transform=FALSE,
                                   group_names=paste0("Group ", 1:standata$G)){
 
     ltmean <-  compute_fitted_mean(stanfit = stanfit,
                                      standata = standata,
                                      include_time =include_time,
-                                     include_reH=include_reH,
+                                   include_reI=include_reI,
                                      add = FALSE,
                                      exp_transform = exp_transform)
 
@@ -248,7 +248,7 @@ plot_exposure_means_bytime <- function(stanfit,
 plot_exposure_means_boxplot <- function(stanfit,
                                  standata,
                                  include_time=TRUE,
-                                 include_reH=TRUE,
+                                 include_reI=TRUE,
                                  exp_transform=FALSE,
                                  one_per_person=!include_time,
                                  group_names=paste0("Group ", 1:standata$G)){
