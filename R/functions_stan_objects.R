@@ -27,15 +27,15 @@ add_priors  <- function(standata, ...){
 #' @param etaG Prior mean and standard deviation for the group means parameter `etaG`.
 #' @param sigmaG Prior mean and standard deviation for the group standard deviation parameter `sigmaG`.
 #' @param reK Prior mean for cluster-level random effects.
-#' @param reH Prior mean for household-level random effects.
+#' @param reI Prior mean for household-level random effects.
 #' @param sigmaK Prior mean and standard deviation for the standard deviation of the cluster random effects, `sigmaK`.
-#' @param sigmaH Prior mean and standard deviation for the standard deviation of the household random effects, `sigmaH`.
+#' @param sigmaI Prior mean and standard deviation for the standard deviation of the household random effects, `sigmaI`.
 #' @param sigmaW Prior mean and standard deviation for the residual standard deviation parameter `sigmaW`.
 #' @param theta Prior mean and standard deviation for the time coefficients `thetaG`.
 #' @param sigmaTheta Prior mean and standard deviation for the standard deviation parameter for time trends, `sigmaTheta`.
 ##' @details For \code{add_stan_priors_exposure_model}, the prior distributions are normal distributions parameterixed by (mean, sd).
 ##' @export
-add_priors_exposure_model <- function(standata, etaG=0, sigmaG=c(0, 1), reK=0, sigmaK=c(0, 1), reH=0,sigmaH=c(0, 1), sigmaW=c(0, 1),  theta=0, sigmaTheta=c(0, 1), ...) {
+add_priors_exposure_model <- function(standata, etaG=0, sigmaG=c(0, 1), reK=0, sigmaK=c(0, 1), reI=0,sigmaI=c(0, 1), sigmaW=c(0, 1),  theta=0, sigmaTheta=c(0, 1), ...) {
 
     standata$prior_etaG_mean <- etaG[1]
     standata$prior_sigmaG_mean <- sigmaG[[1]]
@@ -44,9 +44,9 @@ add_priors_exposure_model <- function(standata, etaG=0, sigmaG=c(0, 1), reK=0, s
     standata$prior_sigmaW_mean <- sigmaW[[1]]
     standata$prior_sigmaW_sd <- sigmaW[[2]]
 
-    standata$prior_reH_mean <- reK[1]
-    standata$prior_sigmaH_mean <- sigmaH[[1]]
-    standata$prior_sigmaH_sd <- sigmaH[[2]]
+    standata$prior_reI_mean <- reK[1]
+    standata$prior_sigmaI_mean <- sigmaI[[1]]
+    standata$prior_sigmaI_sd <- sigmaI[[2]]
 
     standata$prior_reK_mean <- reK[1]
     standata$prior_sigmaK_mean <- sigmaK[[1]]

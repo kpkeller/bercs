@@ -255,13 +255,13 @@ plot_exposure_means_boxplot <- function(stanfit,
 
    ltmean <-  compute_fitted_mean(stanfit = stanfit,standata = standata,
                                     include_time =include_time,
-                                    include_reH=include_reH,
+                                    include_reI=include_reI,
                                     add = FALSE,
                                     exp_transform = exp_transform)
 
     group <- as.factor(standata$group_of_obs)
    if (one_per_person){
-       inds <- !duplicated(standata$hh_of_obs)
+       inds <- !duplicated(standata$unit_of_obs)
        ltmean <- ltmean[inds]
        group <- group[inds]
    }
