@@ -14,8 +14,8 @@ add_priors_exposure_model(
   sigmaG = c(0, 1),
   reK = 0,
   sigmaK = c(0, 1),
-  reH = 0,
-  sigmaH = c(0, 1),
+  reI = 0,
+  sigmaI = c(0, 1),
   sigmaW = c(0, 1),
   theta = 0,
   sigmaTheta = c(0, 1),
@@ -48,9 +48,9 @@ add_priors_outcome_model(
 
 \item{sigmaK}{Prior mean and standard deviation for the standard deviation of the cluster random effects, `sigmaK`.}
 
-\item{reH}{Prior mean for household-level random effects.}
+\item{reI}{Prior mean for household-level random effects.}
 
-\item{sigmaH}{Prior mean and standard deviation for the standard deviation of the household random effects, `sigmaH`.}
+\item{sigmaI}{Prior mean and standard deviation for the standard deviation of the subject-level random effect.}
 
 \item{sigmaW}{Prior mean and standard deviation for the residual standard deviation parameter `sigmaW`.}
 
@@ -69,8 +69,6 @@ add_priors_outcome_model(
 \item{delta}{Prior mean fro the time coefficient(s).}
 
 \item{sigmaDelta}{Prior mean and standard deviation for the standard deviation of time coefficient parameter.}
-
-\item{sigmaI}{Prior mean and standard deviation for the standard deviation of the subject-level random effect.}
 
 \item{beta_nu}{Prior value for the LKJ prior on the correlation between exposure coefficients from different studies.}
 }

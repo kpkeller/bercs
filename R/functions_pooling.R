@@ -9,7 +9,6 @@
 #' @references Gelman, A and Pardoe, I. (2006). Bayesian Measures of Explained Variance and Pooling in Multilevel (Hierarchical) Models. \emph{Technometrics}, 48, 241-251.
 #' @seealso \code{\link{exposure_pooling_factor}}
 #' @export
-#'
 compute_pooling_metrics <- function(theta, epsilon){
     c(prop_var = prop_var_explained(theta=theta, epsilon=epsilon),
       pooling_factor = pooling_factor(epsilon=epsilon))
@@ -36,18 +35,18 @@ pooling_factor <- function(epsilon){
 #' @details This is a wrapper around \code{\link{compute_pooling_metrics}} that extracts the necessary posterior samples from \code{stanfit}.
 #' @seealso \code{\link{compute_pooling_metrics}} \code{\link{sample_exposure_model}}
 #' @export
-exposure_pooling_factor <- function(stanfit, standata, level=c("observation", "household", "cluster", "group", "time")){
+exposure_pooling_factor <- function(stanfit, standata, level=c("observation", "unit", "cluster", "group", "time")){
     if (level=="observation"){
         # Check for muWi......
-        pm <- extract(stanfit, pars=c("reK", "reH", "theta", "etaG"))
-        theta <- matrix(standata$w, nrow=nrow(pm$reH), ncol=length(standata$w), byrow = TRUE)
-        epsilon <- theta - (pm$etaG[, standata$group_of_obs] + pm$reH[, standata$hh_of_obs] + pm$theta %*% t(standata$Ht))
+        pm <- extract(stanfit, pars=c("reK", "reI", "theta", "etaG"))
+        theta <- matrix(standata$w, nrow=nrow(pm$reI), ncol=length(standata$w), byrow = TRUE)
+        epsilon <- theta - (pm$etaG[, standata$group_of_obs] + pm$reI[, standata$unit_of_obs] + pm$theta %*% t(standata$Ht))
         if ("reK" %in% names(pm)) epsilon <- epsilon -  pm$reK[, standata$cluster_of_obs]
-    } else if (level=="household"){
-        pm <- extract(stanfit, pars=c("reH", "reK"))
-        theta <- pm$reH
-        if ("reK" %in% names(pm)) theta <- theta + pm$reK[, get_cluster_of_hh(standata)]
-        epsilon <- pm$reH
+    } else if (level=="unit"){
+        pm <- extract(stanfit, pars=c("reI", "reK"))
+        theta <- pm$reI
+        if ("reK" %in% names(pm)) theta <- theta + pm$reK[, get_cluster_of_unit(standata)]
+        epsilon <- pm$reI
     }  else if (level=="cluster"){
         pm <- extract(stanfit, pars=c("reK"))
         theta <- pm$reK
@@ -67,11 +66,11 @@ exposure_pooling_factor <- function(stanfit, standata, level=c("observation", "h
 }
 
 
-get_cluster_of_hh <- function(standata){
-    hh_of_obs <- standata$hh_of_obs
-    inds <- !duplicated(hh_of_obs)
-    cluster_of_hh <- standata$cluster_of_obs[inds]
-    hh_of_obs <- hh_of_obs[inds]
-    cluster_of_hh <- cluster_of_hh[order(hh_of_obs)]
-    cluster_of_hh
+get_cluster_of_unit <- function(standata){
+    unit_of_obs <- standata$unit_of_obs
+    inds <- !duplicated(unit_of_obs)
+    cluster_of_unit <- standata$cluster_of_obs[inds]
+    unit_of_obs <- unit_of_obs[inds]
+    cluster_of_unit <- cluster_of_unit[order(unit_of_obs)]
+    cluster_of_unit
 }

@@ -33,6 +33,9 @@ create_standata_outcome <- function(datalist=NULL,
             } else {
                 Mt.new <- NULL
             }
+        } else {
+            data.new <- datalist
+            Mt.new <- Mtlist
         }
         out <- create_standata_outcome_singlestudy(data=data.new, Mt=Mt.new,...)
     } else {
@@ -165,7 +168,7 @@ create_standata_outcome_singlestudy <- function(data=NULL,
                         fn=timefn), timefnargs))
     }
     if (!is.null(Mt)) {
-        out <- add_Mt_standata(out, Mt)
+        out <- add_spline_time(out, Mt)
     } else {
         out$Mt <- matrix(0, 0, 0)
         out$timedf <- 0

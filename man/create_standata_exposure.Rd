@@ -40,7 +40,7 @@ A list of class \code{standata_exposure} that contains the following:
 \itemize{
 \item {\code{G} -- Number of groups}
 \item {\code{K} -- Number of clusters.}
-\item{\code{H} Number of households}
+\item{\code{n} Number of households}
 \item{\code{N} -- Number of observations}
 \item{\code{cluster_of_obs} -- Integer providing cluster number of each observation}
 \item{\code{group_of_obs} -- Integer providing group number of each observation}

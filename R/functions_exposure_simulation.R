@@ -123,7 +123,7 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
                            K=K,
                            n=n,
                            N=N,
-                           Ht=matrix(0, 0, 0),
+                           Mt=matrix(0, 0, 0),
                            time=NA,
                            timedf=0,
                            w=rep(NA, N),
@@ -234,7 +234,7 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","hous
 ##' @param ... Additional arguments passed to \code{fn()} via \code{\link{create_spline_matrix}}.
 #' @family exposure simulation functions
 #' @family outcome simulation functions
-##' @seealso \code{\link{create_spline_range}} \code{\link{add_Ht_standata}}
+##' @seealso \code{\link{create_spline_range}} \code{\link{add_time_spline}}
 ##' @export
 ##' @importFrom splines ns
 sim_update_time_splines <- function(obj, df=1, fn="ns", ...){

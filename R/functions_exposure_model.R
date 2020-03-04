@@ -25,7 +25,7 @@
 ##' \itemize{
 ##' \item {\code{G} -- Number of groups}
 ##' \item {\code{K} -- Number of clusters.}
-##' \item{\code{H} Number of households}
+##' \item{\code{n} Number of households}
 ##' \item{\code{N} -- Number of observations}
 ##' \item{\code{cluster_of_obs} -- Integer providing cluster number of each observation}
 ##' \item{\code{group_of_obs} -- Integer providing group number of each observation}
@@ -71,11 +71,11 @@ create_standata_exposure <- function(data=NULL,
 
     out$G <- max(newdata$group_of_obs)
     out$K <- max(newdata$cluster_of_obs)
-    out$H <- max(newdata$unit_of_obs)
+    out$n <- max(newdata$unit_of_obs)
     out$N <- N
     out$cluster_of_obs <- newdata$cluster_of_obs
     out$group_of_obs <-  newdata$group_of_obs
-    out$unit_of_obs <- newdata$hh_of_obs
+    out$unit_of_obs <- newdata$unit_of_obs
 
     if (log_transform){
         out$w <- log(newdata$conc)
@@ -190,7 +190,7 @@ compute_fitted_mean <- function(stanfit,
         ltmean <- ltmean + postmean$reK[standata$cluster_of_obs]
     }
     if (include_reI){
-        ltmean <- ltmean + postmean$reH[standata$unit_of_obs]
+        ltmean <- ltmean + postmean$reI[standata$unit_of_obs]
     }
     if (include_time){
         ltmean <- ltmean + as.vector(standata$Mt %*% postmean$theta)
@@ -233,8 +233,8 @@ plot_exposure_means_bytime <- function(stanfit,
     } else {
         wplot <- standata$w
     }
-    g <- ggplot()  + geom_point(aes(x=standata$times, y=wplot), col="black", shape=2)
-    g <- g + geom_point(aes(x=standata$times, y=ltmean, col=group))
+    g <- ggplot()  + geom_point(aes(x=standata$time, y=wplot), col="black", shape=2)
+    g <- g + geom_point(aes(x=standata$time, y=ltmean, col=group))
     g <- g + scale_color_discrete(name="Group", labels=group_names) + theme_bw() + xlab("Time") + ylab("Concentration")
     g
 }
