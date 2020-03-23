@@ -7,7 +7,7 @@
 ##' create_standata_outcome()
 ##' @title Create List for Fitting Outcome Model via STAN
 ##' @description Generates a 'standata_outcome' object from a 'long' data frame of outcome data
-##' @param datalist List of data frames, containg the data in 'long' format.
+##' @param datalist List of data frames, containing the data in 'long' format.
 ##' @param Mtlist time spline matrix, or a list of such matrices.
 ##' @param ... arguments passed to \code{create_standata_outcome_singlestudy}
 ##' @seealso \code{\link{create_standata_exposure}}
@@ -17,12 +17,12 @@ create_standata_outcome <- function(datalist=NULL,
                                     Mtlist=NULL,
                                     ...) {
     if (!is.null(datalist)){
-        if (length(data)>1 && class(data)=="list"){
-            for (i in 1:length(data)){
-                data[[i]]$clust_id <- paste0(data[[i]]$study, data[[i]]$clust_id)
-                data[[i]]$id <- paste0(data[[i]]$study, data[[i]]$id)
+        if (length(datalist)>1 && class(datalist)=="list"){
+            for (i in 1:length(datalist)){
+                datalist[[i]]$clust_id <- paste0(datalist[[i]]$study, datalist[[i]]$clust_id)
+                datalist[[i]]$id <- paste0(datalist[[i]]$study, datalist[[i]]$id)
             }
-            data.new <- do.call(rbind, data)
+            data.new <- do.call(rbind, datalist)
             if (!is.null(Mtlist)){
                 if (!all(sapply(Mtlist, inherits, "matrix"))) stop("'Mtlist' should be list of matrices.")
                 # for (i in 1:length(Mtlist)){

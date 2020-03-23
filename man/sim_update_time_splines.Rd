@@ -26,7 +26,7 @@ sim_update_times(obj, time = NULL, draw = is.null(time))
 Creates times and splines of time for simulations
 }
 \seealso{
-\code{\link{create_spline_range}} \code{\link{add_Ht_standata}}
+\code{\link{create_spline_range}} \code{\link{add_time_spline}}
 
 Other exposure simulation functions: 
 \code{\link{create_exposure_simulation_skeleton}()},

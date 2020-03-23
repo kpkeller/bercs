@@ -7,7 +7,7 @@
 exposure_pooling_factor(
   stanfit,
   standata,
-  level = c("observation", "household", "cluster", "group", "time")
+  level = c("observation", "unit", "cluster", "group", "time")
 )
 }
 \arguments{

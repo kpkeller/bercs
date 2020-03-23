@@ -7,7 +7,7 @@
 create_standata_outcome(datalist = NULL, Mtlist = NULL, ...)
 }
 \arguments{
-\item{datalist}{List of data frames, containg the data in 'long' format.}
+\item{datalist}{List of data frames, containing the data in 'long' format.}
 
 \item{Mtlist}{time spline matrix, or a list of such matrices.}
 
