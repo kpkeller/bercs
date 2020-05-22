@@ -85,7 +85,7 @@ create_standata_exposure <- function(data=NULL,
     out$time <- newdata$time
     out$timedf <- 0
     if (!is.null(Mt)){
-        out <- add_spline_time(out, Ht)
+        out <- add_spline_time(out, Mt)
     } else {
         out <- add_spline_time(out, array(0, dim=c(0, 0)))
     }

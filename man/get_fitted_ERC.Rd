@@ -13,6 +13,7 @@ get_fitted_ERC(
   ciband = 0.95,
   inclInterceptUncertainty = TRUE,
   inclIntercept = FALSE,
+  intercept_prop = c("equal", "obs"),
   ...
 )
 
@@ -33,6 +34,8 @@ plot_fitted_ERC(obj, incS = NULL, ylab = "Relative Risk", xlab = "Exposure")
 
 \item{inclIntercept}{Should the intercept term be included in the curve?}
 
+\item{intercept_prop}{Proportions used in calculating the "average" intercept. Defaults to equal proportions for each study (\code{"equal"}) and can be set to be proportional to the number of observations in each study (\code{"obs"}). A vector of proportions can also be given.}
+
 \item{...}{Passed to \code{\link{seq}} to control sequence of exposure values.}
 
 \item{obj}{Data frame containing \code{exposure}, \code{mean}, \code{low}, and \code{high}. Typically generated from \code{\link{get_fitted_ERC}}.}
@@ -49,6 +52,8 @@ Computes the exposure-response curve from a fitted outcome model
 \details{
 This function creates a data frame containing the values of the exposure-response curve over a given range of values. The output is designed for easy plotting.
 Currently, the fitted curve is plotted based upon the posterior means of the parameters, with the uncertainty bands based upon quantiles.
+
+Uncertainty from the intercepts is included in the confidence bands by default, since this corresponds to a common interpretation of such intervals. This requires picking a single value for the intercept. For models fit to multiple studies, a separate set of uncertainty will be created for each study. Additionally, a set of results corresponding to "average" intercept is created. The \code{intercept_prop} argument controls the relative contribution of the intercepts from each model.
 }
 \seealso{
 \code{\link{sample_outcome_model}}

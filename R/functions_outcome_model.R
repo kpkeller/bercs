@@ -247,10 +247,13 @@ sample_outcome_model <- function(standata,
 ##' @param ciband width of credible interval band
 ##' @param inclInterceptUncertainty Should intercept uncertainty be included uncertainty estimates? See details for more information.
 ##' @param inclIntercept Should the intercept term be included in the curve?
+##' @param intercept_prop Proportions used in calculating the "average" intercept. Defaults to equal proportions for each study (\code{"equal"}) and can be set to be proportional to the number of observations in each study (\code{"obs"}). A vector of proportions can also be given.
 ##' @param ... Passed to \code{\link{seq}} to control sequence of exposure values.
 ##'
 ##' @details This function creates a data frame containing the values of the exposure-response curve over a given range of values. The output is designed for easy plotting.
 ##' Currently, the fitted curve is plotted based upon the posterior means of the parameters, with the uncertainty bands based upon quantiles.
+##'
+##' Uncertainty from the intercepts is included in the confidence bands by default, since this corresponds to a common interpretation of such intervals. This requires picking a single value for the intercept. For models fit to multiple studies, a separate set of uncertainty will be created for each study. Additionally, a set of results corresponding to "average" intercept is created. The \code{intercept_prop} argument controls the relative contribution of the intercepts from each model.
 ##'
 ##' @seealso \code{\link{sample_outcome_model}}
 ##' @export
@@ -264,6 +267,7 @@ get_fitted_ERC <- function (standata,
                             ciband = 0.95,
                             inclInterceptUncertainty=TRUE,
                             inclIntercept=FALSE,
+                            intercept_prop=c("equal", "obs"),
                             ...)
 {
     nS <- standata$S
@@ -279,7 +283,21 @@ get_fitted_ERC <- function (standata,
 
     if (nSout > nS){
         # Add column that has "average" intercept, if there are multiple studies
-        bs_post <- cbind(bs_post, bs_post %*% table(standata$study_of_obs)/standata$N)
+        if (is.null(intercept_prop)){
+            intercept_prop <- table(standata$study_of_obs)/standata$N
+        }
+        if (intercept_prop=="equal"){
+            intercept_prop <- rep(1/nS, length=nS)
+        } else if (intercept_prop=="obs"){
+            intercept_prop <- table(standata$study_of_obs)/standata$N
+        } else if (!is.numeric(intercept_prop)){
+            stop("'intercept_prop' must be 'equal', 'open' or a numeric vector")
+        }
+        if (sum(intercept_prop)!=1) stop("The values in 'intercept_prop' should equal 1.")
+        if (any(intercept_prop < 0)) stop("The values in 'intercept_prop' should be non-negative.")
+
+
+        bs_post <- cbind(bs_post, bs_post %*% intercept_prop)
     }
     if (length(dim(beta_post))==2) {
         beta_post2 <- array(dim=c(nrow(beta_post),
