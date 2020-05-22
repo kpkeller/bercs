@@ -3,6 +3,7 @@
 \name{get_fitted_ERC}
 \alias{get_fitted_ERC}
 \alias{plot_fitted_ERC}
+\alias{center_ERC}
 \title{Extract fitted Exposure-Response Curve (ERC)}
 \usage{
 get_fitted_ERC(
@@ -25,6 +26,8 @@ plot_fitted_ERC(
   xlab = "Exposure",
   ribbon = FALSE
 )
+
+center_ERC(obj, ref_exposure = min(obj$exposure))
 }
 \arguments{
 \item{standata}{\code{standata_outcome} object used to fit the model}
@@ -56,6 +59,8 @@ plot_fitted_ERC(
 \item{xlab}{String providing x-axis label.}
 
 \item{ribbon}{Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).}
+
+\item{ref_exposure}{Exposure concentration at which the spline should be shifted to have value 0 on log scale (value 1 on exponentiated scale). The largest exposure value less than \code{ref_exposure} is used as the new reference concentration.}
 }
 \description{
 Computes the exposure-response curve from a fitted outcome model
