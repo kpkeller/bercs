@@ -17,7 +17,14 @@ get_fitted_ERC(
   ...
 )
 
-plot_fitted_ERC(obj, incS = NULL, ylab = "Relative Risk", xlab = "Exposure")
+plot_fitted_ERC(
+  obj,
+  incS = NULL,
+  expERC = TRUE,
+  ylab = "Relative Risk",
+  xlab = "Exposure",
+  ribbon = FALSE
+)
 }
 \arguments{
 \item{standata}{\code{standata_outcome} object used to fit the model}
@@ -40,11 +47,15 @@ plot_fitted_ERC(obj, incS = NULL, ylab = "Relative Risk", xlab = "Exposure")
 
 \item{obj}{Data frame containing \code{exposure}, \code{mean}, \code{low}, and \code{high}. Typically generated from \code{\link{get_fitted_ERC}}.}
 
-\item{incS}{Which studies to include. Default of NULL plots all studies.}
+\item{incS}{If model has a single curve but with different selections of intercept uncertainty, this indicates which choice of uncertainty to use. Defaults to the last column of the curve in \code{obj}, which is typically the averaged intercept uncertainty. If multiple curves are fit, this selects which curve(s) is plotted.}
+
+\item{expERC}{Should the fitted curve be exponentiated (TRUE) or not (FALSE).}
 
 \item{ylab}{String providing y-axis label.}
 
 \item{xlab}{String providing x-axis label.}
+
+\item{ribbon}{Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).}
 }
 \description{
 Computes the exposure-response curve from a fitted outcome model

@@ -358,12 +358,14 @@ get_fitted_ERC <- function (standata,
 
 ##' @rdname get_fitted_ERC
 ##' @param obj Data frame containing \code{exposure}, \code{mean}, \code{low}, and \code{high}. Typically generated from \code{\link{get_fitted_ERC}}.
-##' @param incS Which studies to include. Default of NULL plots all studies.
+##' @param incS If model has a single curve but with different selections of intercept uncertainty, this indicates which choice of uncertainty to use. Defaults to the last column of the curve in \code{obj}, which is typically the averaged intercept uncertainty. If multiple curves are fit, this selects which curve(s) is plotted.
+##' @param expERC Should the fitted curve be exponentiated (TRUE) or not (FALSE).
 ##' @param ylab String providing y-axis label.
 ##' @param xlab String providing x-axis label.
+##' @param ribbon Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).
 ##' @export
 ##' @import ggplot2
-plot_fitted_ERC <- function (obj, incS=NULL, ylab = "Relative Risk", xlab = "Exposure")
+plot_fitted_ERC <- function (obj, incS=NULL, expERC=TRUE, ylab = "Relative Risk", xlab = "Exposure", ribbon=FALSE)
 {
     nS <- ncol(obj$mean)
     dflist <- vector("list", nS)
@@ -375,22 +377,44 @@ plot_fitted_ERC <- function (obj, incS=NULL, ylab = "Relative Risk", xlab = "Exp
                                   study=j)
     }
     fulldf <- do.call(rbind, dflist)
-
-    if(!is.null(incS)){
-        fulldf <- subset(fulldf, study %in% incS)
+    if (expERC) {
+        fulldf$mean <- exp(fulldf$mean)
+        fulldf$low <- exp(fulldf$low)
+        fulldf$high <- exp(fulldf$high)
     }
-    ggplot(fulldf) + theme_bw() +
-        geom_ribbon(aes(x = exposure,
-                        ymin = exp(low),
-                        ymax = exp(high),
-                        group=factor(study)), fill = "grey80") +
-        geom_line(aes(x = exposure,
-                      y = exp(mean),
-                      group=factor(study),
-                      col=factor(study)),
+
+    if(is.null(incS)){
+        incS <- nS
+    }
+    fulldf <- subset(fulldf, study %in% incS)
+    fulldf$study <- factor(fulldf$study)
+    g <- ggplot(fulldf) + theme_bw()
+    if (ribbon){
+        g <- g + geom_ribbon(aes(x = exposure,
+                                 ymin = low,
+                                 ymax = high,
+                                 group=study),
+                             fill = "grey80")
+    } else {
+        g <- g+   geom_line(aes(x=exposure,
+                                y=low,
+                                group = study,
+                                col=study),
+                            data=fulldf) +
+            geom_line(aes(x=exposure,
+                          y=high,
+                          group = study,
+                          col=study),
+                      data=fulldf)
+    }
+      g   + geom_line(aes(x = exposure,
+                      y = mean,
+                      group=study,
+                      col=study),
                   lwd = 1.5) +
         geom_hline(yintercept = 1,
                    lty = 2) + xlab(xlab) + ylab(ylab)
+
 }
 
 
