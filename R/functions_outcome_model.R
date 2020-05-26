@@ -420,6 +420,7 @@ plot_fitted_ERC <- function (obj, incS=NULL, expERC=TRUE, ylab = "Relative Risk"
 
 ##' @rdname get_fitted_ERC
 ##' @param ref_exposure Exposure concentration at which the spline should be shifted to have value 0 on log scale (value 1 on exponentiated scale). The largest exposure value less than \code{ref_exposure} is used as the new reference concentration.
+##' @export
 center_ERC <- function(obj, ref_exposure=min(obj$exposure)){
     obj_new <- obj
     ind_cut <- max(which(obj$exposure < ref_exposure))
