@@ -9,7 +9,8 @@
 ##' @description Generates a 'standata_outcome' object from a 'long' data frame of outcome data
 ##' @param datalist List of data frames, containing the data in 'long' format.
 ##' @param Mtlist time spline matrix, or a list of such matrices.
-##' @param ... arguments passed to \code{create_standata_outcome_singlestudy}
+##' @param ... arguments passed to \code{create_standata_outcome_singlestudy}. See Details.
+##' @details An important special case of \code{create_standata_outcome} is when there is only a single study. In this case, all arguments should be named so that they are correctly passed to \code{create_standata_outcome_singlestudy} without pre-processing.
 ##' @seealso \code{\link{create_standata_exposure}}
 ##' @export
 ##' @importFrom Matrix bdiag

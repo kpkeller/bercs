@@ -11,13 +11,15 @@ create_standata_outcome(datalist = NULL, Mtlist = NULL, ...)
 
 \item{Mtlist}{time spline matrix, or a list of such matrices.}
 
-\item{...}{arguments passed to \code{create_standata_outcome_singlestudy}}
+\item{...}{arguments passed to \code{create_standata_outcome_singlestudy}. See Details.}
 }
 \description{
 Generates a 'standata_outcome' object from a 'long' data frame of outcome data
 }
 \details{
 create_standata_outcome()
+
+An important special case of \code{create_standata_outcome} is when there is only a single study. In this case, all arguments should be named so that they are correctly passed to \code{create_standata_outcome_singlestudy} without pre-processing.
 }
 \seealso{
 \code{\link{create_standata_exposure}}
