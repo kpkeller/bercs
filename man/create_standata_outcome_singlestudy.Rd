@@ -13,6 +13,7 @@ create_standata_outcome_singlestudy(
   case = data$case,
   at_risk = data$at_risk,
   covars = "1",
+  scale_covars = TRUE,
   xdf = 1,
   xfn = "iSpline",
   xfnargs = list(),
@@ -39,6 +40,8 @@ create_standata_outcome_singlestudy(
 \item{at_risk}{Time at risk for the observation}
 
 \item{covars}{character vector of variables to include as covariates, or a vector/matrix of covariate values. Should not include an intercept. If a character vector, this intercept is automatically removed (so default of "1" leads to no covariates).}
+
+\item{scale_covars}{should the covariate matrix be centered and scaled?}
 
 \item{xdf}{Degrees of freedom for exposure splines}
 

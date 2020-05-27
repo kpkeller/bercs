@@ -55,6 +55,7 @@ create_standata_outcome <- function(datalist=NULL,
 ##' @param case Count of cases for the observations. In most cases, this is a 0/1 indicator.
 ##' @param at_risk Time at risk for the observation
 ##' @param covars character vector of variables to include as covariates, or a vector/matrix of covariate values. Should not include an intercept. If a character vector, this intercept is automatically removed (so default of "1" leads to no covariates).
+##' @param scale_covars should the covariate matrix be centered and scaled?
 ##' @param xdf Degrees of freedom for exposure splines
 ##' @param Mt Optional matrix of time splines
 ##' @param xfn name of function used to generate exposure splines
@@ -73,6 +74,7 @@ create_standata_outcome_singlestudy <- function(data=NULL,
                                                 case=data$case,
                                                 at_risk=data$at_risk,
                                                 covars="1",
+                                                scale_covars=TRUE,
                                                 xdf=1,
                                                 xfn="iSpline",
                                                 xfnargs=list(),
@@ -144,11 +146,15 @@ create_standata_outcome_singlestudy <- function(data=NULL,
         Z <- stats::model.matrix(stats::formula(Zformula), data=data)
         Z <- Z[, -1, drop=FALSE] # Drop interecept
     } else if (inherits(covars, "vector")){
-        Z <- as.matrix(Z)
-    } else if (!inherits(covars, "matrix")){
+        Z <- as.matrix(covars)
+    } else if (inherits(covars, "matrix")){
+        Z <- covars
+    } else {
         stop("'covars' must be character string, matrix, or vector.")
     }
-    Z <- scale(Z)
+    if (scale_covars){
+      Z <- scale(Z)
+    }
     out$Z <- as.matrix(Z)
     if (ncol(out$Z)==0){
         out$Z <- matrix(0, 0, 0)
