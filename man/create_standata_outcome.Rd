@@ -4,14 +4,16 @@
 \alias{create_standata_outcome}
 \title{Create List for Fitting Outcome Model via STAN}
 \usage{
-create_standata_outcome(datalist = NULL, Mtlist = NULL, ...)
+create_standata_outcome(..., datalist = NULL, Mtlist = NULL, covarslist = NULL)
 }
 \arguments{
+\item{...}{arguments passed to \code{create_standata_outcome_singlestudy}. See Details.}
+
 \item{datalist}{List of data frames, containing the data in 'long' format.}
 
 \item{Mtlist}{time spline matrix, or a list of such matrices.}
 
-\item{...}{arguments passed to \code{create_standata_outcome_singlestudy}. See Details.}
+\item{covarslist}{list of covariate variable names for each matrix, or a list of covariate matrices.}
 }
 \description{
 Generates a 'standata_outcome' object from a 'long' data frame of outcome data
@@ -19,7 +21,7 @@ Generates a 'standata_outcome' object from a 'long' data frame of outcome data
 \details{
 create_standata_outcome()
 
-An important special case of \code{create_standata_outcome} is when there is only a single study. In this case, all arguments should be named so that they are correctly passed to \code{create_standata_outcome_singlestudy} without pre-processing.
+An important special case of \code{create_standata_outcome} is when there is only a single study. In this case, the values are passed to \code{create_standata_outcome_singlestudy} without pre-processing.
 }
 \seealso{
 \code{\link{create_standata_exposure}}

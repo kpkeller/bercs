@@ -7,16 +7,18 @@
 ##' create_standata_outcome()
 ##' @title Create List for Fitting Outcome Model via STAN
 ##' @description Generates a 'standata_outcome' object from a 'long' data frame of outcome data
+##' @param ... arguments passed to \code{create_standata_outcome_singlestudy}. See Details.
 ##' @param datalist List of data frames, containing the data in 'long' format.
 ##' @param Mtlist time spline matrix, or a list of such matrices.
-##' @param ... arguments passed to \code{create_standata_outcome_singlestudy}. See Details.
-##' @details An important special case of \code{create_standata_outcome} is when there is only a single study. In this case, all arguments should be named so that they are correctly passed to \code{create_standata_outcome_singlestudy} without pre-processing.
+##' @param covarslist list of covariate variable names for each matrix, or a list of covariate matrices.
+##' @details An important special case of \code{create_standata_outcome} is when there is only a single study. In this case, the values are passed to \code{create_standata_outcome_singlestudy} without pre-processing.
 ##' @seealso \code{\link{create_standata_exposure}}
 ##' @export
 ##' @importFrom Matrix bdiag
-create_standata_outcome <- function(datalist=NULL,
+create_standata_outcome <- function(...,
+                                    datalist=NULL,
                                     Mtlist=NULL,
-                                    ...) {
+                                    covarslist=NULL) {
     if (!is.null(datalist)){
         if (length(datalist)>1 && class(datalist)=="list"){
             for (i in 1:length(datalist)){
@@ -34,11 +36,36 @@ create_standata_outcome <- function(datalist=NULL,
             } else {
                 Mt.new <- NULL
             }
+            if (!is.null(covarslist)){
+              covarslist.new <- vector("list", length(covarslist))
+              for (i in 1:length(covarslist)){
+                if (inherits(covarslist[[i]], "character")){
+                  Zformula <- paste0("~ ", paste0(covarslist[[i]], collapse="+"))
+                  Z <- stats::model.matrix(stats::formula(Zformula), data=datalist[[i]])
+                  Z <- Z[, -1, drop=FALSE] # Drop intercept
+                } else if (inherits(covarslist[[i]], "vector")){
+                  Z <- as.matrix(covarslist[[i]])
+                } else if (inherits(covarslist[[i]], "matrix")){
+                  Z <- covarslist[[i]]
+                } else {
+                  stop("'covarslist' must be a list containing a character string, matrix, or vector.")
+                }
+                covarslist.new[[i]] <- Z
+              }
+              covars.new <- Matrix::bdiag(covarslist.new)
+              covars.new <- as.matrix(covars.new)
+              colnames(covars.new) <- unlist(sapply(covarslist.new, colnames))
+            } else {
+              covars.new <- c("1")
+            }
         } else {
             data.new <- datalist
             Mt.new <- Mtlist
         }
-        out <- create_standata_outcome_singlestudy(data=data.new, Mt=Mt.new,...)
+        out <- create_standata_outcome_singlestudy(data=data.new,
+                                                   Mt=Mt.new,
+                                                   covars=covars.new,
+                                                   ...)
     } else {
         out <- create_standata_outcome_singlestudy(...)
     }
@@ -145,7 +172,7 @@ create_standata_outcome_singlestudy <- function(data=NULL,
     if (inherits(covars, "character")){
         Zformula <- paste0("~ ", paste0(covars, collapse="+"))
         Z <- stats::model.matrix(stats::formula(Zformula), data=data)
-        Z <- Z[, -1, drop=FALSE] # Drop interecept
+        Z <- Z[, -1, drop=FALSE] # Drop intercept
     } else if (inherits(covars, "vector")){
         Z <- as.matrix(covars)
     } else if (inherits(covars, "matrix")){

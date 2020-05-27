@@ -376,8 +376,8 @@ outsim_update_set_parameter <- function(obj, param=c("beta", "gamma"), value=NUL
 outsim_update_exp_splines <- function(obj, df=1, fn="ns", ...){
     if (!inherits(obj, c("outsim"))) stop("'obj' must be of class 'outsim'.")
     if (all(is.na(obj$structure$x))) stop("obj$structure$x must exist.")
-    Hx <- create_spline_matrix(obj$structure$x, df=df, fn=fn, ...)
-    obj$standata <- add_Hx_standata(obj$standata, Hx)
+    Mx <- create_spline_matrix(obj$structure$x, df=df, fn=fn, ...)
+    obj$standata <- add_spline_exposure(obj$standata, Mx)
     obj
 }
 
