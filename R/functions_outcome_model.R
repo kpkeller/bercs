@@ -157,12 +157,12 @@ create_standata_outcome_singlestudy <- function(data=NULL,
         out$x <- 0
         Mx <- matrix(0, 0, 0)
     } else if (xdf==1){
-        Mx <- scale(data$conc)
-        out$x <- data$conc
+        Mx <- scale(newdata$conc)
+        out$x <- newdata$conc
     } else {
-        out$x <- data$conc
+        out$x <- newdata$conc
         Mx <- do.call(create_spline_matrix,
-                  c(list(x=data$conc,
+                  c(list(x=newdata$conc,
                         df=xdf,
                         fn=xfn), xfnargs))
     }
