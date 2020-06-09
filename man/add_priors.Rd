@@ -36,9 +36,9 @@ add_priors_outcome_model(
 )
 }
 \arguments{
-\item{standata}{Either a \code{standata_exposure} or \code{standata_outcome} object. Based on its class, \code{add_priors} calls \code{add_priors_exposure_model} or \code{add_priors_exposure_model}.}
+\item{standata}{Either a \code{standata_exposure} or \code{standata_outcome} object.}
 
-\item{...}{Arguments passed to \code{add_priors_exposure_model} or \code{add_priors_outcome_model}. Unlisted arguments are ignorred.}
+\item{...}{Arguments passed to \code{add_priors_exposure_model} or \code{add_priors_outcome_model}. Unlisted arguments are ignored.}
 
 \item{etaG}{Prior mean and standard deviation for the group means parameter `etaG`.}
 
@@ -66,7 +66,7 @@ add_priors_outcome_model(
 
 \item{sigmaGamma}{Prior mean and standard deviation for the standard deviation of covariate coefficient parameter.}
 
-\item{delta}{Prior mean fro the time coefficient(s).}
+\item{delta}{Prior mean for the time coefficient(s).}
 
 \item{sigmaDelta}{Prior mean and standard deviation for the standard deviation of time coefficient parameter.}
 
@@ -76,8 +76,8 @@ add_priors_outcome_model(
 Sets prior distribution hyperparameters using defaults or provided values
 }
 \details{
-For \code{add_stan_priors_exposure_model}, the prior distributions are normal distributions parameterixed by (mean, sd).
+Based on its class, \code{add_priors} calls \code{add_priors_exposure_model} or \code{add_priors_exposure_model}. For the variance parameters, the prior distributions are half-normal distributions parameterized by (mean, sd).
 }
 \seealso{
-\code{\link{create_standata_exposure}}
+\code{\link{create_standata_exposure}}, \code{\link{create_standata_outcome}}, \code{\link{sample_exposure_model}}, \code{\link{sample_outcome_model}}
 }

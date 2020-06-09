@@ -29,7 +29,7 @@ create_standata_exposure(
 
 \item{time}{Vector of times corresponding to \code{conc} values.}
 
-\item{Mt}{Matrix of splines values for time to include in the model. Defaults to NULL, and can be added later via \code{\link{add_spline_time}}.}
+\item{Mt}{Matrix of splines values for time to include in the model. Defaults to NULL, and can be added later via \code{\link{add_spline_time}}. See \code{\link{create_spline}} for}
 
 \item{log_transform}{Should the concentration value be log-transformed?}
 
@@ -60,6 +60,18 @@ This function takes as input a `long` data frame and extracts from it the inform
 
 The values of \code{group}, \code{unit_id}, and \code{clust_id} are converted to factor and then coerced to integer. The ordering of groups (units, clusters) in the output object will depend on the default ordering introduced by \code{\link{factor}}.
 }
+\examples{
+# Create simulated data
+exp_data <- create_standata_exposure(group=rep(1, 10),
+                                     conc=rnorm(10),
+                                     unit_id=rep(0:1, 5),
+                                     time=runif(10))
+# Add default priors
+exp_data <- add_priors(exp_data,
+                       sigmaI=c(0, 0.1))
+# Fit the model
+exp_mod_fit <- sample_exposure_model(exp_data)
+}
 \seealso{
-\code{\link{sample_exposure_model}}, \code{\link{create_standata_outcome}}
+\code{\link{sample_exposure_model}},  \code{\link{create_spline}}, \code{\link{create_standata_outcome}}
 }

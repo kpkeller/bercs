@@ -25,7 +25,7 @@ plot_exposure_means_boxplot(
 )
 }
 \arguments{
-\item{stanfit}{Fitted STAN model object containing posterior samples of parameters}
+\item{stanfit}{Fitted STAN model object containing posterior samples of parameters; from \code{\link{sample_exposure_model}}.}
 
 \item{standata}{List containing model structure information corresponding to \code{stanfit}.
 Typically a list of class \code{standata_exposure}. However, it may be any list (or data frame) containing

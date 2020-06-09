@@ -96,7 +96,7 @@ predict_spline <- function(spline, newx, center=FALSE, scale=FALSE){
 ##' @param standata the standata object to be updated
 ##' @param Mt,Mx the matrix of time or exposure splines to be added
 ##' @details \code{add_spline_time} updates the \code{Mt}, \code{timedf}, and \code{Mt_attributes} elements of \code{standata}. \code{add_spline_exposure} updates the \code{Mx}, \code{xdf}, and \code{Mx_attributes} elements of \code{standata}.
-##' @seealso \code{\link{create_standata_exposure}}, \code{\link{create_standata_outcome}}, \code{\link{expsim_update_parameter}}, \code{\link{outsim_update_parameter}}, \code{\link{create_spline_range}}
+##' @seealso \code{\link{create_standata_exposure}}, \code{\link{create_standata_outcome}}, \code{\link{expsim_update_parameter}}, \code{\link{outsim_update_parameter}}, \code{\link{create_spline_range}}, \code{\link{create_spline_matrix}}
 ##' @export
 add_spline_time <- function(standata, Mt){
     if(!inherits(Mt, c("matrix","numeric", "integer"))) stop("'Mt' should be a matrix or vector.")

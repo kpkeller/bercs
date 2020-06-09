@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_exposure_model.R
 \name{compute_fitted_mean}
 \alias{compute_fitted_mean}
-\title{Compute fitted concentration}
+\title{Compute estimated concentration}
 \usage{
 compute_fitted_mean(
   stanfit,
@@ -16,7 +16,7 @@ compute_fitted_mean(
 )
 }
 \arguments{
-\item{stanfit}{Fitted STAN model object containing posterior samples of parameters}
+\item{stanfit}{Fitted STAN model object containing posterior samples of parameters; from \code{\link{sample_exposure_model}}.}
 
 \item{standata}{List containing model structure information corresponding to \code{stanfit}.
 Typically a list of class \code{standata_exposure}. However, it may be any list (or data frame) containing

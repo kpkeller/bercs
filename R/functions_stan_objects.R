@@ -5,9 +5,10 @@
 # Wrapper function for adding prior values to standata object fed in to STAN.
 ##' @title Add Hyperparameter Values to Standata Object
 ##' @description Sets prior distribution hyperparameters using defaults or provided values
-##' @param standata Either a \code{standata_exposure} or \code{standata_outcome} object. Based on its class, \code{add_priors} calls \code{add_priors_exposure_model} or \code{add_priors_exposure_model}.
-##' @param ... Arguments passed to \code{add_priors_exposure_model} or \code{add_priors_outcome_model}. Unlisted arguments are ignorred.
-##' @seealso \code{\link{create_standata_exposure}}
+##' @param standata Either a \code{standata_exposure} or \code{standata_outcome} object.
+##' @param ... Arguments passed to \code{add_priors_exposure_model} or \code{add_priors_outcome_model}. Unlisted arguments are ignored.
+##' @details Based on its class, \code{add_priors} calls \code{add_priors_exposure_model} or \code{add_priors_exposure_model}. For the variance parameters, the prior distributions are half-normal distributions parameterized by (mean, sd).
+##' @seealso \code{\link{create_standata_exposure}}, \code{\link{create_standata_outcome}}, \code{\link{sample_exposure_model}}, \code{\link{sample_outcome_model}}
 ##' @export
 add_priors  <- function(standata, ...){
     if (inherits(standata, "standata_exposure")){
@@ -19,7 +20,6 @@ add_priors  <- function(standata, ...){
     }
     out
 }
-
 
 # Function for adding prior values to standataect for Exposure model
 # Numeric pairs are (mean, sd) for variables
@@ -33,7 +33,6 @@ add_priors  <- function(standata, ...){
 #' @param sigmaW Prior mean and standard deviation for the residual standard deviation parameter `sigmaW`.
 #' @param theta Prior mean and standard deviation for the time coefficients `thetaG`.
 #' @param sigmaTheta Prior mean and standard deviation for the standard deviation parameter for time trends, `sigmaTheta`.
-##' @details For \code{add_stan_priors_exposure_model}, the prior distributions are normal distributions parameterixed by (mean, sd).
 ##' @export
 add_priors_exposure_model <- function(standata, etaG=0, sigmaG=c(0, 1), reK=0, sigmaK=c(0, 1), reI=0,sigmaI=c(0, 1), sigmaW=c(0, 1),  theta=0, sigmaTheta=c(0, 1), ...) {
 
@@ -65,7 +64,7 @@ add_priors_exposure_model <- function(standata, etaG=0, sigmaG=c(0, 1), reK=0, s
 ##' @param sigmaBeta Prior mean and standard deviation for the standard deviation of exposure coefficient parameter.
 ##' @param gamma Prior mean for the covariate coefficient(s).
 ##' @param sigmaGamma Prior mean and standard deviation for the standard deviation of covariate coefficient parameter.
-##' @param delta Prior mean fro the time coefficient(s).
+##' @param delta Prior mean for the time coefficient(s).
 ##' @param sigmaDelta Prior mean and standard deviation for the standard deviation of time coefficient parameter.
 ##' @param sigmaI Prior mean and standard deviation for the standard deviation of the subject-level random effect.
 ##' @param beta_nu Prior value for the LKJ prior on the correlation between exposure coefficients from different studies.

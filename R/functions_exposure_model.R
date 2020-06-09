@@ -15,7 +15,7 @@
 ##' @param unit_id Vector identifying the distinct unit (e.g. person, household) for each observation.
 ##' @param clust_id Vector identifying cluster membership for each observation.
 ##' @param time Vector of times corresponding to \code{conc} values.
-##' @param Mt Matrix of splines values for time to include in the model. Defaults to NULL, and can be added later via \code{\link{add_spline_time}}.
+##' @param Mt Matrix of splines values for time to include in the model. Defaults to NULL, and can be added later via \code{\link{add_spline_time}}. See \code{\link{create_spline}} for
 ##' @param log_transform Should the concentration value be log-transformed?
 ##' @param return_addition See 'Value'.
 ##' @details This function takes as input a `long` data frame and extracts from it the information needed for fitting the exposure model in STAN.
@@ -35,8 +35,19 @@
 ##' }
 ##' If \code{return_addition=TRUE}, then a two-element list is returned. The first element
 ##' is the \code{standata_exposure} object described above. The second element is a modified version of \code{data}, with the variables \code{group_of_obs}, \code{cluster_of_obs}, \code{hh_of_obs}, and \code{times} added (or overwritten).
-##' @seealso \code{\link{sample_exposure_model}}, \code{\link{create_standata_outcome}}
+##' @seealso \code{\link{sample_exposure_model}},  \code{\link{create_spline}}, \code{\link{create_standata_outcome}}
 ##' @export
+##' @examples
+##' # Create simulated data
+##' exp_data <- create_standata_exposure(group=rep(1, 10),
+##'                                      conc=rnorm(10),
+##'                                      unit_id=rep(0:1, 5),
+##'                                      time=runif(10))
+##' # Add default priors
+##' exp_data <- add_priors(exp_data,
+##'                        sigmaI=c(0, 0.1))
+##' # Fit the model
+##' exp_mod_fit <- sample_exposure_model(exp_data)
 create_standata_exposure <- function(data=NULL,
                                      group=data$group,
                                      conc=data$conc,
@@ -100,17 +111,29 @@ create_standata_exposure <- function(data=NULL,
 
 ##' @title Sample Exposure Model
 ##' @description Samples from the posterior distribution of the exposure model, using STAN
-##' @param standata An object of class `standata_exposure`, typically created from \code{\link{create_standata_exposure}}.
+##' @param standata An object of class `standata_exposure`, typically created from \code{\link{create_standata_exposure}}. It should also include information on prior distributions, which can be added via \code{\link{add_priors}}
 ##' @param B Number of post-warmup iterations.
 ##' @param warmup Number of warmup iterations.
 ##' @param chains Number of chains to sample.
 ##' @param control List provided as the \code{control} argument of \code{\link[rstan]{sampling}}
 ##' @param ... Additional arguments passed to \code{\link[rstan]{sampling}}.
-##' @details The model is:
-##' \deqn{w = \eta_G...}
-##' @seealso \code{\link{create_standata_exposure}}, \code{\link{sample_outcome_model}}
+##' @details This fits a hierarchical model designed for modeling exposure concentrations from a study that has irregularly-spaced, clustered measurements. The model for an observation \eqn{w_{gkit}} from exposure group \eqn{g}, cluster (e.g. neighborhood) \eqn{k}, unit (e.g. household) \eqn{i}, and time \eqn{t} is:
+##' \deqn{w_{gkit} = \eta_g + \alpha_{0k} + \alpha_{1i}+ H(t)*\theta}
+##' Here, \eqn{\eta_g} is a group-specific mean, \eqn{alpha_{0k}} is a cluster-specific random effect, \eqn{alpha_{1i}} is a unit-specific random effect, and \eqn{\theta} are coefficients for a temporal spline \eqn{H(t)}.
+##' @seealso \code{\link{create_standata_exposure}}, \code{\link{sample_outcome_model}}, \code{\link{add_priors}}
 ##' @importFrom rstan sampling
 ##' @export
+##' @examples
+##' # Create simulated data
+##' exp_data <- create_standata_exposure(group=rep(1, 10),
+##'                                      conc=rnorm(10),
+##'                                      unit_id=rep(0:1, 5),
+##'                                      time=runif(10))
+##' # Add default priors
+##' exp_data <- add_priors(exp_data,
+##'                        sigmaI=c(0, 0.1))
+##' # Fit the model
+##' exp_mod_fit <- sample_exposure_model(exp_data)
 sample_exposure_model <- function(standata,
                                   B=1000,
                                   warmup=B,
@@ -133,11 +156,9 @@ sample_exposure_model <- function(standata,
 }
 
 
-
-
-#' @title Compute fitted concentration
+#' @title Compute estimated concentration
 #' @description Calculates the posterior mean exposure concentrations.
-#' @param stanfit Fitted STAN model object containing posterior samples of parameters
+#' @param stanfit Fitted STAN model object containing posterior samples of parameters; from \code{\link{sample_exposure_model}}.
 #' @param standata List containing model structure information corresponding to \code{stanfit}.
 #'  Typically a list of class \code{standata_exposure}. However, it may be any list (or data frame) containing
 #'  \code{cluster_of_obs} (if \code{etaK} was sampled in \code{stanfit}), \code{group_of_obs}

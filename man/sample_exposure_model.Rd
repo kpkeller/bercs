@@ -14,7 +14,7 @@ sample_exposure_model(
 )
 }
 \arguments{
-\item{standata}{An object of class `standata_exposure`, typically created from \code{\link{create_standata_exposure}}.}
+\item{standata}{An object of class `standata_exposure`, typically created from \code{\link{create_standata_exposure}}. It should also include information on prior distributions, which can be added via \code{\link{add_priors}}}
 
 \item{B}{Number of post-warmup iterations.}
 
@@ -30,9 +30,22 @@ sample_exposure_model(
 Samples from the posterior distribution of the exposure model, using STAN
 }
 \details{
-The model is:
-\deqn{w = \eta_G...}
+This fits a hierarchical model designed for modeling exposure concentrations from a study that has irregularly-spaced, clustered measurements. The model for an observation \eqn{w_{gkit}} from exposure group \eqn{g}, cluster (e.g. neighborhood) \eqn{k}, unit (e.g. household) \eqn{i}, and time \eqn{t} is:
+\deqn{w_{gkit} = \eta_g + \alpha_{0k} + \alpha_{1i}+ H(t)*\theta}
+Here, \eqn{\eta_g} is a group-specific mean, \eqn{alpha_{0k}} is a cluster-specific random effect, \eqn{alpha_{1i}} is a unit-specific random effect, and \eqn{\theta} are coefficients for a temporal spline \eqn{H(t)}.
+}
+\examples{
+# Create simulated data
+exp_data <- create_standata_exposure(group=rep(1, 10),
+                                     conc=rnorm(10),
+                                     unit_id=rep(0:1, 5),
+                                     time=runif(10))
+# Add default priors
+exp_data <- add_priors(exp_data,
+                       sigmaI=c(0, 0.1))
+# Fit the model
+exp_mod_fit <- sample_exposure_model(exp_data)
 }
 \seealso{
-\code{\link{create_standata_exposure}}, \code{\link{sample_outcome_model}}
+\code{\link{create_standata_exposure}}, \code{\link{sample_outcome_model}}, \code{\link{add_priors}}
 }
