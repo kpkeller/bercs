@@ -1,8 +1,8 @@
 ######################
 # Contains the following functions
 #
-# expsim_create_study_skeleton_parallel()
-# expsim_create_study_skeleton()
+# create_exposure_simulation_skeleton()
+# create_exposure_simulation_skeleton_parallel()
 # expsim_update_times()
 # expsim_update_time_splines()
 # expsim_update_time_effect()
@@ -18,9 +18,10 @@
 ##' Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via
 ##' \code{\link{expsim_sample_observations}}
 ##' and posterior parameter estimates obtained from \code{\link{sample_exposure_model}}.
+##' See \code{\link{sample_exposure_model}} for a mathematical description of the model.
 ##' @return A list containing two sublists: \code{structure}, which contains settings and parameters for generating data, and \code{standata} which contains the study data as a \code{standata_exposure} obejct for sampling via \code{\link{sample_exposure_model}}.
 #' @family exposure simulation functions
-#' @seealso \code{\link{create_outcome_simulation_skeleton}}
+#' @seealso \code{\link{create_outcome_simulation_skeleton}}, \code{\link{sample_exposure_model}}
 #' @export
 create_exposure_simulation_skeleton <- function(design="parallel",...){
     if (design=="parallel"){
@@ -42,10 +43,15 @@ create_exposure_simulation_skeleton <- function(design="parallel",...){
 ##' @param nobs Number of observations in each household. If length 1, repeated for all households and if length \code{sum(nclusters)}, repeated for all households within each cluster.
 ##' @param verbose Logical indicator for message printing.
 ##' @examples
+##' # Create simulation structure
 ##' es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=10)
+##' # No standard deviation parameter set by default
 ##' es$structure$sigK
+##' # Add standard deviation parameter value
 ##' es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
 ##' es$structure$sigK
+##' # Sample the model
+##' es2 <- expsim_sample_observations(es)
 ##' @export
 create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
                                                   nclusters=1,
@@ -248,14 +254,19 @@ sim_update_time_splines <- function(obj, df=1, fn="ns", ...){
 
 #' @title Sample Simulated Exposure Observations
 #' @description Draws a sample of exposure observations using the specified model parameters
-#' @param obj exposure simualtion object, created by \code{\link{create_exposure_simulation_skeleton}}.
-#' @details This function assumes that \code{etaK} (or at least \code{etaG}), \code{sigW}, \code{reI}, and \code{timefn} have been set. The latter defaults to zero, but the others must be set with \code{\link{expsim_update_parameter}}. If these have not been set, then this will set \code{w} to a vector of \code{NA}.
-#' @family exposure simulation functions
-#' @export
-#' @importFrom stats rnorm
+#' @param obj exposure simulation object, created by \code{\link{create_exposure_simulation_skeleton}}.
+#' @details This function assumes that \code{etaG}, \code{sigW}, \code{reI}, and \code{timefn} have been set. Optionally, \code{sigK} should be set if a cluster random effect is to be included. These can be set with \code{\link{expsim_update_parameter}}.
+##' @return An object of class \code{expsim}, with updated values of \code{obj$standata$w} and \code{obj$structure$meanW}.
+##' @family exposure simulation functions
+##' @export
+##' @importFrom stats rnorm
 expsim_sample_observations <- function(obj){
         if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
 
+    if (is.na(obj$structure$etaG)) stop("etaG must be set. See expsim_update_parameter().")
+    if (is.na(obj$structure$reI)) stop("reI must be set. See expsim_update_parameter().")
+    if (is.na(obj$structure$timefn)) stop("timefn must be set. See expsim_update_parameter().")
+    if (is.na(obj$structure$sigW)) stop("sigW must be set. See expsim_update_parameter().")
     obj$structure$meanW <- with(obj$structure, etaG[group_of_obs] + reI[unit_of_obs] + timefn(time))
 
     if (!any(is.na(obj$structure$reK))){

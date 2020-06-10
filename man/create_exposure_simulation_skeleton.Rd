@@ -41,15 +41,21 @@ These functions create the blank structure of groups, clusters, households, and 
 Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via
 \code{\link{expsim_sample_observations}}
 and posterior parameter estimates obtained from \code{\link{sample_exposure_model}}.
+See \code{\link{sample_exposure_model}} for a mathematical description of the model.
 }
 \examples{
+# Create simulation structure
 es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=10)
+# No standard deviation parameter set by default
 es$structure$sigK
+# Add standard deviation parameter value
 es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
 es$structure$sigK
+# Sample the model
+es2 <- expsim_sample_observations(es)
 }
 \seealso{
-\code{\link{create_outcome_simulation_skeleton}}
+\code{\link{create_outcome_simulation_skeleton}}, \code{\link{sample_exposure_model}}
 
 Other exposure simulation functions: 
 \code{\link{expsim_sample_observations}()},
