@@ -6,3 +6,4 @@ exposure_model.hpp
 Read-and-delete-me
 .Rhistory
 *.cc
+inst/doc
