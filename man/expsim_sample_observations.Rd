@@ -7,7 +7,10 @@
 expsim_sample_observations(obj)
 }
 \arguments{
-\item{obj}{exposure simualtion object, created by \code{\link{create_exposure_simulation_skeleton}}.}
+\item{obj}{exposure simulation object, created by \code{\link{create_exposure_simulation_skeleton}}.}
+}
+\value{
+An object of class \code{expsim}, with updated values of \code{obj$standata$w} and \code{obj$structure$meanW}.
 }
 \description{
 Draws a sample of exposure observations using the specified model parameters

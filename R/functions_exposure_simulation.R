@@ -7,6 +7,8 @@
 # expsim_update_time_splines()
 # expsim_update_time_effect()
 # expsim_update_parameter()
+# expsim_sample_observations()
+# sim_update_times()
 ######################
 
 
@@ -14,7 +16,7 @@
 ##' @description These functions construct lists containing the structure for simulating exposure data and the objects needed for fitting the model to the data.
 ##' @param design String providing the study design. Currently only \code{"parallel"} is implemented.
 ##' @param ... Additional arguments passed to the design-specific functions.
-##' @details These functions create the blank structure of groups, clusters, households, and subject.
+##' @details These functions create the blank structure of groups, clusters, and units (e.g. households).
 ##' Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via
 ##' \code{\link{expsim_sample_observations}}
 ##' and posterior parameter estimates obtained from \code{\link{sample_exposure_model}}.
@@ -39,8 +41,8 @@ create_exposure_simulation_skeleton <- function(design="parallel",...){
 ##' @rdname create_exposure_simulation_skeleton
 ##' @param ngroups Number of groups.
 ##' @param nclusters Number of clusters. Either a single value or a vector of length \code{ngroups}.
-##' @param nunits Number of households in each cluster. If length 1, repeated for all clusters.
-##' @param nobs Number of observations in each household. If length 1, repeated for all households and if length \code{sum(nclusters)}, repeated for all households within each cluster.
+##' @param nunits Number of units (e.g. households) in each cluster. If length 1, repeated for all clusters.
+##' @param nobs Number of observations in each unit. If length 1, repeated for all units and if length \code{sum(nclusters)}, repeated for all units within each cluster.
 ##' @param verbose Logical indicator for message printing.
 ##' @examples
 ##' # Create simulation structure
@@ -61,7 +63,7 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 
     # Check input
     if(!is.null(nclusters) && !check_all_nonnegative_value(nclusters)) stop("'nclusters' should be a non-negative integer and must have at least one positive element.")
-    if(!check_all_nonnegative_value(nunits)) stop("'nhouseholds' should be a non-negative integer and must have at least one positive element.")
+    if(!check_all_nonnegative_value(nunits)) stop("'nunits' should be a non-negative integer and must have at least one positive element.")
     if(!check_all_postive_value(ngroups)) stop("'ngroups' should be a positive integer.")
 
     # Process nclusters
@@ -74,7 +76,7 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
     }
     K <- sum(nclusters)
 
-    # Process nhouseholds
+    # Process nunits
     if(!length(nunits) %in% c(1, K)) stop("'nunits' must have length 1 or 'sum(nclusters)'.")
     if (length(nunits)==1) {
         nunits <- rep(nunits, times=K)
@@ -169,7 +171,7 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 #' @family exposure simulation functions
 #' @export
 #' @importFrom stats rnorm
-expsim_update_parameter <- function(obj, param, level=c("group", "cluster","household", "observation", "correlation","time"), type=c("mean", "sd", "re"), value=NULL, draw=is.null(value)){
+expsim_update_parameter <- function(obj, param, level=c("group", "cluster","uni", "observation", "correlation","time"), type=c("mean", "sd", "re"), value=NULL, draw=is.null(value)){
 
     if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
     if (!missing(param)){

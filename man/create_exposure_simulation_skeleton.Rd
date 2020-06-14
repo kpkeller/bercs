@@ -24,9 +24,9 @@ create_exposure_simulation_skeleton_parallel(
 
 \item{nclusters}{Number of clusters. Either a single value or a vector of length \code{ngroups}.}
 
-\item{nunits}{Number of households in each cluster. If length 1, repeated for all clusters.}
+\item{nunits}{Number of units (e.g. households) in each cluster. If length 1, repeated for all clusters.}
 
-\item{nobs}{Number of observations in each household. If length 1, repeated for all households and if length \code{sum(nclusters)}, repeated for all households within each cluster.}
+\item{nobs}{Number of observations in each unit. If length 1, repeated for all units and if length \code{sum(nclusters)}, repeated for all units within each cluster.}
 
 \item{verbose}{Logical indicator for message printing.}
 }
@@ -37,7 +37,7 @@ A list containing two sublists: \code{structure}, which contains settings and pa
 These functions construct lists containing the structure for simulating exposure data and the objects needed for fitting the model to the data.
 }
 \details{
-These functions create the blank structure of groups, clusters, households, and subject.
+These functions create the blank structure of groups, clusters, and units (e.g. households).
 Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via
 \code{\link{expsim_sample_observations}}
 and posterior parameter estimates obtained from \code{\link{sample_exposure_model}}.
