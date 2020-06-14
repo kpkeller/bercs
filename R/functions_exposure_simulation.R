@@ -171,7 +171,7 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 #' @family exposure simulation functions
 #' @export
 #' @importFrom stats rnorm
-expsim_update_parameter <- function(obj, param, level=c("group", "cluster","uni", "observation", "correlation","time"), type=c("mean", "sd", "re"), value=NULL, draw=is.null(value)){
+expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit", "observation", "correlation","time"), type=c("mean", "sd", "re"), value=NULL, draw=is.null(value)){
 
     if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
     if (!missing(param)){

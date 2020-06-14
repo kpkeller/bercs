@@ -7,7 +7,7 @@
 expsim_update_parameter(
   obj,
   param,
-  level = c("group", "cluster", "uni", "observation", "correlation", "time"),
+  level = c("group", "cluster", "unit", "observation", "correlation", "time"),
   type = c("mean", "sd", "re"),
   value = NULL,
   draw = is.null(value)
