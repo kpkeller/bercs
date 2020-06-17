@@ -16,12 +16,14 @@ compute_pooling_metrics <- function(theta, epsilon){
 
 #' @rdname compute_pooling_metrics
 #' @export
+#' @importFrom stats var
 prop_var_explained <- function(theta, epsilon){
     1 - mean(apply(epsilon, 1, var))/mean(apply(theta, 1, var))
 }
 
 #' @rdname compute_pooling_metrics
 #' @export
+#' @importFrom stats var
 pooling_factor <- function(epsilon){
     1 - var(apply(epsilon, 2, mean))/mean(apply(epsilon, 1, var))
 }

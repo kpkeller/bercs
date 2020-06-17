@@ -46,14 +46,8 @@ create_exposure_simulation_skeleton <- function(design="parallel",...){
 ##' @param verbose Logical indicator for message printing.
 ##' @examples
 ##' # Create simulation structure
-##' es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=10)
-##' # No standard deviation parameter set by default
-##' es$structure$sigK
-##' # Add standard deviation parameter value
-##' es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
-##' es$structure$sigK
-##' # Sample the model
-##' es2 <- expsim_sample_observations(es)
+##' es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=3)
+##' str(es)
 ##' @export
 create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
                                                   nclusters=1,
@@ -171,6 +165,13 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 #' @family exposure simulation functions
 #' @export
 #' @importFrom stats rnorm
+#' @examples
+#' es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=10)
+#' # No standard deviation parameter set by default
+#' es$structure$sigK
+#' # Add standard deviation parameter value
+#' es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
+#' es$structure$sigK
 expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit", "observation", "correlation","time"), type=c("mean", "sd", "re"), value=NULL, draw=is.null(value)){
 
     if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
@@ -257,18 +258,49 @@ sim_update_time_splines <- function(obj, df=1, fn="ns", ...){
 #' @title Sample Simulated Exposure Observations
 #' @description Draws a sample of exposure observations using the specified model parameters
 #' @param obj exposure simulation object, created by \code{\link{create_exposure_simulation_skeleton}}.
-#' @details This function assumes that \code{etaG}, \code{sigW}, \code{reI}, and \code{timefn} have been set. Optionally, \code{sigK} should be set if a cluster random effect is to be included. These can be set with \code{\link{expsim_update_parameter}}.
+##' @details This function assumes that \code{etaG}, \code{sigW}, \code{reI}, and \code{timefn} have been set. Optionally, \code{sigK} should be set if a cluster random effect is to be included. These can be set with \code{\link{expsim_update_parameter}}. Using these values, it first computes the (conditional) observation mean, with is
 ##' @return An object of class \code{expsim}, with updated values of \code{obj$standata$w} and \code{obj$structure$meanW}.
 ##' @family exposure simulation functions
 ##' @export
 ##' @importFrom stats rnorm
+##' @examples
+##' es <- create_exposure_simulation_skeleton_parallel(ngroups=2,
+##' nclusters=15,
+##' nunits=10,
+##' nobs=2)
+##' # Set group means
+##' es <- expsim_update_parameter(es,
+##'                               level="group",
+##'                               type="mean",
+##'                               value=c(3, 4))
+##' # Set unit random effect standard deviation
+##' es <- expsim_update_parameter(es,
+##'                               level="unit",
+##'                               type="sd",
+##'                               value=c(1))
+##' # Set observation standard deviation
+##' es <- expsim_update_parameter(es,
+##'                               level="observation",
+##'                               type="sd",
+##'                               value=c(1))
+##' # Sample unit random effects
+##' es <- expsim_update_parameter(es,
+##'                               level="unit",
+##'                               type="re")
+##' # Compute (conditional) observation means and sample observations
+##' expsim_demo <- expsim_sample_observations(es)
+##' str(expsim_demo$structure$meanW)
+##' str(expsim_demo$standata$w)
+##' # Add priors and estimate parameters
+##' expsim_demo$standata <- add_priors(expsim_demo$standata)
+##' fit <- sample_exposure_model(expsim_demo$standata)
+##' print(fit, pars=c("reI_raw", "muW", "reI", "reK", "reK_raw"), include=FALSE)
 expsim_sample_observations <- function(obj){
-        if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
-
-    if (is.na(obj$structure$etaG)) stop("etaG must be set. See expsim_update_parameter().")
-    if (is.na(obj$structure$reI)) stop("reI must be set. See expsim_update_parameter().")
-    if (is.na(obj$structure$timefn)) stop("timefn must be set. See expsim_update_parameter().")
-    if (is.na(obj$structure$sigW)) stop("sigW must be set. See expsim_update_parameter().")
+    if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
+    if (any(is.na(obj$structure$etaG))) stop("etaG must be set. See expsim_update_parameter().")
+    if (any(is.na(obj$structure$reI))) stop("reI must be set. See expsim_update_parameter().")
+    if (any(is.null(obj$structure$timefn))) stop("timefn must be set. See expsim_update_parameter().")
+    if (any(is.na(obj$structure$sigW))) stop("sigW must be set. See expsim_update_parameter().")
     obj$structure$meanW <- with(obj$structure, etaG[group_of_obs] + reI[unit_of_obs] + timefn(time))
 
     if (!any(is.na(obj$structure$reK))){
@@ -287,7 +319,7 @@ sim_update_times <- function(obj, time=NULL, draw=is.null(time)){
         if (!inherits(obj, c("expsim", "outsim"))) stop("'obj' must be of class 'expsim' or 'outsim'.")
 
     if (draw){
-        if(!is.null(times)) warning("'time' is provided, but 'draw=TRUE'. Ignoring provided value of 'time'.")
+        if(!is.null(time)) warning("'time' is provided, but 'draw=TRUE'. Ignoring provided value of 'time'.")
         # Draw from (0, 1)
         time <- stats::runif(obj$standata$N)
     }

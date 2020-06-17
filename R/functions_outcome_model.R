@@ -424,27 +424,27 @@ plot_fitted_ERC <- function (obj, incS=NULL, expERC=TRUE, ylab = "Relative Risk"
     fulldf$study <- factor(fulldf$study)
     g <- ggplot(fulldf) + theme_bw()
     if (ribbon){
-        g <- g + geom_ribbon(aes(x = exposure,
-                                 ymin = low,
-                                 ymax = high,
-                                 group=study),
+        g <- g + geom_ribbon(aes(x = .data$exposure,
+                                 ymin = .data$low,
+                                 ymax = .data$high,
+                                 group=.data$study),
                              fill = "grey80")
     } else {
-        g <- g+   geom_line(aes(x=exposure,
-                                y=low,
-                                group = study,
-                                col=study),
+        g <- g+   geom_line(aes(x=.data$exposure,
+                                y=.data$low,
+                                group = .data$study,
+                                col=.data$study),
                             data=fulldf) +
-            geom_line(aes(x=exposure,
-                          y=high,
-                          group = study,
-                          col=study),
+            geom_line(aes(x=.data$exposure,
+                          y=.data$high,
+                          group = .data$study,
+                          col=.data$study),
                       data=fulldf)
     }
-      g   + geom_line(aes(x = exposure,
-                      y = mean,
-                      group=study,
-                      col=study),
+      g   + geom_line(aes(x = .data$exposure,
+                      y = .data$mean,
+                      group=.data$study,
+                      col=.data$study),
                   lwd = 1.5) +
         geom_hline(yintercept = 1,
                    lty = 2) + xlab(xlab) + ylab(ylab)

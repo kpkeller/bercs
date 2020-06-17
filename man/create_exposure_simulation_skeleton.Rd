@@ -45,14 +45,8 @@ See \code{\link{sample_exposure_model}} for a mathematical description of the mo
 }
 \examples{
 # Create simulation structure
-es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=10)
-# No standard deviation parameter set by default
-es$structure$sigK
-# Add standard deviation parameter value
-es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
-es$structure$sigK
-# Sample the model
-es2 <- expsim_sample_observations(es)
+es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=3)
+str(es)
 }
 \seealso{
 \code{\link{create_outcome_simulation_skeleton}}, \code{\link{sample_exposure_model}}

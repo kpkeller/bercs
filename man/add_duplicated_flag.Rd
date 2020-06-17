@@ -11,6 +11,9 @@ add_duplicated_flag(data, dupvars)
 
 \item{dupvars}{Character vector providing the names of variables for which duplicated observations should be checked.}
 }
+\value{
+The data frame \code{data}, with an additional column \code{"dupobs"} that is a logical indicator of a duplicated row.
+}
 \description{
 Adds a column indicating duplicated rows
 }

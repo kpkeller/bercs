@@ -39,6 +39,14 @@ Only specific combinations of \code{level} and \code{type} are allowed. They are
 \item \code{"time"}: \code{"mean"} sets 'timefn'.
 }
 }
+\examples{
+es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=10)
+# No standard deviation parameter set by default
+es$structure$sigK
+# Add standard deviation parameter value
+es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
+es$structure$sigK
+}
 \seealso{
 Other exposure simulation functions: 
 \code{\link{create_exposure_simulation_skeleton}()},

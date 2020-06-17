@@ -42,12 +42,14 @@ Typically a list of class \code{standata_exposure}. However, it may be any list 
 
 \item{group_names}{Names of groups to use in plot labels}
 
-\item{one_per_person}{Logical indicator of whether a single observation per person should be included. If \code{FALSE} (the default), then
-all observations are included in the boxplot.}
+\item{one_per_person}{Logical indicator of whether a single observation per unit should be included. If \code{FALSE} (the default), then
+all observations are included in the boxplot. Setting to \code{TRUE} is most useful when \code{include_time=FALSE} and there is no group crossover, in which case all fitted posterior means for a single unit are the same.}
 }
 \description{
 Different plots of the concentrations modelled in the exposure model
 }
 \details{
 Uses \code{\link[ggplot2]{ggplot}} to create plots of concentrations using posterior means of model parameters. The graphical object is returned and can be customized if needed.
+
+Both functions are wrappers around \code{\link{compute_fitted_mean()}} and first call that function to compute the posterior mean for each observation.
 }

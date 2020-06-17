@@ -134,6 +134,7 @@ create_standata_exposure <- function(data=NULL,
 ##'                        sigmaI=c(0, 0.1))
 ##' # Fit the model
 ##' exp_mod_fit <- sample_exposure_model(exp_data)
+##' print(exp_mod_fit, pars=c("muW", "reI_raw", "etaG_raw"), include=FALSE)
 sample_exposure_model <- function(standata,
                                   B=1000,
                                   warmup=B,
@@ -232,6 +233,8 @@ compute_fitted_mean <- function(stanfit,
 #' @inheritParams compute_fitted_mean
 #' @param group_names Names of groups to use in plot labels
 #' @details Uses \code{\link[ggplot2]{ggplot}} to create plots of concentrations using posterior means of model parameters. The graphical object is returned and can be customized if needed.
+#'
+#' Both functions are wrappers around \code{\link{compute_fitted_mean()}} and first call that function to compute the posterior mean for each observation.
 ##' @export
 ##' @import ggplot2
 plot_exposure_means_bytime <- function(stanfit,
@@ -262,8 +265,8 @@ plot_exposure_means_bytime <- function(stanfit,
 
 ## NOTE-- this includes repeated measures, since it has one value per observation
 ##' @rdname plot_exposure_means_bytime
-##' @param one_per_person Logical indicator of whether a single observation per person should be included. If \code{FALSE} (the default), then
-##' all observations are included in the boxplot.
+##' @param one_per_person Logical indicator of whether a single observation per unit should be included. If \code{FALSE} (the default), then
+##' all observations are included in the boxplot. Setting to \code{TRUE} is most useful when \code{include_time=FALSE} and there is no group crossover, in which case all fitted posterior means for a single unit are the same.
 ##' @export
 ##' @import ggplot2
 plot_exposure_means_boxplot <- function(stanfit,
