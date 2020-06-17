@@ -29,7 +29,7 @@ create_standata_exposure(
 
 \item{time}{Vector of times corresponding to \code{conc} values.}
 
-\item{Mt}{Matrix of splines values for time to include in the model. Defaults to NULL, and can be added later via \code{\link{add_spline_time}}. See \code{\link{create_spline}} for}
+\item{Mt}{Matrix of splines values for time to include in the model. Defaults to NULL, and can be added later via \code{\link{add_spline_time}}. See \code{\link{create_spline}} for creating this matrix.}
 
 \item{log_transform}{Should the concentration value be log-transformed?}
 

@@ -15,7 +15,7 @@
 ##' @param unit_id Vector identifying the distinct unit (e.g. person, household) for each observation.
 ##' @param clust_id Vector identifying cluster membership for each observation.
 ##' @param time Vector of times corresponding to \code{conc} values.
-##' @param Mt Matrix of splines values for time to include in the model. Defaults to NULL, and can be added later via \code{\link{add_spline_time}}. See \code{\link{create_spline}} for
+##' @param Mt Matrix of splines values for time to include in the model. Defaults to NULL, and can be added later via \code{\link{add_spline_time}}. See \code{\link{create_spline}} for creating this matrix.
 ##' @param log_transform Should the concentration value be log-transformed?
 ##' @param return_addition See 'Value'.
 ##' @details This function takes as input a `long` data frame and extracts from it the information needed for fitting the exposure model in STAN.

@@ -1,9 +1,8 @@
-#########################
+# ########################
 # Utility functions
 #
 # create_spline_matrix()
 # create_spline()
-# create_spline_range()
 # predict_spline()
 # add_spline_time()
 # add_spline_exposure()
@@ -14,16 +13,48 @@
 # check_names_to_overwrite()
 # check_all_nonnegative_value()
 # check_all_postive_value()
-###############################
+# ##############################
+
 
 
 ##' @title Create spline matrix
 ##' @description Wrapper function for creating a spline matrix
 ##' @param x Variable values for which spline is to be created.
+##' @param xrange Range (min and max) of values to use for creating spline. Only used if \code{x} not provided.
+##' @param by Interval of generated sequence.
 ##' @param df Degrees of freedom for spline. If set to 1, then a linear function assumed; otherwise \code{df} is passed to \code{fn}.
 ##' @param fn Character string specifying the spline-generating function. Defaults to \code{\link[splines]{ns}}.
 ##' @param ... additional arguments passed to \code{fn}.
+##' @return For \code{create_spline}, a list containing:
+##' \describe{
+##' \item{\code{x}}{the values provided in argument \code{x}}
+##' \item{\code{spline}}{a matrix of spline values evaluated at \code{x}}
+##' \item{\code{spline_mean}}{a vector of column-wise means of \code{spline}}
+##' }
 ##' @export
+##' @examples
+##' x_ns <- create_spline(x=1:10, df=3, fn="ns")
+##' x2_ns <- predict(x_ns$spline, newx=seq(0.5, 9.5, by=1))
+##' x2_ns
+##' @seealso \code{\link{add_spline_time}}, \code{\link{sim_update_time_splines}}
+create_spline <- function(x, xrange=NULL, by=1, df=1, fn="ns",...){
+    if(is.null(x)) {
+        if (is.null(x)){
+            stop("Either 'x' or 'xrange' required.")
+        } else {
+            x <- seq(xrange[1], to=xrange[2], by=by)
+        }
+    }
+    spline <- create_spline_matrix(x, df=df, fn=fn, ...)
+    out <- list(x=x,
+                spline=spline,
+                spline_mean=colMeans(spline))
+    out
+}
+
+#' @rdname create_spline
+##' @return For \code{create_spline_matrix}, the matrix of spline values only.
+#' @export
 create_spline_matrix <- function(x, df=1, fn="ns",...){
     if (!is.numeric(df) || df<1) stop("'df' must be postive integer.")
     if (df==1){
@@ -37,52 +68,17 @@ create_spline_matrix <- function(x, df=1, fn="ns",...){
     Mx
 }
 
-#' @rdname create_spline_matrix
-#' @export
-create_spline <- function(x, df=1, fn="ns",...){
-    spline <- create_spline_matrix(x, df=df, fn=fn, ...)
-    out <- list(x=x,
-                spline=spline,
-                spline_mean=colMeans(spline))
-    out
-}
-
-
-#' @rdname create_spline_matrix
-#' @param xseq Sequence of values to use for creating time spline.
-#' @param xrange Range (min and max) of values to use for creating spline. Only used if \code{xseq} not provided.
-#' @param by Interval of generated sequence.
-##' @export
-##' @seealso \code{\link{sim_update_time_splines}}
-create_spline_range <- function(df, xseq=NULL, xrange=NULL, by=1, fn="ns", ...){
-    if(is.null(xseq)) {
-        if (is.null(xrange)){
-            stop("Either 'xseq' or 'xrange' required.")
-        } else {
-            xseq <- seq(xrange[1], to=xrange[2], by=by)
-        }
-    }
-    out <- create_spline(xseq, df=df, fn=fn, ...)
-    out
-}
-
-##' @rdname create_spline_matrix
+##' @rdname create_spline
 ##' @param spline Spline object from which to predict.
 ##' @param newx New values for which splines should be generated
 ##' @param center,scale Should spline values be centered and/or scaled? Default is \code{FALSE}. If a vector is provided, it is pased to \code{\link{scale}}.
+##' @details Note that \code{predict_spline} relies on the existence of a \code{predict} generic for the class of spline.
+##' @return For \code{predict_spline}, a matrix of spline values evaluated at \code{newx}.
 ##' @export
 ##' @importFrom utils getS3method
 predict_spline <- function(spline, newx, center=FALSE, scale=FALSE){
-    spline_class <- class(spline)
-    if(spline_class[1]=="matrix" && length(spline_class)==1) {
-        # NOT checking 'inherits' here, since most splines are matrices, but not vice versa
-        # THen odf = 1
-        if (ncol(spline)!=1) stop("Error: spline has >1 column but is class matrix only")
-        H <- as.matrix(newx)
-    } else {
-        predfn <- utils::getS3method(f="predict", class(spline))
-        H <- predfn(spline, newx=newx)
-    }
+    predfn <- utils::getS3method(f="predict", class(spline))
+    H <- predfn(spline, newx=newx)
 
     if(any(as.logical(center)) || any(as.logical(scale))){
         H <- scale(H, center=center,scale=scale)
@@ -96,8 +92,18 @@ predict_spline <- function(spline, newx, center=FALSE, scale=FALSE){
 ##' @param standata the standata object to be updated
 ##' @param Mt,Mx the matrix of time or exposure splines to be added
 ##' @details \code{add_spline_time} updates the \code{Mt}, \code{timedf}, and \code{Mt_attributes} elements of \code{standata}. \code{add_spline_exposure} updates the \code{Mx}, \code{xdf}, and \code{Mx_attributes} elements of \code{standata}.
-##' @seealso \code{\link{create_standata_exposure}}, \code{\link{create_standata_outcome}}, \code{\link{expsim_update_parameter}}, \code{\link{outsim_update_parameter}}, \code{\link{create_spline_range}}, \code{\link{create_spline_matrix}}
-##' @export
+##' @return The \code{standata} object with updated elements.
+##' @seealso \code{\link{create_standata_exposure}}, \code{\link{create_standata_outcome}}, \code{\link{expsim_update_parameter}}, \code{\link{outsim_update_parameter}}, \code{\link{create_spline}}, \code{\link{create_spline_matrix}}
+#' @export
+#' @examples
+#' exp_data <- create_standata_exposure(group=rep(1, 10),
+#'                                      conc=rnorm(10),
+#'                                      unit_id=rep(0:1, 5),
+#'                                      time=runif(10))
+#' exp_data$Mt
+#' Mt <- create_spline_matrix(exp_data$time, df=3, fn="ns")
+#' exp_data <- add_spline_time(exp_data, Mt=Mt)
+#' exp_data$Mt
 add_spline_time <- function(standata, Mt){
     if(!inherits(Mt, c("matrix","numeric", "integer"))) stop("'Mt' should be a matrix or vector.")
     standata$Mt <- as.matrix(Mt)
@@ -121,6 +127,7 @@ add_spline_exposure <- function(standata, Mx){
 #' @param data Data frame to check.
 #' @param dupvars Character vector providing the names of variables for which duplicated observations should be checked.
 #' @details This is a wrapper around \code{\link{duplicated}}.
+#' @return The data frame \code{data}, with an additional column \code{"dupobs"} that is a logical indicator of a duplicated row.
 ##' @export
 add_duplicated_flag <- function(data, dupvars){
     check_names_to_overwrite(data, expected_names=c("dupobs"))

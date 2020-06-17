@@ -4,7 +4,7 @@
 # create_exposure_simulation_skeleton()
 # create_exposure_simulation_skeleton_parallel()
 # expsim_update_times()
-# expsim_update_time_splines()
+# sim_update_time_splines()
 # expsim_update_time_effect()
 # expsim_update_parameter()
 # expsim_sample_observations()
@@ -242,7 +242,7 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit
 ##' @param ... Additional arguments passed to \code{fn()} via \code{\link{create_spline_matrix}}.
 #' @family exposure simulation functions
 #' @family outcome simulation functions
-##' @seealso \code{\link{create_spline_range}} \code{\link{add_time_spline}}
+##' @seealso \code{\link{create_spline}} \code{\link{add_spline_time}}
 ##' @export
 ##' @importFrom splines ns
 sim_update_time_splines <- function(obj, df=1, fn="ns", ...){
@@ -279,7 +279,7 @@ expsim_sample_observations <- function(obj){
 }
 
 ##' @rdname sim_update_time_splines
-##' @param times Values to set as the times.
+##' @param time Values to set as the times.
 ##' @param draw Logical indicating times should be sampled from a Unif(0,1) distribution.
 ##' @export
 ##' @importFrom stats runif

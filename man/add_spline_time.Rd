@@ -14,12 +14,25 @@ add_spline_exposure(standata, Mx)
 
 \item{Mt, Mx}{the matrix of time or exposure splines to be added}
 }
+\value{
+The \code{standata} object with updated elements.
+}
 \description{
 Updates a standata object with a matrix of time or exposure splines
 }
 \details{
 \code{add_spline_time} updates the \code{Mt}, \code{timedf}, and \code{Mt_attributes} elements of \code{standata}. \code{add_spline_exposure} updates the \code{Mx}, \code{xdf}, and \code{Mx_attributes} elements of \code{standata}.
 }
+\examples{
+exp_data <- create_standata_exposure(group=rep(1, 10),
+                                     conc=rnorm(10),
+                                     unit_id=rep(0:1, 5),
+                                     time=runif(10))
+exp_data$Mt
+Mt <- create_spline_matrix(exp_data$time, df=3, fn="ns")
+exp_data <- add_spline_time(exp_data, Mt=Mt)
+exp_data$Mt
+}
 \seealso{
-\code{\link{create_standata_exposure}}, \code{\link{create_standata_outcome}}, \code{\link{expsim_update_parameter}}, \code{\link{outsim_update_parameter}}, \code{\link{create_spline_range}}, \code{\link{create_spline_matrix}}
+\code{\link{create_standata_exposure}}, \code{\link{create_standata_outcome}}, \code{\link{expsim_update_parameter}}, \code{\link{outsim_update_parameter}}, \code{\link{create_spline}}, \code{\link{create_spline_matrix}}
 }

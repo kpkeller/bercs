@@ -18,15 +18,15 @@ sim_update_times(obj, time = NULL, draw = is.null(time))
 
 \item{...}{Additional arguments passed to \code{fn()} via \code{\link{create_spline_matrix}}.}
 
-\item{draw}{Logical indicating times should be sampled from a Unif(0,1) distribution.}
+\item{time}{Values to set as the times.}
 
-\item{times}{Values to set as the times.}
+\item{draw}{Logical indicating times should be sampled from a Unif(0,1) distribution.}
 }
 \description{
 Creates times and splines of time for simulations
 }
 \seealso{
-\code{\link{create_spline_range}} \code{\link{add_time_spline}}
+\code{\link{create_spline}} \code{\link{add_spline_time}}
 
 Other exposure simulation functions: 
 \code{\link{create_exposure_simulation_skeleton}()},
