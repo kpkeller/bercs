@@ -1,9 +1,9 @@
 Package: bercs
-Version: 0.0.1.9025
+Version: 0.0.1.9026
 Title: Bayesian Exposure-Response Curves via Stan
 Description: Implements hierarchical models for modeling exposure concentrations and estimating pooled analyses of expsoure-response curves, using STAN.
 Authors@R: person("Joshua", "Keller", email="joshua.keller@colostate.edu", role=c("aut", "cre"))
-License: GPL (>=3)
+License: GPL (>=3) | file LICENSE
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
