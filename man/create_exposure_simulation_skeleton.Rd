@@ -54,6 +54,6 @@ str(es)
 Other exposure simulation functions: 
 \code{\link{expsim_sample_observations}()},
 \code{\link{expsim_update_parameter}()},
-\code{\link{sim_update_time_splines}()}
+\code{\link{sim_update_times}()}
 }
 \concept{exposure simulation functions}

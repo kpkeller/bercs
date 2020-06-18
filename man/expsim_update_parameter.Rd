@@ -40,17 +40,24 @@ Only specific combinations of \code{level} and \code{type} are allowed. They are
 }
 }
 \examples{
+# Create simulation structure
 es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=10)
+
 # No standard deviation parameter set by default
 es$structure$sigK
 # Add standard deviation parameter value
 es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
 es$structure$sigK
+# Sample random effect values
+es <- expsim_update_parameter(es, level="cluster", type="re", draw=TRUE)
+
+# Add time function
+es <- expsim_update_parameter(es, level="time", type="mean", value=function(w) 2*cos(w))
 }
 \seealso{
 Other exposure simulation functions: 
 \code{\link{create_exposure_simulation_skeleton}()},
 \code{\link{expsim_sample_observations}()},
-\code{\link{sim_update_time_splines}()}
+\code{\link{sim_update_times}()}
 }
 \concept{exposure simulation functions}

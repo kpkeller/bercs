@@ -83,6 +83,6 @@ Only specific combinations of \code{level} and \code{type} are allowed. They are
 Other outcome simulation functions: 
 \code{\link{create_outcome_simulation_skeleton}()},
 \code{\link{outsim_sample_observations}()},
-\code{\link{sim_update_time_splines}()}
+\code{\link{sim_update_times}()}
 }
 \concept{outcome simulation functions}

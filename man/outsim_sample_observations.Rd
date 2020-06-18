@@ -18,6 +18,6 @@ Draws a sample of outcome observations using provided model parameters
 Other outcome simulation functions: 
 \code{\link{create_outcome_simulation_skeleton}()},
 \code{\link{outsim_update_parameter}()},
-\code{\link{sim_update_time_splines}()}
+\code{\link{sim_update_times}()}
 }
 \concept{outcome simulation functions}

@@ -55,6 +55,6 @@ print(fit, pars=c("reI_raw", "muW", "reI", "reK", "reK_raw"), include=FALSE)
 Other exposure simulation functions: 
 \code{\link{create_exposure_simulation_skeleton}()},
 \code{\link{expsim_update_parameter}()},
-\code{\link{sim_update_time_splines}()}
+\code{\link{sim_update_times}()}
 }
 \concept{exposure simulation functions}

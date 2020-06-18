@@ -166,12 +166,19 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 #' @export
 #' @importFrom stats rnorm
 #' @examples
+#' # Create simulation structure
 #' es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=10)
+#'
 #' # No standard deviation parameter set by default
 #' es$structure$sigK
 #' # Add standard deviation parameter value
 #' es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
 #' es$structure$sigK
+#' # Sample random effect values
+#' es <- expsim_update_parameter(es, level="cluster", type="re", draw=TRUE)
+#'
+#' # Add time function
+#' es <- expsim_update_parameter(es, level="time", type="mean", value=function(w) 2*cos(w))
 expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit", "observation", "correlation","time"), type=c("mean", "sd", "re"), value=NULL, draw=is.null(value)){
 
     if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
@@ -235,15 +242,45 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit
     obj
 }
 
+
+
 ##' @title Update time values and spline object
 ##' @description Creates times and splines of time for simulations
-#' @param obj Simualtion object, created by \code{\link{create_exposure_simulation_skeleton}} or \code{\link{create_outcome_simulation_skeleton}}.
+#' @param obj Simulation object, created by \code{\link{create_exposure_simulation_skeleton}} or \code{\link{create_outcome_simulation_skeleton}}.
+##' @param time Values to set as the times.
+##' @param draw Logical indicating times should be sampled from a Unif(0,1) distribution.
+##' @export
+##' @importFrom stats runif
+##' @family exposure simulation functions
+##' @family outcome simulation functions
+##' @seealso \code{\link{create_spline}} \code{\link{add_spline_time}}
+##' @examples
+##' # Create structure
+##' es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=10)
+##'
+##' es <- sim_update_times(es, draw=TRUE)
+##' es <- sim_update_time_splines(es, df=3)
+sim_update_times <- function(obj, time=NULL, draw=is.null(time)){
+    if (!inherits(obj, c("expsim", "outsim"))) stop("'obj' must be of class 'expsim' or 'outsim'.")
+
+    if (draw){
+        if(!is.null(time)) warning("'time' is provided, but 'draw=TRUE'. Ignoring provided value of 'time'.")
+        # Draw from (0, 1)
+        time <- stats::runif(obj$standata$N)
+    }
+    if (is.null(time)) {
+        stop("'time' is NULL, but 'draw=FALSE'.")
+    }
+    obj$structure$time <- time
+    obj$standata$time <- time
+
+    obj
+}
+
+##' @rdname sim_update_times
 ##' @param df degrees of freedom for the time spline used in model estimation.
 ##' @param fn function for generating splines. Defaults to \code{\link{ns}}.
 ##' @param ... Additional arguments passed to \code{fn()} via \code{\link{create_spline_matrix}}.
-#' @family exposure simulation functions
-#' @family outcome simulation functions
-##' @seealso \code{\link{create_spline}} \code{\link{add_spline_time}}
 ##' @export
 ##' @importFrom splines ns
 sim_update_time_splines <- function(obj, df=1, fn="ns", ...){
@@ -310,27 +347,6 @@ expsim_sample_observations <- function(obj){
     obj
 }
 
-##' @rdname sim_update_time_splines
-##' @param time Values to set as the times.
-##' @param draw Logical indicating times should be sampled from a Unif(0,1) distribution.
-##' @export
-##' @importFrom stats runif
-sim_update_times <- function(obj, time=NULL, draw=is.null(time)){
-        if (!inherits(obj, c("expsim", "outsim"))) stop("'obj' must be of class 'expsim' or 'outsim'.")
-
-    if (draw){
-        if(!is.null(time)) warning("'time' is provided, but 'draw=TRUE'. Ignoring provided value of 'time'.")
-        # Draw from (0, 1)
-        time <- stats::runif(obj$standata$N)
-    }
-    if (is.null(time)) {
-        stop("'time' is NULL, but 'draw=FALSE'.")
-    }
-    obj$structure$time <- time
-    obj$standata$time <- time
-
-    obj
-}
 
 
 

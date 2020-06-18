@@ -77,6 +77,6 @@ For creating a \code{standata_outcome} object from an existing 'wide' format dat
 Other outcome simulation functions: 
 \code{\link{outsim_sample_observations}()},
 \code{\link{outsim_update_parameter}()},
-\code{\link{sim_update_time_splines}()}
+\code{\link{sim_update_times}()}
 }
 \concept{outcome simulation functions}
