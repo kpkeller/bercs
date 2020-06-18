@@ -7,3 +7,4 @@ Read-and-delete-me
 .Rhistory
 *.cc
 inst/doc
+README_cache

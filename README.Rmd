@@ -6,17 +6,141 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(bercs)
+library(ggplot2)
 ```
 
 # bercs
 Bayesian Exposure-Response Curves via STAN
 
-This R package implements a two flexible hierarchical models. The *outcome model* is designed for estimating exposure-response curves, with particular focus on settings where data from multiple studies are being pooled. The *exposure model* is designed for modeling highly-variable, clustered, sparse longitudinal exposure measurements.
+This R package implements a two flexible hierarchical models. The **exposure model** is designed for modeling highly-variable, clustered, sparse longitudinal exposure measurements. The **outcome model** is designed for estimating exposure-response curves, with particular focus on settings where data from multiple studies are being pooled.
 
 This package uses the Stan language and depends on the `rstan` package. To install `bercs`, use the following commands:  
 ```
 devtools::install_github("jpkeller/bercs")
 ```
+
+## Exposure Model
+
+The exposure model is a hierarchical model for concentrations as a function of group means, cluster random effects, unit (e.g. subject or household) random effects, and temporal spline. The general procedure for fitting the model is the following:
+
+1. Create the data object using `create_standata_exposure()`. This function creates a list with the named components used in model fitting.
+
+```{r}
+# Create simulated data with:
+#  3 groups
+#  each with 6 units
+#  that each have 4 observations
+#  at times 1, 2, 3, 4
+exposure_standata <- create_standata_exposure(group=rep(1:3, each=24),
+                                              conc=rnorm(n=72,mean=rep(c(0, 2, 4), each=23)),
+                                              unit_id=rep(1:18, each=4),
+                                              time=rep(1:4, times=18))
+```
+
+2. If using a time spline, add the corresponding matrix of spline values to the model.
+
+```{r}
+# Add natural splines with 3 df
+Mt <- create_spline_matrix(x=exposure_standata$time,
+                    df=3,
+                    fn="ns")
+exposure_standata <- add_spline_time(exposure_standata, Mt=Mt)
+```
+3. Add the hyperparameters for the prior distributions.
+
+```{r}
+# Use defaults for all except sigmaI
+exposure_standata <- add_priors(exposure_standata,
+                                sigmaI=c(0, 0.5))
+```
+
+
+4. Sample from the posterior distribution of parameters using STAN.
+
+```{r echo=TRUE, results="hide"}
+exposure_mod_fit <- sample_exposure_model(exposure_standata,
+                                          B=1000,
+                                          chains=4)
+```
+```{r}
+print(exposure_mod_fit,
+      pars=c("muW", "reI_raw", "reI", "etaG_raw", "theta_raw"),
+      include=FALSE)
+```
+
+5. Compute long-term means and plot them.
+
+```{r}
+fitted_means <- compute_fitted_mean(stanfit=exposure_mod_fit,
+                                    standata=exposure_standata)
+summary(fitted_means)
+# Plots the fitted values (colored points) on top of original data (black outlines).
+plot_exposure_means_bytime(stanfit=exposure_mod_fit,
+                           standata=exposure_standata)
+```
+
+
+
+## Exposure-Response (Outcome) Model
+
+
+The outcome model is a hierarchical model for estimating an exposure-response function. 
+It can accommodate data from multiple studies, each with their own measured covariates, temporal trend, and overall risk mean. Currently, the model is designed only for binary outcomes (i.e. logistic regression). In addition to the study-specific time trends and covariate effects, subject-level random effects can be included. The general procedure for fitting the model is the following:
+
+1. Create the data object using `create_standata_outcome()`. This function creates a list with the named components used in model fitting.
+
+```{r}
+# Dataset A has a linear exposure-response relationship
+# across the exposure range of 5-50
+data(casedataA)
+# Dataset B has no exposure-response relationship
+# and an exposure range of 50-200
+data(casedataB)
+outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
+                                              xdf=4,
+                                              xfnargs=list(Boundary.knots=c(5, 200),
+                                                           knots=c(25)))
+```
+
+
+2. Add the hyperparameters for the prior distributions.
+
+```{r}
+# Use defaults for all except sigmaI
+outcome_combo_data <- add_priors(outcome_combo_data,
+                                 sigmaI=c(0, 0.1))
+```
+
+3. Sample from the posterior distribution of parameters using STAN.
+
+```{r echo=TRUE, eval=FALSE}
+outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
+                                         B=2000)
+```
+
+```{r include=FALSE, cache=TRUE}
+outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
+                                         B=2000,
+                                         cores=4)
+```
+
+```{r}
+print(outcome_combo_mod_fit, pars=c("reI_raw", "reI","mui", "beta_raw"), include=FALSE)
+```
+
+5. Plot the exposure-response curve
+
+```{r}
+fitted_ERC <- get_fitted_ERC(standata=outcome_combo_data,
+                             stanfit=outcome_combo_mod_fit,
+                             exprange=c(5,200))
+plot_fitted_ERC(fitted_ERC) + scale_y_log10()
+```
+
+
+
 
 
 ## Community guidelines
