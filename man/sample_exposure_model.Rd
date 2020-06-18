@@ -48,5 +48,5 @@ exp_mod_fit <- sample_exposure_model(exp_data)
 print(exp_mod_fit, pars=c("muW", "reI_raw", "etaG_raw"), include=FALSE)
 }
 \seealso{
-\code{\link{create_standata_exposure}}, \code{\link{sample_outcome_model}}, \code{\link{add_priors}}
+\code{\link{create_standata_exposure}}, \code{\link{sample_outcome_model}}, \code{\link{add_priors}}, \code{\link{compute_fitted_mean}}
 }

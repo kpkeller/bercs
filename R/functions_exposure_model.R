@@ -120,7 +120,7 @@ create_standata_exposure <- function(data=NULL,
 ##' @details This fits a hierarchical model designed for modeling exposure concentrations from a study that has irregularly-spaced, clustered measurements. The model for an observation \eqn{w_{gkit}} from exposure group \eqn{g}, cluster (e.g. neighborhood) \eqn{k}, unit (e.g. household) \eqn{i}, and time \eqn{t} is:
 ##' \deqn{w_{gkit} = \eta_g + \alpha_{0k} + \alpha_{1i}+ H(t)*\theta}
 ##' Here, \eqn{\eta_g} is a group-specific mean, \eqn{alpha_{0k}} is a cluster-specific random effect, \eqn{alpha_{1i}} is a unit-specific random effect, and \eqn{\theta} are coefficients for a temporal spline \eqn{H(t)}.
-##' @seealso \code{\link{create_standata_exposure}}, \code{\link{sample_outcome_model}}, \code{\link{add_priors}}
+##' @seealso \code{\link{create_standata_exposure}}, \code{\link{sample_outcome_model}}, \code{\link{add_priors}}, \code{\link{compute_fitted_mean}}
 ##' @importFrom rstan sampling
 ##' @export
 ##' @examples
@@ -172,7 +172,7 @@ sample_exposure_model <- function(standata,
 #' @param exp_transform Logical indicator of whether concentrations should be exponentiated.
 #' @param add Logical indicator of whether the modeled means should be added to \code{standata} or just returned directly (the default).
 #' @param ... Additional arugments passed to \code{\link[rstan]{extract}}.
-#' @seealso \code{\link{plot_exposure_means_bytime}}
+#' @seealso \code{\link{plot_exposure_means_bytime}}, \code{\link{sample_exposure_model}}
 #' @export
 #' @importFrom rstan extract
 compute_fitted_mean <- function(stanfit,

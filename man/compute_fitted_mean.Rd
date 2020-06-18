@@ -41,5 +41,5 @@ Typically a list of class \code{standata_exposure}. However, it may be any list 
 Calculates the posterior mean exposure concentrations.
 }
 \seealso{
-\code{\link{plot_exposure_means_bytime}}
+\code{\link{plot_exposure_means_bytime}}, \code{\link{sample_exposure_model}}
 }
