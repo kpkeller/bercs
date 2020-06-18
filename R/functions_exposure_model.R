@@ -35,7 +35,7 @@
 ##' }
 ##' If \code{return_addition=TRUE}, then a two-element list is returned. The first element
 ##' is the \code{standata_exposure} object described above. The second element is a modified version of \code{data}, with the variables \code{group_of_obs}, \code{cluster_of_obs}, \code{hh_of_obs}, and \code{times} added (or overwritten).
-##' @seealso \code{\link{sample_exposure_model}},  \code{\link{create_spline}}, \code{\link{create_standata_outcome}}
+##' @seealso \code{\link{sample_exposure_model}},  \code{\link{create_spline}}, \code{\link{add_spline_time}}, \code{\link{create_standata_outcome}}
 ##' @export
 ##' @examples
 ##' # Create simulated data

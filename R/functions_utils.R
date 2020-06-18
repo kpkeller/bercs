@@ -26,10 +26,10 @@
 ##' @param fn Character string specifying the spline-generating function. Defaults to \code{\link[splines]{ns}}.
 ##' @param ... additional arguments passed to \code{fn}.
 ##' @return For \code{create_spline}, a list containing:
-##' \describe{
-##' \item{\code{x}}{the values provided in argument \code{x}}
-##' \item{\code{spline}}{a matrix of spline values evaluated at \code{x}}
-##' \item{\code{spline_mean}}{a vector of column-wise means of \code{spline}}
+##' \itemize{
+##' \item{\code{x} -- the values provided in argument \code{x}}
+##' \item{\code{spline} -- a matrix of spline values evaluated at \code{x}}
+##' \item{\code{spline_mean} -- a vector of column-wise means of \code{spline}}
 ##' }
 ##' @export
 ##' @examples

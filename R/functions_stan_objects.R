@@ -21,7 +21,7 @@ add_priors  <- function(standata, ...){
     out
 }
 
-# Function for adding prior values to standataect for Exposure model
+# Function for adding prior values to standata for Exposure model
 # Numeric pairs are (mean, sd) for variables
 ##' @rdname add_priors
 #' @param etaG Prior mean and standard deviation for the group means parameter `etaG`.
@@ -34,6 +34,16 @@ add_priors  <- function(standata, ...){
 #' @param theta Prior mean and standard deviation for the time coefficients `thetaG`.
 #' @param sigmaTheta Prior mean and standard deviation for the standard deviation parameter for time trends, `sigmaTheta`.
 ##' @export
+##' @examples
+##' # Create simulated data
+##' exp_data <- create_standata_exposure(group=rep(1, 10),
+##'                                      conc=rnorm(10),
+##'                                      unit_id=rep(0:1, 5),
+##'                                      time=runif(10))
+##' # Add comnbination of default and custom prior
+##' exp_data <- add_priors(exp_data,
+##'                        sigmaI=c(0, 0.1),
+##'                        sigmaK=c(0, 2))
 add_priors_exposure_model <- function(standata, etaG=0, sigmaG=c(0, 1), reK=0, sigmaK=c(0, 1), reI=0,sigmaI=c(0, 1), sigmaW=c(0, 1),  theta=0, sigmaTheta=c(0, 1), ...) {
 
     standata$prior_etaG_mean <- etaG[1]

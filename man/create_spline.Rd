@@ -33,10 +33,10 @@ predict_spline(spline, newx, center = FALSE, scale = FALSE)
 }
 \value{
 For \code{create_spline}, a list containing:
-\describe{
-\item{\code{x}}{the values provided in argument \code{x}}
-\item{\code{spline}}{a matrix of spline values evaluated at \code{x}}
-\item{\code{spline_mean}}{a vector of column-wise means of \code{spline}}
+\itemize{
+\item{\code{x} -- the values provided in argument \code{x}}
+\item{\code{spline} -- a matrix of spline values evaluated at \code{x}}
+\item{\code{spline_mean} -- a vector of column-wise means of \code{spline}}
 }
 
 For \code{create_spline_matrix}, the matrix of spline values only.

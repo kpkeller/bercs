@@ -78,6 +78,17 @@ Sets prior distribution hyperparameters using defaults or provided values
 \details{
 Based on its class, \code{add_priors} calls \code{add_priors_exposure_model} or \code{add_priors_exposure_model}. For the variance parameters, the prior distributions are half-normal distributions parameterized by (mean, sd).
 }
+\examples{
+# Create simulated data
+exp_data <- create_standata_exposure(group=rep(1, 10),
+                                     conc=rnorm(10),
+                                     unit_id=rep(0:1, 5),
+                                     time=runif(10))
+# Add comnbination of default and custom prior
+exp_data <- add_priors(exp_data,
+                       sigmaI=c(0, 0.1),
+                       sigmaK=c(0, 2))
+}
 \seealso{
 \code{\link{create_standata_exposure}}, \code{\link{create_standata_outcome}}, \code{\link{sample_exposure_model}}, \code{\link{sample_outcome_model}}
 }

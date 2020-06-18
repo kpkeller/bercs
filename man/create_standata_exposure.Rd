@@ -73,5 +73,5 @@ exp_data <- add_priors(exp_data,
 exp_mod_fit <- sample_exposure_model(exp_data)
 }
 \seealso{
-\code{\link{sample_exposure_model}},  \code{\link{create_spline}}, \code{\link{create_standata_outcome}}
+\code{\link{sample_exposure_model}},  \code{\link{create_spline}}, \code{\link{add_spline_time}}, \code{\link{create_standata_outcome}}
 }
