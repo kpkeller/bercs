@@ -2,9 +2,30 @@
 % Please edit documentation in R/functions_outcome_model.R
 \name{create_standata_outcome}
 \alias{create_standata_outcome}
+\alias{create_standata_outcome_singlestudy}
 \title{Create List for Fitting Outcome Model via STAN}
 \usage{
 create_standata_outcome(..., datalist = NULL, Mtlist = NULL, covarslist = NULL)
+
+create_standata_outcome_singlestudy(
+  data = NULL,
+  unit_id = data$unit_id,
+  conc = data$conc,
+  study = data$study,
+  clust_id = data$clust_id,
+  case = data$case,
+  at_risk = data$at_risk,
+  covars = "1",
+  scale_covars = TRUE,
+  xdf = 1,
+  xfn = "iSpline",
+  xfnargs = list(),
+  Mt = NULL,
+  timefn = "ns",
+  timedf = 0,
+  timefnargs = list(),
+  return_addition = FALSE
+)
 }
 \arguments{
 \item{...}{arguments passed to \code{create_standata_outcome_singlestudy}. See Details.}
@@ -13,16 +34,52 @@ create_standata_outcome(..., datalist = NULL, Mtlist = NULL, covarslist = NULL)
 
 \item{Mtlist}{time spline matrix, or a list of such matrices.}
 
-\item{covarslist}{list of covariate variable names for each matrix, or a list of covariate matrices.}
+\item{covarslist}{list of covariate variable names for each study, or a list of covariate matrices.}
+
+\item{data}{Optional data frame containing data in a long format.}
+
+\item{unit_id}{Vector identifying the distinct unit (e.g. person) for each observation.}
+
+\item{conc}{Vector of exposure concentrations for each observation.}
+
+\item{study}{Vector identifying the study of each observation.}
+
+\item{clust_id}{Optional vector identifying cluster membership for each observation.}
+
+\item{case}{Count of cases for the observations. In most cases, this is a 0/1 indicator.}
+
+\item{at_risk}{Time at risk for the observation}
+
+\item{covars}{character vector of variables to include as covariates, or a vector/matrix of covariate values. Should not include an intercept. If a character vector, this intercept is automatically removed (so default of "1" leads to no covariates).}
+
+\item{scale_covars}{should the covariate matrix be centered and scaled?}
+
+\item{xdf}{Degrees of freedom for exposure splines}
+
+\item{xfn}{name of function used to generate exposure splines}
+
+\item{xfnargs}{named list of additional arguments for \code{xfn}}
+
+\item{Mt}{Optional matrix of time splines}
+
+\item{timefn}{name of function used to generate time splines}
+
+\item{timedf}{degrees of freedom for time spline}
+
+\item{timefnargs}{named list of additional arugments to \code{timefn}}
+
+\item{return_addition}{should the modified version of \code{data} be returned in addition to the \code{standata_outcome} object?}
 }
 \description{
 Generates a 'standata_outcome' object from a 'long' data frame of outcome data
 }
 \details{
-create_standata_outcome()
-
 An important special case of \code{create_standata_outcome} is when there is only a single study. In this case, the values are passed to \code{create_standata_outcome_singlestudy} without pre-processing.
+
+If using a separate temporal spline for each study, first compute the time splines for each study individually using \code{\link{create_spline}}. Combine these into a list and pass that to \code{Mtlist}.
+
+The matrices of adjustment variables are created using the names provided to \code{covarslist}. This is done using \code{\link[stats]{formula}} and \code{\link[stats]{model.matrix}}, so transformations and interactions can be used in the typical manner.
 }
 \seealso{
-\code{\link{create_standata_exposure}}
+\code{\link{create_standata_exposure}}, \code{\link{add_spline_exposure}}, \code{\link{sample_outcome_model}}
 }

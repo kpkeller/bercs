@@ -1,18 +1,17 @@
 # Functions to support fitting of the outcome models
 
-
-# return_sorted -- returns data frame that has been sorted, with added labels of
-#                   'household_num
-# log_transform -- log the concentrations?
-##' create_standata_outcome()
 ##' @title Create List for Fitting Outcome Model via STAN
 ##' @description Generates a 'standata_outcome' object from a 'long' data frame of outcome data
 ##' @param ... arguments passed to \code{create_standata_outcome_singlestudy}. See Details.
 ##' @param datalist List of data frames, containing the data in 'long' format.
 ##' @param Mtlist time spline matrix, or a list of such matrices.
-##' @param covarslist list of covariate variable names for each matrix, or a list of covariate matrices.
+##' @param covarslist list of covariate variable names for each study, or a list of covariate matrices.
 ##' @details An important special case of \code{create_standata_outcome} is when there is only a single study. In this case, the values are passed to \code{create_standata_outcome_singlestudy} without pre-processing.
-##' @seealso \code{\link{create_standata_exposure}}
+##'
+##' If using a separate temporal spline for each study, first compute the time splines for each study individually using \code{\link{create_spline}}. Combine these into a list and pass that to \code{Mtlist}.
+##'
+##' The matrices of adjustment variables are created using the names provided to \code{covarslist}. This is done using \code{\link[stats]{formula}} and \code{\link[stats]{model.matrix}}, so transformations and interactions can be used in the typical manner.
+##' @seealso \code{\link{create_standata_exposure}}, \code{\link{add_spline_exposure}}, \code{\link{sample_outcome_model}}
 ##' @export
 ##' @importFrom Matrix bdiag
 create_standata_outcome <- function(...,
@@ -22,8 +21,10 @@ create_standata_outcome <- function(...,
     if (!is.null(datalist)){
         if (length(datalist)>1 && class(datalist)=="list"){
             for (i in 1:length(datalist)){
+              if (!all(is.null(datalist[[i]]$clust_id))){
                 datalist[[i]]$clust_id <- paste0(datalist[[i]]$study, datalist[[i]]$clust_id)
-                datalist[[i]]$id <- paste0(datalist[[i]]$study, datalist[[i]]$id)
+              }
+                datalist[[i]]$unit_id <- paste0(datalist[[i]]$study, datalist[[i]]$unit_id)
             }
             data.new <- do.call(rbind, datalist)
             if (!is.null(Mtlist)){
@@ -72,8 +73,7 @@ create_standata_outcome <- function(...,
     out
 }
 
-##' @title create_standata_outcome
-##'
+##' @rdname create_standata_outcome
 ##' @param return_addition should the modified version of \code{data} be returned in addition to the \code{standata_outcome} object?
 ##' @param data Optional data frame containing data in a long format.
 ##' @param unit_id Vector identifying the distinct unit (e.g. person) for each observation.
@@ -228,6 +228,13 @@ create_standata_outcome_singlestudy <- function(data=NULL,
 ##' @author Joshua Keller
 ##' @seealso \link{create_standata_outcome}, \link{outsim_sample_observations}
 ##' @export
+##' @examples
+##' data(casedataA)
+##' outcome_dataA <- create_standata_outcome(data=casedataA)
+##' outcome_dataA <- add_priors(outcome_dataA,
+##'                             sigmaI=c(0, 0.1))
+##' outcome_mod_fit1 <- sample_outcome_model(outcome_dataA)
+##' print(outcome_mod_fit1, pars=c("reI_raw", "reI","mui"), include=FALSE)
 sample_outcome_model <- function(standata,
                                  B=1000,
                                  warmup=B,
