@@ -285,10 +285,12 @@ sample_outcome_model <- function(standata,
 ##' @param stanfit fitted outcome model from \code{\link{sample_outcome_model}}. Posterior samples of 'beta' are extracted from this object.
 ##' @param beta_post vector or matrix of posterior samples for 'beta' parameter. Only needed if \code{stanfit} not provided.
 ##' @param exprange range of exposure values over which to compute the curve
+##' @param expsequence sequence of exposure values at which the curve should be evaluated. For plotting, it is preferable to use \code{\link{exprange}}, but for specific known exposure values use \code{\link{expsequence}}.
 ##' @param ciband width of credible interval band
 ##' @param inclInterceptUncertainty Should intercept uncertainty be included uncertainty estimates? See details for more information.
 ##' @param inclIntercept Should the intercept term be included in the curve?
 ##' @param intercept_prop Proportions used in calculating the "average" intercept. Defaults to equal proportions for each study (\code{"equal"}) and can be set to be proportional to the number of observations in each study (\code{"obs"}). A vector of proportions can also be given.
+##' @param study Return the curve for a specific study, or the
 ##' @param ... Passed to \code{\link{seq}} to control sequence of exposure values.
 ##'
 ##' @details This function creates a data frame containing the values of the exposure-response curve over a given range of values. The output is designed for easy plotting.
@@ -305,11 +307,13 @@ get_fitted_ERC <- function (standata,
                             stanfit,
                             beta_post,
                             exprange = c(0, 100),
+                            expsequence=NULL,
                             ref_exposure=NULL,
                             ciband = 0.95,
                             inclInterceptUncertainty=TRUE,
                             inclIntercept=FALSE,
                             intercept_prop=c("equal", "obs"),
+                            study=NULL,
                             ...)
 {
     nS <- standata$S
@@ -320,7 +324,15 @@ get_fitted_ERC <- function (standata,
     }
     # If multiple studies, will add column with "average" intercept
     nSout <- ifelse(nS>1 & length(dim(beta_post))==2, nS+1, nS)
-    exposure_seq <- seq(exprange[1], exprange[2],...)
+    if (is.null(expsequence)){
+      expsequence <- seq(exprange[1], exprange[2],...)
+    } else {
+      if (!is.null(ref_exposure)){
+        if (!ref_exposure %in% expsequence) {
+          expsequence <- c(ref_exposure, expsequence)
+        }
+      }
+    }
     bs_post <- extract(stanfit, pars = "bS")$bS
 
     if (nSout > nS){
@@ -353,10 +365,10 @@ get_fitted_ERC <- function (standata,
 
     if (standata$xdf == 1) {
         if (!is.null(standata$Mx_attributes$`scaled:center`)) {
-            exposure_seq_scaled <- (exposure_seq - standata$Mx_attributes$`scaled:center`)/standata$Mx_attributes$`scaled:scale`
+            exposure_seq_scaled <- (expsequence - standata$Mx_attributes$`scaled:center`)/standata$Mx_attributes$`scaled:scale`
         }
         else {
-            exposure_seq_scaled <- exposure_seq
+            exposure_seq_scaled <- expsequence
         }
     }
     else {
@@ -364,9 +376,9 @@ get_fitted_ERC <- function (standata,
         attributes(Mxtemp) <- standata$Mx_attr
         predfn <- utils::getS3method(f = "predict",
                                      class(Mxtemp)[class(Mxtemp) !="matrix"][1])
-        exposure_seq_scaled <- predfn(Mxtemp, newx = exposure_seq)
+        exposure_seq_scaled <- predfn(Mxtemp, newx = expsequence)
     }
-    fitted_seq <- array(dim=c(length(exposure_seq),
+    fitted_seq <- array(dim=c(length(expsequence),
                               dim(beta_post)[1], # B from stan fit
                               nSout))
     for (i in 1:nSout){
@@ -381,7 +393,7 @@ get_fitted_ERC <- function (standata,
         if (!inclIntercept){
             bs_post <- sweep(bs_post, 2, colMeans(bs_post), FUN = "-")
         }
-        bs_post <- rep(1, length(exposure_seq)) %o% bs_post
+        bs_post <- rep(1, length(expsequence)) %o% bs_post
 
         fitted_seq <- fitted_seq + bs_post
     }
@@ -394,7 +406,7 @@ get_fitted_ERC <- function (standata,
     obj <- list(mean = fitted_seq_mean,
                 low = fitted_seq_low,
                 high = fitted_seq_high,
-                exposure = exposure_seq)
+                exposure = expsequence)
 
     if (!is.null(ref_exposure)){
       obj <- center_ERC(obj,
@@ -471,11 +483,11 @@ plot_fitted_ERC <- function (obj,
 
 
 ##' @rdname get_fitted_ERC
-##' @param ref_exposure Exposure concentration at which the spline should be shifted to have value 0 on log scale (value 1 on exponentiated scale). The largest exposure value less than \code{ref_exposure} is used as the new reference concentration.
+##' @param ref_exposure Exposure concentration at which the spline should be shifted to have value 0 on log scale (value 1 on exponentiated scale). The largest exposure value less than or equal to \code{ref_exposure} is used as the new reference concentration.
 ##' @export
 center_ERC <- function(obj, ref_exposure=min(obj$exposure)){
     obj_new <- obj
-    ind_cut <- max(which(obj$exposure < ref_exposure))
+    ind_cut <- max(which(obj$exposure <= ref_exposure))
     for (j in 1:ncol(obj_new$mean)){
         obj_new$mean[, j] <- obj$mean[, j] - obj$mean[ind_cut, j]
         obj_new$low[, j] <- obj$low[, j] - obj$mean[ind_cut, j]
