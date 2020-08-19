@@ -418,11 +418,6 @@ get_fitted_ERC <- function (standata,
                 low = fitted_seq_low,
                 high = fitted_seq_high,
                 exposure = expsequence)
-
-    if (!is.null(ref_exposure)){
-      obj <- center_ERC(obj,
-                        ref_exposure=ref_exposure)
-    }
     dflist <- vector("list", nSout)
     for (j in 1:nSout){
       dflist[[j]] <- data.frame(mean=obj$mean[, j],
@@ -433,6 +428,10 @@ get_fitted_ERC <- function (standata,
     }
     if (length(dflist)==1){
       dflist <- dflist[[1]]
+    }
+    if (!is.null(ref_exposure)){
+      dflist <- center_ERC(dflist,
+                        ref_exposure=ref_exposure)
     }
     dflist
 }
@@ -505,11 +504,17 @@ plot_fitted_ERC <- function (obj,
 ##' @export
 center_ERC <- function(obj, ref_exposure=min(obj$exposure)){
     obj_new <- obj
-    ind_cut <- max(which(obj$exposure <= ref_exposure))
-    for (j in 1:length(obj_new)){
-      obj_new[[j]]$mean <- obj_new[[j]]$mean - obj_new[[j]]$mean[ind_cut]
-      obj_new[[j]]$low <- obj_new[[j]]$low - obj_new[[j]]$low[ind_cut]
-      obj_new[[j]]$high <- obj_new[[j]]$high - obj_new[[j]]$high[ind_cut]
-    }
+    if (is.list(obj_new)){
+      for (j in 1:length(obj_new)){
+        ind_cut <- max(which(obj_new[[j]]$exposure <= ref_exposure))
+        obj_new[[j]]$low <- obj_new[[j]]$low - obj_new[[j]]$mean[ind_cut]
+        obj_new[[j]]$high <- obj_new[[j]]$high - obj_new[[j]]$mean[ind_cut]
+        obj_new[[j]]$mean <- obj_new[[j]]$mean - obj_new[[j]]$mean[ind_cut] # do last
+      }} else {
+        ind_cut <- max(which(obj_new$exposure <= ref_exposure))
+        obj_new$low <- obj_new$low - obj_new$mean[ind_cut]
+        obj_new$high <- obj_new$high - obj_new$mean[ind_cut]
+        obj_new$mean <- obj_new$mean - obj_new$mean[ind_cut] # do last
+      }
     obj_new
 }
