@@ -9,12 +9,20 @@
 get_fitted_ERC(
   standata,
   stanfit,
-  beta_post,
   exprange = c(0, 100),
+  expsequence = NULL,
+  ref_exposure = NULL,
   ciband = 0.95,
   inclInterceptUncertainty = TRUE,
   inclIntercept = FALSE,
   intercept_prop = c("equal", "obs"),
+  study = NULL,
+  beta_post,
+  bs_post,
+  nS = standata$S,
+  Mx = standata$Mx,
+  Mx_attributes = standata$Mx_attributes,
+  xdf = standata$xdf,
   ...
 )
 
@@ -34,9 +42,11 @@ center_ERC(obj, ref_exposure = min(obj$exposure))
 
 \item{stanfit}{fitted outcome model from \code{\link{sample_outcome_model}}. Posterior samples of 'beta' are extracted from this object.}
 
-\item{beta_post}{vector or matrix of posterior samples for 'beta' parameter. Only needed if \code{stanfit} not provided.}
-
 \item{exprange}{range of exposure values over which to compute the curve}
+
+\item{expsequence}{sequence of exposure values at which the curve should be evaluated. For plotting, it is preferable to use \code{\link{exprange}}, but for specific known exposure values use \code{\link{expsequence}}.}
+
+\item{ref_exposure}{Exposure concentration at which the spline should be shifted to have value 0 on log scale (value 1 on exponentiated scale). The largest exposure value less than or equal to \code{ref_exposure} is used as the new reference concentration.}
 
 \item{ciband}{width of credible interval band}
 
@@ -45,6 +55,20 @@ center_ERC(obj, ref_exposure = min(obj$exposure))
 \item{inclIntercept}{Should the intercept term be included in the curve?}
 
 \item{intercept_prop}{Proportions used in calculating the "average" intercept. Defaults to equal proportions for each study (\code{"equal"}) and can be set to be proportional to the number of observations in each study (\code{"obs"}). A vector of proportions can also be given.}
+
+\item{study}{Return the curve for a specific study, or the}
+
+\item{beta_post}{vector or matrix of posterior samples for 'beta' parameter. Only needed if \code{stanfit} not provided.}
+
+\item{bs_post}{vector or matrix of posterior samples for 'bS' parameter. Only needed if \code{stanfit} not provided.}
+
+\item{nS}{Number of studies. Only needed if \code{standata} not provided.}
+
+\item{Mx}{Spline matrix for exposure. Only needed if \code{standata} not provided.}
+
+\item{Mx_attributes}{Attributes for the spline matrix. Only needed if \code{standata} not provided.}
+
+\item{xdf}{Degrees of freedom in exposure splines}
 
 \item{...}{Passed to \code{\link{seq}} to control sequence of exposure values.}
 
@@ -59,8 +83,6 @@ center_ERC(obj, ref_exposure = min(obj$exposure))
 \item{xlab}{String providing x-axis label.}
 
 \item{ribbon}{Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).}
-
-\item{ref_exposure}{Exposure concentration at which the spline should be shifted to have value 0 on log scale (value 1 on exponentiated scale). The largest exposure value less than \code{ref_exposure} is used as the new reference concentration.}
 }
 \description{
 Computes the exposure-response curve from a fitted outcome model
