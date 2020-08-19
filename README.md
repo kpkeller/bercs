@@ -85,37 +85,37 @@ print(exposure_mod_fit,
     ## post-warmup draws per chain=1000, total post-warmup draws=4000.
     ## 
     ##                  mean se_mean   sd    2.5%     25%     50%     75%   97.5%
-    ## sigmaG           1.84    0.01 0.46    1.12    1.50    1.77    2.12    2.91
-    ## sigmaI           0.63    0.01 0.24    0.12    0.49    0.64    0.79    1.09
-    ## sigmaW           1.20    0.00 0.13    0.99    1.11    1.19    1.28    1.48
-    ## sigmaTheta[1]    0.35    0.01 0.33    0.01    0.12    0.25    0.48    1.24
-    ## etaG[1]          0.03    0.01 0.37   -0.70   -0.21    0.03    0.27    0.79
-    ## etaG[2]          1.95    0.01 0.38    1.17    1.71    1.96    2.21    2.67
-    ## etaG[3]          3.38    0.01 0.38    2.60    3.14    3.39    3.64    4.10
-    ## theta[1]         0.04    0.00 0.29   -0.55   -0.09    0.01    0.15    0.70
-    ## theta[2]        -0.05    0.00 0.32   -0.80   -0.17   -0.01    0.09    0.63
-    ## theta[3]         0.05    0.00 0.23   -0.39   -0.07    0.02    0.15    0.57
-    ## sigma2I          0.46    0.01 0.31    0.01    0.24    0.40    0.62    1.19
-    ## sigma2W          1.46    0.01 0.31    0.98    1.24    1.42    1.65    2.18
-    ## sigma2G          3.60    0.04 1.89    1.25    2.25    3.13    4.49    8.48
-    ## lp__          -158.37    0.18 5.37 -170.17 -161.62 -157.95 -154.48 -149.23
+    ## sigmaG           1.83    0.01 0.45    1.13    1.50    1.78    2.10    2.85
+    ## sigmaI           0.39    0.01 0.23    0.03    0.22    0.38    0.55    0.86
+    ## sigmaW           1.34    0.00 0.12    1.12    1.25    1.33    1.42    1.60
+    ## sigmaTheta[1]    0.49    0.01 0.38    0.02    0.20    0.41    0.68    1.43
+    ## etaG[1]         -0.36    0.01 0.36   -1.08   -0.60   -0.36   -0.12    0.33
+    ## etaG[2]          1.85    0.01 0.36    1.10    1.61    1.86    2.09    2.53
+    ## etaG[3]          3.53    0.01 0.38    2.74    3.29    3.54    3.77    4.25
+    ## theta[1]         0.05    0.00 0.36   -0.65   -0.13    0.02    0.22    0.86
+    ## theta[2]         0.18    0.01 0.44   -0.60   -0.07    0.09    0.39    1.29
+    ## theta[3]         0.30    0.01 0.34   -0.21    0.04    0.23    0.50    1.09
+    ## sigma2I          0.21    0.01 0.21    0.00    0.05    0.15    0.30    0.75
+    ## sigma2W          1.81    0.01 0.34    1.25    1.57    1.78    2.01    2.55
+    ## sigma2G          3.56    0.04 1.82    1.27    2.25    3.15    4.40    8.10
+    ## lp__          -165.95    0.15 4.91 -176.34 -169.10 -165.61 -162.54 -156.84
     ##               n_eff Rhat
-    ## sigmaG         2275    1
-    ## sigmaI         1290    1
-    ## sigmaW         1948    1
-    ## sigmaTheta[1]  3424    1
-    ## etaG[1]        2536    1
-    ## etaG[2]        3689    1
-    ## etaG[3]        3654    1
-    ## theta[1]       4836    1
-    ## theta[2]       5016    1
-    ## theta[3]       4996    1
-    ## sigma2I        1730    1
-    ## sigma2W        1910    1
-    ## sigma2G        2367    1
-    ## lp__            858    1
+    ## sigmaG         2291 1.00
+    ## sigmaI         1444 1.00
+    ## sigmaW         3618 1.00
+    ## sigmaTheta[1]  2718 1.00
+    ## etaG[1]        3520 1.00
+    ## etaG[2]        3739 1.00
+    ## etaG[3]        3504 1.00
+    ## theta[1]       5409 1.00
+    ## theta[2]       3400 1.00
+    ## theta[3]       3392 1.00
+    ## sigma2I        1574 1.00
+    ## sigma2W        3629 1.00
+    ## sigma2G        2411 1.00
+    ## lp__           1102 1.01
     ## 
-    ## Samples were drawn using NUTS(diag_e) at Thu Jun 18 16:14:11 2020.
+    ## Samples were drawn using NUTS(diag_e) at Wed Aug 19 09:20:03 2020.
     ## For each parameter, n_eff is a crude measure of effective sample size,
     ## and Rhat is the potential scale reduction factor on split chains (at 
     ## convergence, Rhat=1).
@@ -131,7 +131,7 @@ summary(fitted_means)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ## -0.5347  0.4131  1.8332  1.8291  3.5621  3.9226
+    ## -0.5940 -0.1244  1.9146  1.7749  3.5297  4.0821
 
 ``` r
 # Plots the fitted values (colored points) on top of original data (black outlines).
@@ -228,10 +228,10 @@ print(outcome_combo_mod_fit, pars=c("reI_raw", "reI","mui", "beta_raw"), include
 <!-- end list -->
 
 ``` r
-fitted_ERC <- get_fitted_ERC(standata=outcome_combo_data,
+fitted_ERC <- compute_ERC(standata=outcome_combo_data,
                              stanfit=outcome_combo_mod_fit,
                              exprange=c(5,200))
-plot_fitted_ERC(fitted_ERC) + scale_y_log10()
+plot_ERC(fitted_ERC) + scale_y_log10()
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
