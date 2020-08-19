@@ -305,6 +305,7 @@ get_fitted_ERC <- function (standata,
                             stanfit,
                             beta_post,
                             exprange = c(0, 100),
+                            ref_exposure=NULL,
                             ciband = 0.95,
                             inclInterceptUncertainty=TRUE,
                             inclIntercept=FALSE,
@@ -394,6 +395,11 @@ get_fitted_ERC <- function (standata,
                 low = fitted_seq_low,
                 high = fitted_seq_high,
                 exposure = exposure_seq)
+
+    if (!is.null(ref_exposure)){
+      obj <- center_ERC(obj,
+                        ref_exposure=ref_exposure)
+    }
     obj
 }
 
@@ -406,7 +412,12 @@ get_fitted_ERC <- function (standata,
 ##' @param ribbon Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).
 ##' @export
 ##' @import ggplot2
-plot_fitted_ERC <- function (obj, incS=NULL, expERC=TRUE, ylab = "Relative Risk", xlab = "Exposure", ribbon=FALSE)
+plot_fitted_ERC <- function (obj,
+                             incS=NULL,
+                             expERC=TRUE,
+                             ylab = "Relative Risk",
+                             xlab = "Exposure",
+                             ribbon=FALSE)
 {
     nS <- ncol(obj$mean)
     dflist <- vector("list", nS)
@@ -472,9 +483,3 @@ center_ERC <- function(obj, ref_exposure=min(obj$exposure)){
     }
     obj_new
 }
-
-
-
-
-
-
