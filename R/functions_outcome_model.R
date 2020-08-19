@@ -412,7 +412,18 @@ get_fitted_ERC <- function (standata,
       obj <- center_ERC(obj,
                         ref_exposure=ref_exposure)
     }
-    obj
+    dflist <- vector("list", nSout)
+    for (j in 1:nSout){
+      dflist[[j]] <- data.frame(mean=obj$mean[, j],
+                                low=obj$low[, j],
+                                high=obj$high[, j],
+                                exposure=obj$exposure,
+                                study=j)
+    }
+    if (length(dflist)==1){
+      dflist <- dflist[[1]]
+    }
+    dflist
 }
 
 ##' @rdname get_fitted_ERC
@@ -431,16 +442,12 @@ plot_fitted_ERC <- function (obj,
                              xlab = "Exposure",
                              ribbon=FALSE)
 {
-    nS <- ncol(obj$mean)
-    dflist <- vector("list", nS)
-    for (j in 1:nS){
-        dflist[[j]] <- data.frame(mean=obj$mean[, j],
-                                  low=obj$low[, j],
-                                  high=obj$high[, j],
-                                  exposure=obj$exposure,
-                                  study=j)
+    if (is.list(obj)){
+      nS <- length(obj)
+    } else {
+      nS <- 1
     }
-    fulldf <- do.call(rbind, dflist)
+    fulldf <- do.call(rbind, obj)
     if (expERC) {
         fulldf$mean <- exp(fulldf$mean)
         fulldf$low <- exp(fulldf$low)
@@ -488,10 +495,10 @@ plot_fitted_ERC <- function (obj,
 center_ERC <- function(obj, ref_exposure=min(obj$exposure)){
     obj_new <- obj
     ind_cut <- max(which(obj$exposure <= ref_exposure))
-    for (j in 1:ncol(obj_new$mean)){
-        obj_new$mean[, j] <- obj$mean[, j] - obj$mean[ind_cut, j]
-        obj_new$low[, j] <- obj$low[, j] - obj$mean[ind_cut, j]
-        obj_new$high[, j] <- obj$high[, j] - obj$mean[ind_cut, j]
+    for (j in 1:length(obj_new)){
+      obj_new[[j]]$mean <- obj_new[[j]]$mean - obj_new[[j]]$mean[ind_cut]
+      obj_new[[j]]$low <- obj_new[[j]]$low - obj_new[[j]]$low[ind_cut]
+      obj_new[[j]]$high <- obj_new[[j]]$high - obj_new[[j]]$high[ind_cut]
     }
     obj_new
 }
