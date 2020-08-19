@@ -283,7 +283,6 @@ sample_outcome_model <- function(standata,
 ##' @description Computes the exposure-response curve from a fitted outcome model
 ##' @param standata \code{standata_outcome} object used to fit the model
 ##' @param stanfit fitted outcome model from \code{\link{sample_outcome_model}}. Posterior samples of 'beta' are extracted from this object.
-##' @param beta_post vector or matrix of posterior samples for 'beta' parameter. Only needed if \code{stanfit} not provided.
 ##' @param exprange range of exposure values over which to compute the curve
 ##' @param expsequence sequence of exposure values at which the curve should be evaluated. For plotting, it is preferable to use \code{\link{exprange}}, but for specific known exposure values use \code{\link{expsequence}}.
 ##' @param ciband width of credible interval band
@@ -291,6 +290,12 @@ sample_outcome_model <- function(standata,
 ##' @param inclIntercept Should the intercept term be included in the curve?
 ##' @param intercept_prop Proportions used in calculating the "average" intercept. Defaults to equal proportions for each study (\code{"equal"}) and can be set to be proportional to the number of observations in each study (\code{"obs"}). A vector of proportions can also be given.
 ##' @param study Return the curve for a specific study, or the
+##' @param beta_post vector or matrix of posterior samples for 'beta' parameter. Only needed if \code{stanfit} not provided.
+##' @param bs_post vector or matrix of posterior samples for 'bS' parameter. Only needed if \code{stanfit} not provided.
+##' @param nS Number of studies. Only needed if \code{standata} not provided.
+##' @param Mx Spline matrix for exposure. Only needed if \code{standata} not provided.
+##' @param Mx_attributes Attributes for the spline matrix. Only needed if \code{standata} not provided.
+##' @param xdf Degrees of freedom in exposure splines
 ##' @param ... Passed to \code{\link{seq}} to control sequence of exposure values.
 ##'
 ##' @details This function creates a data frame containing the values of the exposure-response curve over a given range of values. The output is designed for easy plotting.
@@ -305,7 +310,6 @@ sample_outcome_model <- function(standata,
 #' @importFrom rstan extract
 get_fitted_ERC <- function (standata,
                             stanfit,
-                            beta_post,
                             exprange = c(0, 100),
                             expsequence=NULL,
                             ref_exposure=NULL,
@@ -314,9 +318,14 @@ get_fitted_ERC <- function (standata,
                             inclIntercept=FALSE,
                             intercept_prop=c("equal", "obs"),
                             study=NULL,
+                            beta_post,
+                            bs_post,
+                            nS=standata$S,
+                            Mx=standata$Mx,
+                            Mx_attributes=standata$Mx_attributes,
+                            xdf=standata$xdf,
                             ...)
 {
-    nS <- standata$S
     if (ciband < 0 || ciband > 1)
         stop("'ciband' must be between 0 and 1.")
     if (missing(beta_post)) {
@@ -333,7 +342,9 @@ get_fitted_ERC <- function (standata,
         }
       }
     }
-    bs_post <- extract(stanfit, pars = "bS")$bS
+    if (missing(bs_post)) {
+      bs_post <- extract(stanfit, pars = "bS")$bS
+    }
 
     if (nSout > nS){
         # Add column that has "average" intercept, if there are multiple studies
@@ -363,17 +374,17 @@ get_fitted_ERC <- function (standata,
         beta_post <- beta_post2
     }
 
-    if (standata$xdf == 1) {
-        if (!is.null(standata$Mx_attributes$`scaled:center`)) {
-            exposure_seq_scaled <- (expsequence - standata$Mx_attributes$`scaled:center`)/standata$Mx_attributes$`scaled:scale`
+    if (xdf == 1) {
+        if (!is.null(Mx_attributes$`scaled:center`)) {
+            exposure_seq_scaled <- (expsequence - Mx_attributes$`scaled:center`)/Mx_attributes$`scaled:scale`
         }
         else {
             exposure_seq_scaled <- expsequence
         }
     }
     else {
-        Mxtemp <- standata$Mx
-        attributes(Mxtemp) <- standata$Mx_attr
+        Mxtemp <- Mx
+        attributes(Mxtemp) <- Mx_attributes
         predfn <- utils::getS3method(f = "predict",
                                      class(Mxtemp)[class(Mxtemp) !="matrix"][1])
         exposure_seq_scaled <- predfn(Mxtemp, newx = expsequence)
