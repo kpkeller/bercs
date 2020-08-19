@@ -308,7 +308,7 @@ sample_outcome_model <- function(standata,
 #' @importFrom stats quantile
 #' @importFrom utils getS3method
 #' @importFrom rstan extract
-get_fitted_ERC <- function (standata,
+compute_ERC <- function (standata,
                             stanfit,
                             exprange = c(0, 100),
                             expsequence=NULL,
@@ -436,8 +436,8 @@ get_fitted_ERC <- function (standata,
     dflist
 }
 
-##' @rdname get_fitted_ERC
-##' @param obj Data frame containing \code{exposure}, \code{mean}, \code{low}, and \code{high}. Typically generated from \code{\link{get_fitted_ERC}}.
+##' @rdname compute_ERC
+##' @param obj Data frame containing \code{exposure}, \code{mean}, \code{low}, and \code{high}. Typically generated from \code{\link{compute_ERC}}.
 ##' @param incS If model has a single curve but with different selections of intercept uncertainty, this indicates which choice of uncertainty to use. Defaults to the last column of the curve in \code{obj}, which is typically the averaged intercept uncertainty. If multiple curves are fit, this selects which curve(s) is plotted.
 ##' @param expERC Should the fitted curve be exponentiated (TRUE) or not (FALSE).
 ##' @param ylab String providing y-axis label.
@@ -445,7 +445,7 @@ get_fitted_ERC <- function (standata,
 ##' @param ribbon Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).
 ##' @export
 ##' @import ggplot2
-plot_fitted_ERC <- function (obj,
+plot_ERC <- function (obj,
                              incS=NULL,
                              expERC=TRUE,
                              ylab = "Relative Risk",
@@ -499,7 +499,7 @@ plot_fitted_ERC <- function (obj,
 }
 
 
-##' @rdname get_fitted_ERC
+##' @rdname compute_ERC
 ##' @param ref_exposure Exposure concentration at which the spline should be shifted to have value 0 on log scale (value 1 on exponentiated scale). The largest exposure value less than or equal to \code{ref_exposure} is used as the new reference concentration.
 ##' @export
 center_ERC <- function(obj, ref_exposure=min(obj$exposure)){
