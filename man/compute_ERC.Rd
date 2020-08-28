@@ -4,6 +4,7 @@
 \alias{compute_ERC}
 \alias{plot_ERC}
 \alias{center_ERC}
+\alias{compute_OR}
 \title{Extract fitted Exposure-Response Curve (ERC)}
 \usage{
 compute_ERC(
@@ -36,6 +37,26 @@ plot_ERC(
 )
 
 center_ERC(obj, ref_exposure = min(obj$exposure))
+
+compute_OR(
+  standata,
+  stanfit,
+  exprange = c(0, 100),
+  expsequence = NULL,
+  ref_exposure = 0,
+  ciband = 0.95,
+  inclInterceptUncertainty = TRUE,
+  inclIntercept = FALSE,
+  intercept_prop = c("equal", "obs"),
+  study = NULL,
+  beta_post,
+  bs_post,
+  nS = standata$S,
+  Mx = standata$Mx,
+  Mx_attributes = standata$Mx_attributes,
+  xdf = standata$xdf,
+  ...
+)
 }
 \arguments{
 \item{standata}{\code{standata_outcome} object used to fit the model}
@@ -44,7 +65,7 @@ center_ERC(obj, ref_exposure = min(obj$exposure))
 
 \item{exprange}{range of exposure values over which to compute the curve}
 
-\item{expsequence}{sequence of exposure values at which the curve should be evaluated. For plotting, it is preferable to use \code{\link{exprange}}, but for specific known exposure values use \code{\link{expsequence}}.}
+\item{expsequence}{sequence of exposure values at which the curve should be evaluated. For plotting, it is preferable to use \code{exprange}, but for specific known exposure values use \code{expsequence}.}
 
 \item{ref_exposure}{Exposure concentration at which the spline should be shifted to have value 0 on log scale (value 1 on exponentiated scale). The largest exposure value less than or equal to \code{ref_exposure} is used as the new reference concentration.}
 
@@ -92,6 +113,8 @@ This function creates a data frame containing the values of the exposure-respons
 Currently, the fitted curve is plotted based upon the posterior means of the parameters, with the uncertainty bands based upon quantiles.
 
 Uncertainty from the intercepts is included in the confidence bands by default, since this corresponds to a common interpretation of such intervals. This requires picking a single value for the intercept. For models fit to multiple studies, a separate set of uncertainty will be created for each study. Additionally, a set of results corresponding to "average" intercept is created. The \code{intercept_prop} argument controls the relative contribution of the intercepts from each model.
+
+To calculate odds ratios for specific combinations of exposure values, use the `compute_OR` function, which will correctly calculate the credible intervals for the relative difference.
 }
 \seealso{
 \code{\link{sample_outcome_model}}

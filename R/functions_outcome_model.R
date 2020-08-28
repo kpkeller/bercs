@@ -284,7 +284,7 @@ sample_outcome_model <- function(standata,
 ##' @param standata \code{standata_outcome} object used to fit the model
 ##' @param stanfit fitted outcome model from \code{\link{sample_outcome_model}}. Posterior samples of 'beta' are extracted from this object.
 ##' @param exprange range of exposure values over which to compute the curve
-##' @param expsequence sequence of exposure values at which the curve should be evaluated. For plotting, it is preferable to use \code{\link{exprange}}, but for specific known exposure values use \code{\link{expsequence}}.
+##' @param expsequence sequence of exposure values at which the curve should be evaluated. For plotting, it is preferable to use \code{exprange}, but for specific known exposure values use \code{expsequence}.
 ##' @param ciband width of credible interval band
 ##' @param inclInterceptUncertainty Should intercept uncertainty be included uncertainty estimates? See details for more information.
 ##' @param inclIntercept Should the intercept term be included in the curve?
@@ -329,7 +329,7 @@ compute_ERC <- function (standata,
     if (ciband < 0 || ciband > 1)
         stop("'ciband' must be between 0 and 1.")
     if (missing(beta_post)) {
-        beta_post <- extract(stanfit, pars = "beta")$beta
+        beta_post <- rstan::extract(stanfit, pars = "beta")$beta
     }
     # If multiple studies, will add column with "average" intercept
     nSout <- ifelse(nS>1 & length(dim(beta_post))==2, nS+1, nS)
@@ -364,37 +364,51 @@ compute_ERC <- function (standata,
 
         bs_post <- cbind(bs_post, bs_post %*% intercept_prop)
     }
-    if (length(dim(beta_post))==2) {
-        beta_post2 <- array(dim=c(nrow(beta_post),
-                                  nSout,
-                                  ncol(beta_post)))
-        for (j in 1:dim(beta_post2)[2]){
-            beta_post2[, j, ] <-beta_post
-        }
-        beta_post <- beta_post2
-    }
 
-    if (xdf == 1) {
-        if (!is.null(Mx_attributes$`scaled:center`)) {
-            exposure_seq_scaled <- (expsequence - Mx_attributes$`scaled:center`)/Mx_attributes$`scaled:scale`
-        }
-        else {
-            exposure_seq_scaled <- expsequence
-        }
-    }
-    else {
-        Mxtemp <- Mx
-        attributes(Mxtemp) <- Mx_attributes
-        predfn <- utils::getS3method(f = "predict",
-                                     class(Mxtemp)[class(Mxtemp) !="matrix"][1])
-        exposure_seq_scaled <- predfn(Mxtemp, newx = expsequence)
-    }
-    fitted_seq <- array(dim=c(length(expsequence),
-                              dim(beta_post)[1], # B from stan fit
-                              nSout))
-    for (i in 1:nSout){
-        fitted_seq[, , i] <- exposure_seq_scaled %*% t(beta_post[, i, ])
-    }
+    beta_post <- reshape_beta_post(beta_post=beta_post,
+                      nSout=nSout)
+
+    # if (length(dim(beta_post))==2) {
+    #     beta_post2 <- array(dim=c(nrow(beta_post),
+    #                               nSout,
+    #                               ncol(beta_post)))
+    #     for (j in 1:dim(beta_post2)[2]){
+    #         beta_post2[, j, ] <-beta_post
+    #     }
+    #     beta_post <- beta_post2
+    # }
+
+
+
+        #
+    # if (xdf == 1) {
+    #     if (!is.null(Mx_attributes$`scaled:center`)) {
+    #         exposure_seq_scaled <- (expsequence - Mx_attributes$`scaled:center`)/Mx_attributes$`scaled:scale`
+    #     }
+    #     else {
+    #         exposure_seq_scaled <- expsequence
+    #     }
+    # }
+    # else {
+    #     Mxtemp <- Mx
+    #     attributes(Mxtemp) <- Mx_attributes
+    #     predfn <- utils::getS3method(f = "predict",
+    #                                  class(Mxtemp)[class(Mxtemp) !="matrix"][1])
+    #     exposure_seq_scaled <- predfn(Mxtemp, newx = expsequence)
+    # }
+    # fitted_seq <- array(dim=c(length(expsequence),
+    #                           dim(beta_post)[1], # B from stan fit
+    #                           nSout))
+    # for (i in 1:nSout){
+    #     fitted_seq[, , i] <- exposure_seq_scaled %*% t(beta_post[, i, ])
+    # }
+
+    fitted_seq <- compute_fitted_sequence(beta_post = beta_post,
+                                          expsequence=expsequence,
+                                          nSout=nSout,
+                                          xdf=xdf,
+                                          Mx=Mx,
+                                          Mx_attributes=Mx_attributes)
 
     if (inclIntercept & !inclInterceptUncertainty) {
         inclInterceptUncertainty <- TRUE
@@ -517,4 +531,138 @@ center_ERC <- function(obj, ref_exposure=min(obj$exposure)){
         obj_new$mean <- obj_new$mean - obj_new$mean[ind_cut] # do last
       }
     obj_new
+}
+
+
+
+##' @rdname compute_ERC
+##' @details To calculate odds ratios for specific combinations of exposure values, use the `compute_OR` function, which will correctly calculate the credible intervals for the relative difference.
+compute_OR <- function (standata,
+                        stanfit,
+                        exprange = c(0, 100),
+                        expsequence=NULL,
+                        ref_exposure=0,
+                        ciband = 0.95,
+                        inclInterceptUncertainty=TRUE,
+                        inclIntercept=FALSE,
+                        intercept_prop=c("equal", "obs"),
+                        study=NULL,
+                        beta_post,
+                        bs_post,
+                        nS=standata$S,
+                        Mx=standata$Mx,
+                        Mx_attributes=standata$Mx_attributes,
+                        xdf=standata$xdf,
+                        ...)
+{
+  if (ciband < 0 || ciband > 1)
+    stop("'ciband' must be between 0 and 1.")
+  if (missing(beta_post)) {
+    beta_post <- rstan::extract(stanfit, pars = "beta")$beta
+  }
+
+  if (is.null(expsequence)){
+    expsequence <- seq(exprange[1], exprange[2],...)
+  } else {
+    if (!is.null(ref_exposure)){
+      if (!ref_exposure %in% expsequence) {
+        expsequence <- c(ref_exposure, expsequence)
+      }
+    }
+  }
+
+  # Are there multiple curves? Usually no.
+  multiple_curves <- ifelse(length(dim(beta_post))>2, TRUE, FALSE)
+
+  beta_post <- reshape_beta_post(beta_post,
+                    nSout=nS)
+  fitted_seq <- compute_fitted_sequence(beta_post = beta_post,
+                                        expsequence=expsequence,
+                                        nSout=nS,
+                                        xdf=xdf,
+                                        Mx=Mx,
+                                        Mx_attributes=Mx_attributes)
+
+  fitted_seq_ref <- fitted_seq[which(expsequence==ref_exposure),,]
+  fitted_seq <- sweep(fitted_seq, 2:3, fitted_seq_ref,FUN="-")
+  fitted_seq_mean <- apply(fitted_seq, c(1, 3), mean)
+  fitted_seq_low <- apply(fitted_seq, c(1,3), stats::quantile,
+                          probs = (1 - ciband)/2)
+  fitted_seq_high <- apply(fitted_seq, c(1,3), stats::quantile,
+                           probs = 0.5 + ciband/2)
+
+  obj <- list(exposure = expsequence,
+              logOR_mean = fitted_seq_mean,
+              logOR_low = fitted_seq_low,
+              logOR_high = fitted_seq_high,
+              OR_mean = exp(fitted_seq_mean),
+              OR_low = exp(fitted_seq_low),
+              OR_high = exp(fitted_seq_high))
+  dflist <- vector("list", nS)
+  for (j in 1:nS){
+    dflist[[j]] <- data.frame(exposure=obj$exposure,
+                              logOR_mean=obj$logOR_mean[, j],
+                              logOR_low=obj$logOR_low[, j],
+                              logOR_high=obj$logOR_high[, j],
+                              OR_mean=obj$OR_mean[, j],
+                              OR_low=obj$OR_low[, j],
+                              OR_high=obj$OR_high[, j],
+                              study=j)
+  }
+  if (!multiple_curves){
+    dflist <- dflist[[1]]
+  }
+  dflist
+}
+
+
+reshape_beta_post <- function(beta_post, nSout){
+  if (length(dim(beta_post))==2) {
+    beta_post2 <- array(dim=c(nrow(beta_post),
+                              nSout,
+                              ncol(beta_post)))
+    for (j in 1:dim(beta_post2)[2]){
+      beta_post2[, j, ] <-beta_post
+    }
+    beta_post <- beta_post2
+  }
+  beta_post
+}
+
+# Compute the fitted sequence from an exposure sequence
+# and set of beta values
+## @param beta_post Matrix of posterior sample of beta's
+## @param expsequence Sequence of exposure values
+## @param nSout Number of studies + 1 (unless only one study) in model output
+## @param xdf Degrees of freedom in exposure spline
+## @param Mx Matrix of exposure spline values
+## @param Mx_attributes Attributes of Mx
+compute_fitted_sequence <- function(beta_post,
+                                    expsequence,
+                                    nSout,
+                                    xdf,
+                                    Mx,
+                                    Mx_attributes){
+if (xdf == 1) {
+  if (!is.null(Mx_attributes$`scaled:center`)) {
+    exposure_seq_scaled <- (expsequence - Mx_attributes$`scaled:center`)/Mx_attributes$`scaled:scale`
+  }
+  else {
+    exposure_seq_scaled <- expsequence
+  }
+}
+else {
+  Mxtemp <- Mx
+  attributes(Mxtemp) <- Mx_attributes
+  predfn <- utils::getS3method(f = "predict",
+                               class(Mxtemp)[class(Mxtemp) !="matrix"][1])
+  exposure_seq_scaled <- predfn(Mxtemp, newx = expsequence)
+}
+fitted_seq <- array(dim=c(length(expsequence),
+                          dim(beta_post)[1], # B from stan fit
+                          nSout))
+for (i in 1:nSout){
+  fitted_seq[, , i] <- exposure_seq_scaled %*% t(beta_post[, i, ])
+}
+  fitted_seq
 }

@@ -1,3 +1,7 @@
 ^bercs\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
+paper.Rmd
+paper.bib
+paper.html
+README*
