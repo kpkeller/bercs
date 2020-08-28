@@ -285,7 +285,7 @@ sim_update_times <- function(obj, time=NULL, draw=is.null(time)){
 ##' @importFrom splines ns
 sim_update_time_splines <- function(obj, df=1, fn="ns", ...){
     if (!inherits(obj, c("expsim", "outsim"))) stop("'obj' must be of class 'expsim' or 'outsim'.")
-    if (all(is.na(obj$structure$times))) stop("obj$structure$times must exist.")
+    if (all(is.na(obj$structure$time))) stop("obj$structure$time must exist.")
     Mt <- create_spline_matrix(obj$structure$time, df=df, fn=fn, ...)
     obj$standata <- add_spline_time(obj$standata, Mt)
     obj
