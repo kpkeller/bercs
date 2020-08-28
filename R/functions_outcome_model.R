@@ -537,6 +537,7 @@ center_ERC <- function(obj, ref_exposure=min(obj$exposure)){
 
 ##' @rdname compute_ERC
 ##' @details To calculate odds ratios for specific combinations of exposure values, use the `compute_OR` function, which will correctly calculate the credible intervals for the relative difference.
+##' @export
 compute_OR <- function (standata,
                         stanfit,
                         exprange = c(0, 100),
