@@ -11,6 +11,16 @@ sparse longitudinal exposure measurements. The **outcome model** is
 designed for estimating exposure-response curves, with particular focus
 on settings where data from multiple studies are being pooled.
 
+A description of these models is provided in:
+
+Keller JP, Katz J, Pokhrel AK, Bates MN, Tielsch J, and Zeger SL. A
+Hierarchical Model for Estimating the Exposure-Response Curve by
+Combining Multiple Studies of Acute Lower Respiratory Infections in
+Children and Household Fine Particulate Matter Air Pollution. In press.
+*Environmental Epidemiology.*
+
+## Installation
+
 This package uses the Stan language and depends on the `rstan` package.
 To install `bercs`, use the following commands:
 
@@ -85,37 +95,37 @@ print(exposure_mod_fit,
     ## post-warmup draws per chain=1000, total post-warmup draws=4000.
     ## 
     ##                  mean se_mean   sd    2.5%     25%     50%     75%   97.5%
-    ## sigmaG           1.75    0.01 0.45    1.04    1.43    1.70    2.02    2.79
-    ## sigmaI           0.86    0.01 0.20    0.48    0.73    0.85    0.99    1.29
-    ## sigmaW           1.13    0.00 0.11    0.93    1.05    1.12    1.20    1.38
-    ## sigmaTheta[1]    0.55    0.01 0.37    0.04    0.28    0.48    0.74    1.48
-    ## etaG[1]         -0.06    0.01 0.44   -0.91   -0.34   -0.06    0.23    0.82
-    ## etaG[2]          1.88    0.01 0.44    0.97    1.59    1.88    2.17    2.77
-    ## etaG[3]          3.07    0.01 0.46    2.13    2.78    3.08    3.38    3.96
-    ## theta[1]        -0.16    0.01 0.37   -0.97   -0.37   -0.12    0.05    0.54
-    ## theta[2]        -0.06    0.01 0.39   -0.92   -0.27   -0.02    0.16    0.73
-    ## theta[3]         0.42    0.01 0.34   -0.11    0.16    0.39    0.66    1.13
-    ## sigma2I          0.79    0.01 0.37    0.24    0.53    0.72    0.98    1.66
-    ## sigma2W          1.29    0.01 0.27    0.87    1.10    1.26    1.45    1.90
-    ## sigma2G          3.27    0.04 1.74    1.08    2.05    2.89    4.07    7.80
-    ## lp__          -154.21    0.18 5.23 -165.91 -157.45 -153.75 -150.52 -145.46
+    ## sigmaG           1.80    0.01 0.44    1.08    1.48    1.74    2.07    2.82
+    ## sigmaI           0.59    0.01 0.22    0.13    0.45    0.59    0.73    1.01
+    ## sigmaW           1.14    0.00 0.12    0.94    1.06    1.14    1.22    1.41
+    ## sigmaTheta[1]    0.36    0.01 0.33    0.01    0.12    0.26    0.48    1.24
+    ## etaG[1]          0.07    0.01 0.36   -0.63   -0.16    0.07    0.30    0.78
+    ## etaG[2]          2.19    0.01 0.37    1.45    1.95    2.19    2.42    2.92
+    ## etaG[3]          3.11    0.01 0.37    2.36    2.87    3.12    3.36    3.83
+    ## theta[1]         0.01    0.00 0.28   -0.60   -0.12    0.00    0.14    0.65
+    ## theta[2]        -0.05    0.00 0.32   -0.77   -0.18   -0.02    0.09    0.61
+    ## theta[3]        -0.10    0.00 0.24   -0.66   -0.22   -0.06    0.03    0.32
+    ## sigma2I          0.39    0.01 0.26    0.02    0.21    0.35    0.53    1.02
+    ## sigma2W          1.32    0.01 0.28    0.88    1.12    1.29    1.48    1.99
+    ## sigma2G          3.44    0.04 1.77    1.17    2.19    3.04    4.30    7.93
+    ## lp__          -154.54    0.18 5.28 -165.91 -158.00 -154.16 -150.57 -145.47
     ##               n_eff Rhat
-    ## sigmaG         2234    1
-    ## sigmaI         1374    1
-    ## sigmaW         2192    1
-    ## sigmaTheta[1]  2228    1
-    ## etaG[1]        2168    1
-    ## etaG[2]        2596    1
-    ## etaG[3]        2716    1
-    ## theta[1]       5055    1
-    ## theta[2]       5159    1
-    ## theta[3]       3133    1
-    ## sigma2I        1628    1
-    ## sigma2W        2105    1
-    ## sigma2G        2298    1
-    ## lp__            885    1
+    ## sigmaG         2003 1.00
+    ## sigmaI         1234 1.00
+    ## sigmaW         2108 1.00
+    ## sigmaTheta[1]  3187 1.00
+    ## etaG[1]        2921 1.00
+    ## etaG[2]        3516 1.00
+    ## etaG[3]        3496 1.00
+    ## theta[1]       5600 1.00
+    ## theta[2]       4181 1.00
+    ## theta[3]       4714 1.00
+    ## sigma2I        1647 1.00
+    ## sigma2W        2115 1.00
+    ## sigma2G        2133 1.00
+    ## lp__            855 1.01
     ## 
-    ## Samples were drawn using NUTS(diag_e) at Fri Aug 28 15:19:32 2020.
+    ## Samples were drawn using NUTS(diag_e) at Fri Sep 18 13:39:50 2020.
     ## For each parameter, n_eff is a crude measure of effective sample size,
     ## and Rhat is the potential scale reduction factor on split chains (at 
     ## convergence, Rhat=1).
@@ -131,7 +141,7 @@ summary(fitted_means)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ## -0.7172  0.1616  1.6704  1.7078  2.9399  4.4485
+    ## -0.2991  0.2349  2.1052  1.8100  3.1738  3.7171
 
 ``` r
 # Plots the fitted values (colored points) on top of original data (black outlines).
@@ -166,8 +176,7 @@ data(casedataA)
 data(casedataB)
 outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
                                               xdf=4,
-                                              xfnargs=list(Boundary.knots=c(5, 200),
-                                                           knots=c(25)))
+                                              xfnargs=list(Boundary.knots=c(5, 200)))
 ```
 
 2.  Add the hyperparameters for the prior distributions.
@@ -186,7 +195,8 @@ outcome_combo_data <- add_priors(outcome_combo_data,
 
 ``` r
 outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
-                                         B=2000)
+                                         B=2000,
+                                         cores=4)
 ```
 
 ``` r
@@ -198,15 +208,15 @@ print(outcome_combo_mod_fit, pars=c("reI_raw", "reI","mui", "beta_raw"), include
     ## post-warmup draws per chain=2000, total post-warmup draws=8000.
     ## 
     ##              mean se_mean    sd     2.5%     25%     50%     75%   97.5% n_eff
-    ## sigmaI       0.08    0.00  0.06     0.00    0.03    0.07    0.11    0.22  6789
-    ## bS[1]       -1.65    0.01  0.38    -2.45   -1.90   -1.63   -1.38   -0.98  3673
-    ## bS[2]       -2.93    0.01  0.76    -4.45   -3.45   -2.94   -2.39   -1.52  3819
-    ## sigmaBeta    1.21    0.01  0.59     0.15    0.79    1.17    1.59    2.48  3626
-    ## beta[1]      1.91    0.02  1.11     0.01    1.10    1.85    2.65    4.27  3449
-    ## beta[2]     -0.43    0.01  1.01    -2.78   -0.97   -0.26    0.20    1.29  6622
-    ## beta[3]     -0.23    0.01  0.92    -2.20   -0.75   -0.17    0.27    1.60  7352
-    ## beta[4]      0.38    0.01  0.85    -1.17   -0.14    0.28    0.86    2.27  7659
-    ## lp__      -971.91    0.30 16.06 -1003.99 -982.44 -971.85 -961.07 -940.77  2861
+    ## sigmaI       0.08    0.00  0.06     0.00    0.03    0.07    0.12    0.22  6022
+    ## bS[1]       -1.80    0.01  0.45    -2.73   -2.09   -1.79   -1.47   -0.98  2791
+    ## bS[2]       -3.07    0.02  0.82    -4.71   -3.62   -3.07   -2.50   -1.51  2739
+    ## sigmaBeta    1.22    0.01  0.59     0.16    0.81    1.19    1.60    2.46  3099
+    ## beta[1]      1.99    0.02  1.15     0.01    1.14    1.94    2.76    4.41  2619
+    ## beta[2]     -0.30    0.01  1.03    -2.69   -0.87   -0.15    0.35    1.55  7178
+    ## beta[3]     -0.32    0.01  0.96    -2.40   -0.86   -0.23    0.24    1.52  6673
+    ## beta[4]      0.37    0.01  0.86    -1.23   -0.17    0.29    0.89    2.21  7951
+    ## lp__      -971.55    0.29 15.95 -1004.11 -981.86 -971.17 -960.79 -941.29  2956
     ##           Rhat
     ## sigmaI       1
     ## bS[1]        1
@@ -218,7 +228,7 @@ print(outcome_combo_mod_fit, pars=c("reI_raw", "reI","mui", "beta_raw"), include
     ## beta[4]      1
     ## lp__         1
     ## 
-    ## Samples were drawn using NUTS(diag_e) at Thu Jun 18 16:14:47 2020.
+    ## Samples were drawn using NUTS(diag_e) at Fri Sep 18 13:40:37 2020.
     ## For each parameter, n_eff is a crude measure of effective sample size,
     ## and Rhat is the potential scale reduction factor on split chains (at 
     ## convergence, Rhat=1).
@@ -243,26 +253,25 @@ plot_ERC(fitted_ERC) + scale_y_log10()
 ``` r
 estimated_ORs <- compute_OR(standata=outcome_combo_data,
                              stanfit=outcome_combo_mod_fit,
-                             # exprange=c(5,200),
                             expsequence = c(5, 10, 20, 50, 100, 200),
                          ref_exposure=10)
 estimated_ORs
 ```
 
-    ##   exposure  logOR_mean    logOR_low    logOR_high   OR_mean    OR_low
-    ## 1        5 -0.06050711 -0.134961369 -0.0004094403 0.9412871 0.8737497
-    ## 2       10  0.00000000  0.000000000  0.0000000000 1.0000000 1.0000000
-    ## 3       20  0.29887327  0.002744556  0.6574887028 1.3483387 1.0027483
-    ## 4       50  1.01744454  0.014571441  2.1582092270 2.7661170 1.0146781
-    ## 5      100  1.37809414  0.004670150  2.8815850758 3.9673332 1.0046811
-    ## 6      200  1.55927510 -0.047406901  3.3671775297 4.7553728 0.9536993
-    ##      OR_high study
-    ## 1  0.9995906     1
-    ## 2  1.0000000     1
-    ## 3  1.9299396     1
-    ## 4  8.6556235     1
-    ## 5 17.8425325     1
-    ## 6 28.9965695     1
+    ##   exposure logOR_mean    logOR_low   logOR_high   OR_mean    OR_low    OR_high
+    ## 1        5 -0.1947854 -0.430240145 -0.001058144 0.8230112 0.6503529  0.9989424
+    ## 2       10  0.0000000  0.000000000  0.000000000 1.0000000 1.0000000  1.0000000
+    ## 3       20  0.3391810  0.002058172  0.727351189 1.4037975 1.0020603  2.0695914
+    ## 4       50  1.0155959  0.007824245  2.113947364 2.7610081 1.0078549  8.2808644
+    ## 5      100  1.3825783  0.001512870  2.869332079 3.9851634 1.0015140 17.6252420
+    ## 6      200  1.5422606 -0.044378946  3.301674576 4.6751469 0.9565914 27.1580791
+    ##   study
+    ## 1     1
+    ## 2     1
+    ## 3     1
+    ## 4     1
+    ## 5     1
+    ## 6     1
 
 ## Community guidelines
 
