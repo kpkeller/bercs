@@ -16,7 +16,7 @@ Bayesian Exposure-Response Curves via STAN
 
 This R package implements a two flexible hierarchical models. The **exposure model** is designed for modeling highly-variable, clustered, sparse longitudinal exposure measurements. The **outcome model** is designed for estimating exposure-response curves, with particular focus on settings where data from multiple studies are being pooled.
 
-A description of these models is provided in:
+An application of these models to household air pollution and respiratory infections is provided in:
 
 Keller JP, Katz J, Pokhrel AK, Bates MN, Tielsch J, and Zeger SL. A Hierarchical Model for Estimating the Exposure-Response Curve by Combining Multiple Studies of Acute Lower Respiratory Infections in Children and Household Fine Particulate Matter Air Pollution.  In press. *Environmental Epidemiology.*
 

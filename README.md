@@ -11,7 +11,8 @@ sparse longitudinal exposure measurements. The **outcome model** is
 designed for estimating exposure-response curves, with particular focus
 on settings where data from multiple studies are being pooled.
 
-A description of these models is provided in:
+An application of these models to household air pollution and
+respiratory infections is provided in:
 
 Keller JP, Katz J, Pokhrel AK, Bates MN, Tielsch J, and Zeger SL. A
 Hierarchical Model for Estimating the Exposure-Response Curve by
@@ -95,37 +96,37 @@ print(exposure_mod_fit,
     ## post-warmup draws per chain=1000, total post-warmup draws=4000.
     ## 
     ##                  mean se_mean   sd    2.5%     25%     50%     75%   97.5%
-    ## sigmaG           1.80    0.01 0.44    1.08    1.48    1.74    2.07    2.82
-    ## sigmaI           0.59    0.01 0.22    0.13    0.45    0.59    0.73    1.01
-    ## sigmaW           1.14    0.00 0.12    0.94    1.06    1.14    1.22    1.41
-    ## sigmaTheta[1]    0.36    0.01 0.33    0.01    0.12    0.26    0.48    1.24
-    ## etaG[1]          0.07    0.01 0.36   -0.63   -0.16    0.07    0.30    0.78
-    ## etaG[2]          2.19    0.01 0.37    1.45    1.95    2.19    2.42    2.92
-    ## etaG[3]          3.11    0.01 0.37    2.36    2.87    3.12    3.36    3.83
-    ## theta[1]         0.01    0.00 0.28   -0.60   -0.12    0.00    0.14    0.65
-    ## theta[2]        -0.05    0.00 0.32   -0.77   -0.18   -0.02    0.09    0.61
-    ## theta[3]        -0.10    0.00 0.24   -0.66   -0.22   -0.06    0.03    0.32
-    ## sigma2I          0.39    0.01 0.26    0.02    0.21    0.35    0.53    1.02
-    ## sigma2W          1.32    0.01 0.28    0.88    1.12    1.29    1.48    1.99
-    ## sigma2G          3.44    0.04 1.77    1.17    2.19    3.04    4.30    7.93
-    ## lp__          -154.54    0.18 5.28 -165.91 -158.00 -154.16 -150.57 -145.47
+    ## sigmaG           1.86    0.01 0.46    1.14    1.53    1.80    2.14    2.95
+    ## sigmaI           0.42    0.01 0.23    0.03    0.25    0.42    0.57    0.88
+    ## sigmaW           1.31    0.00 0.13    1.09    1.23    1.31    1.40    1.58
+    ## sigmaTheta[1]    0.38    0.01 0.33    0.01    0.14    0.29    0.53    1.24
+    ## etaG[1]          0.09    0.01 0.35   -0.61   -0.14    0.09    0.31    0.76
+    ## etaG[2]          2.08    0.01 0.35    1.40    1.86    2.08    2.32    2.77
+    ## etaG[3]          3.49    0.01 0.34    2.79    3.27    3.49    3.71    4.16
+    ## theta[1]         0.02    0.00 0.30   -0.60   -0.12    0.00    0.16    0.70
+    ## theta[2]        -0.08    0.00 0.36   -0.89   -0.23   -0.03    0.08    0.60
+    ## theta[3]         0.12    0.00 0.26   -0.34   -0.03    0.06    0.26    0.74
+    ## sigma2I          0.23    0.01 0.22    0.00    0.06    0.17    0.33    0.78
+    ## sigma2W          1.75    0.01 0.34    1.19    1.50    1.71    1.95    2.50
+    ## sigma2G          3.69    0.04 1.93    1.30    2.35    3.23    4.56    8.71
+    ## lp__          -164.71    0.14 4.71 -174.34 -167.77 -164.56 -161.21 -156.36
     ##               n_eff Rhat
-    ## sigmaG         2003 1.00
-    ## sigmaI         1234 1.00
-    ## sigmaW         2108 1.00
-    ## sigmaTheta[1]  3187 1.00
-    ## etaG[1]        2921 1.00
-    ## etaG[2]        3516 1.00
-    ## etaG[3]        3496 1.00
-    ## theta[1]       5600 1.00
-    ## theta[2]       4181 1.00
-    ## theta[3]       4714 1.00
-    ## sigma2I        1647 1.00
-    ## sigma2W        2115 1.00
-    ## sigma2G        2133 1.00
-    ## lp__            855 1.01
+    ## sigmaG         2760    1
+    ## sigmaI         1396    1
+    ## sigmaW         3473    1
+    ## sigmaTheta[1]  3005    1
+    ## etaG[1]        4427    1
+    ## etaG[2]        4704    1
+    ## etaG[3]        4328    1
+    ## theta[1]       5284    1
+    ## theta[2]       5229    1
+    ## theta[3]       4776    1
+    ## sigma2I        1596    1
+    ## sigma2W        3464    1
+    ## sigma2G        2849    1
+    ## lp__           1089    1
     ## 
-    ## Samples were drawn using NUTS(diag_e) at Fri Sep 18 13:39:50 2020.
+    ## Samples were drawn using NUTS(diag_e) at Wed Sep 30 15:49:10 2020.
     ## For each parameter, n_eff is a crude measure of effective sample size,
     ## and Rhat is the potential scale reduction factor on split chains (at 
     ## convergence, Rhat=1).
@@ -141,7 +142,7 @@ summary(fitted_means)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ## -0.2991  0.2349  2.1052  1.8100  3.1738  3.7171
+    ## -0.3192  0.2389  2.0533  1.8967  3.4069  3.8837
 
 ``` r
 # Plots the fitted values (colored points) on top of original data (black outlines).
