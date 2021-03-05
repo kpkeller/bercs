@@ -144,6 +144,138 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 }
 
 
+##' @rdname create_exposure_simulation_skeleton
+##' @param nobs Number of observations in each unit. If length 1, repeated for all units and if length \code{sum(nclusters)}, repeated for all units within each cluster.
+##' @param nobs1 Number of observations in the first group for each unit (should have length equal to the number of units). Note that the "first" group might not be group 1.
+##' @param nobs2 Number of observations in the second group for each unit (should have length equal to the number of units). Note that the "second" group might not be group 2.
+##' @param firstgroup Integer indicating which group a unit is in first (should have length equal to the number of units).
+##' @details The crossover design is currently implemented with only 2 groups.
+##' @examples
+##' # Create simulation structure
+##' es <- create_exposure_simulation_skeleton_crossover(ngroups=2, nunits=3)
+##' str(es)
+##' @export
+create_exposure_simulation_skeleton_crossover <- function(ngroups=2,
+                                                         nclusters=1,
+                                                         nunits=1,
+                                                         nobs1=1,
+                                                         nobs2=1,
+                                                         firstgroup=1,
+                                                         verbose=TRUE){
+
+    # Check input
+    if(!is.null(nclusters) && !check_all_nonnegative_value(nclusters)) stop("'nclusters' should be a non-negative integer and must have at least one positive element.")
+    if(!check_all_nonnegative_value(nunits)) stop("'nunits' should be a non-negative integer and must have at least one positive element.")
+    if(!check_all_postive_value(ngroups)) stop("'ngroups' should be a positive integer.")
+
+    if (ngroups!=2) stop("Currently only 'ngroups=2' is supported for crossover designs.")
+
+    # Process nclusters
+    if (nclusters!=1) stop("Multiple clusters not currently supported for crossover design.")
+    # if(!length(nclusters) %in% c(1, ngroups)) stop("'nclusters' must have length 1 or 'ngroups'.")
+    # if (length(nclusters)==1) {
+    #     nclusters <- rep(nclusters, times=ngroups)
+    #     if(verbose) {
+    #         message("Only one value of 'nclusters' provided. Applying value to all groups.")
+    #     }
+    # }
+    K <- sum(nclusters)
+
+    # Process nunits
+    # if(!length(nunits) %in% c(1, K)) stop("'nunits' must have length 1 or 'sum(nclusters)'.")
+    # if (length(nunits)==1) {
+    #     nunits <- rep(nunits, times=K)
+    #     if(verbose) {
+    #         message("Only one value of 'nunits' provided. Applying value to all clusters.")
+    #     }
+    # }
+    n <- sum(nunits)
+
+    # Process nobs
+    if(!length(nobs1) %in% c(1, n)) stop("'nobs1' must have length 1 or 'sum(nunits)'.")
+    if(!length(nobs2) %in% c(1, n)) stop("'nobs2' must have length 1 or 'sum(nunits)'.")
+    if (length(nobs1)==1) {
+        nobs1 <- rep(nobs1, times=n)
+        if(verbose) {
+            message("Only one value of 'nobs1' provided. Applying value to all units")
+        }
+    }
+    if (length(nobs2)==1) {
+        nobs2 <- rep(nobs2, times=n)
+        if(verbose) {
+            message("Only one value of 'nobs2' provided. Applying value to all units")
+        }
+    }
+    N <- sum(nobs1) + sum(nobs2)
+
+
+    # Process firstgroup
+    if(!length(firstgroup) %in% c(1, n)) stop("'firstgroup' must have length 1 or 'sum(nunits)'.")
+    if (length(firstgroup)==1) {
+        firstgroup <- rep(firstgroup, times=n)
+        if(verbose) {
+            message("Only one value of 'firstgroup' provided. Applying value to all units")
+        }
+    }
+
+
+
+    # Defaults
+    # group_of_cluster <- rep(1:ngroups, times=nclusters)
+    group_of_cluster <- NA
+    cluster_of_unit <- rep(1, times=n) #rep(1:K, times=nunits)
+    unit_of_obs <- rep(1:n, times=nobs1 + nobs2)
+    cluster_of_obs <- cluster_of_unit[unit_of_obs]
+    group_of_obs <- rep(c(rbind(firstgroup,
+                                3- firstgroup)),
+                        times=c(rbind(nobs1,
+                                      nobs2))) #group_of_cluster[cluster_of_obs]
+
+    study_structure <- list(ngroups=ngroups,
+                            nclusters=nclusters,
+                            nunits=nunits,
+                            nobs=nobs,
+                            group_of_cluster=group_of_cluster,
+                            cluster_of_unit=cluster_of_unit,
+                            unit_of_obs=unit_of_obs,
+                            cluster_of_obs=cluster_of_obs,
+                            group_of_obs=group_of_obs,
+                            etaG=rep(NA, ngroups), # Group Means
+                            sigK=rep(NA, ngroups), # Group-level standard deviations for drawing reK)
+                            reK=rep(NA, K), # Cluster random effects
+                            sigI=NA, # SD for unit-level RE's. Not within cluster
+                            reI=rep(NA, n), # unit-level random effects
+                            sigW=NA, # SD for observation residual variation
+                            time=NA,
+                            timefn=function(t) {rep(0, length(t))},
+                            meanW=rep(NA, N), # mean for generating data. will also have time component added.
+                            design="crossover")
+    study_standata <- list(G=ngroups,
+                           K=K,
+                           n=n,
+                           N=N,
+                           Mt=matrix(0, 0, 0),
+                           time=NA,
+                           timedf=0,
+                           w=rep(NA, N),
+                           group_of_cluster=group_of_cluster,
+                           group_of_obs=group_of_obs,
+                           cluster_of_obs=cluster_of_obs,
+                           cluster_of_unit=cluster_of_unit,
+                           unit_of_obs=unit_of_obs)
+
+    class(study_standata) <- "standata_exposure"
+
+    obj <- list(structure=study_structure,
+                standata=study_standata)
+    class(obj) <- "expsim"
+    obj
+}
+
+
+
+
+
 
 
 #' @title Update Exposure Model Parameters
@@ -247,8 +379,9 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit
 ##' @title Update time values and spline object
 ##' @description Creates times and splines of time for simulations
 #' @param obj Simulation object, created by \code{\link{create_exposure_simulation_skeleton}} or \code{\link{create_outcome_simulation_skeleton}}.
-##' @param time Values to set as the times.
+##' @param time Values to set as the times. Must have length equal to the number of observations in \code{obj}.
 ##' @param draw Logical indicating times should be sampled from a Unif(0,1) distribution.
+##' @param ... Passed to \code{runif}
 ##' @export
 ##' @importFrom stats runif
 ##' @family exposure simulation functions
@@ -260,16 +393,19 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit
 ##'
 ##' es <- sim_update_times(es, draw=TRUE)
 ##' es <- sim_update_time_splines(es, df=3)
-sim_update_times <- function(obj, time=NULL, draw=is.null(time)){
+sim_update_times <- function(obj, time=NULL, draw=is.null(time), ...){
     if (!inherits(obj, c("expsim", "outsim"))) stop("'obj' must be of class 'expsim' or 'outsim'.")
 
     if (draw){
         if(!is.null(time)) warning("'time' is provided, but 'draw=TRUE'. Ignoring provided value of 'time'.")
         # Draw from (0, 1)
-        time <- stats::runif(obj$standata$N)
+        time <- stats::runif(obj$standata$N,...)
     }
     if (is.null(time)) {
         stop("'time' is NULL, but 'draw=FALSE'.")
+    }
+    if (length(time) !=length(obj$standata$N)){
+        stop("Incorrect length for times.")
     }
     obj$structure$time <- time
     obj$standata$time <- time

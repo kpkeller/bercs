@@ -5,22 +5,22 @@
 \alias{sim_update_time_splines}
 \title{Update time values and spline object}
 \usage{
-sim_update_times(obj, time = NULL, draw = is.null(time))
+sim_update_times(obj, time = NULL, draw = is.null(time), ...)
 
 sim_update_time_splines(obj, df = 1, fn = "ns", ...)
 }
 \arguments{
 \item{obj}{Simulation object, created by \code{\link{create_exposure_simulation_skeleton}} or \code{\link{create_outcome_simulation_skeleton}}.}
 
-\item{time}{Values to set as the times.}
+\item{time}{Values to set as the times. Must have length equal to the number of observations in \code{obj}.}
 
 \item{draw}{Logical indicating times should be sampled from a Unif(0,1) distribution.}
+
+\item{...}{Additional arguments passed to \code{fn()} via \code{\link{create_spline_matrix}}.}
 
 \item{df}{degrees of freedom for the time spline used in model estimation.}
 
 \item{fn}{function for generating splines. Defaults to \code{\link{ns}}.}
-
-\item{...}{Additional arguments passed to \code{fn()} via \code{\link{create_spline_matrix}}.}
 }
 \description{
 Creates times and splines of time for simulations

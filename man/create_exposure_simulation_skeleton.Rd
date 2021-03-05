@@ -3,6 +3,7 @@
 \name{create_exposure_simulation_skeleton}
 \alias{create_exposure_simulation_skeleton}
 \alias{create_exposure_simulation_skeleton_parallel}
+\alias{create_exposure_simulation_skeleton_crossover}
 \title{Create List Structure for Simulations}
 \usage{
 create_exposure_simulation_skeleton(design = "parallel", ...)
@@ -12,6 +13,16 @@ create_exposure_simulation_skeleton_parallel(
   nclusters = 1,
   nunits = 1,
   nobs = 1,
+  verbose = TRUE
+)
+
+create_exposure_simulation_skeleton_crossover(
+  ngroups = 2,
+  nclusters = 1,
+  nunits = 1,
+  nobs1 = 1,
+  nobs2 = 1,
+  firstgroup = 1,
   verbose = TRUE
 )
 }
@@ -29,6 +40,12 @@ create_exposure_simulation_skeleton_parallel(
 \item{nobs}{Number of observations in each unit. If length 1, repeated for all units and if length \code{sum(nclusters)}, repeated for all units within each cluster.}
 
 \item{verbose}{Logical indicator for message printing.}
+
+\item{nobs1}{Number of observations in the first group for each unit (should have length equal to the number of units). Note that the "first" group might not be group 1.}
+
+\item{nobs2}{Number of observations in the second group for each unit (should have length equal to the number of units). Note that the "second" group might not be group 2.}
+
+\item{firstgroup}{Integer indicating which group a unit is in first (should have length equal to the number of units).}
 }
 \value{
 A list containing two sublists: \code{structure}, which contains settings and parameters for generating data, and \code{standata} which contains the study data as a \code{standata_exposure} obejct for sampling via \code{\link{sample_exposure_model}}.
@@ -42,10 +59,15 @@ Once parameters are set via \code{\link{expsim_update_parameter}} and related fu
 \code{\link{expsim_sample_observations}}
 and posterior parameter estimates obtained from \code{\link{sample_exposure_model}}.
 See \code{\link{sample_exposure_model}} for a mathematical description of the model.
+
+The crossover design is currently implemented with only 2 groups.
 }
 \examples{
 # Create simulation structure
 es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=3)
+str(es)
+# Create simulation structure
+es <- create_exposure_simulation_skeleton_crossover(ngroups=2, nunits=3)
 str(es)
 }
 \seealso{
