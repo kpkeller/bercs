@@ -404,7 +404,7 @@ sim_update_times <- function(obj, time=NULL, draw=is.null(time), ...){
     if (is.null(time)) {
         stop("'time' is NULL, but 'draw=FALSE'.")
     }
-    if (length(time) !=length(obj$standata$N)){
+    if (length(time) !=obj$standata$N){
         stop("Incorrect length for times.")
     }
     obj$structure$time <- time
