@@ -14,7 +14,7 @@
 
 ##' @title Create List Structure for Simulations
 ##' @description These functions construct lists containing the structure for simulating exposure data and the objects needed for fitting the model to the data.
-##' @param design String providing the study design. Currently only \code{"parallel"} is implemented.
+##' @param design String providing the study design. Currently only \code{"parallel"} and \code{"crossover"} is implemented.
 ##' @param ... Additional arguments passed to the design-specific functions.
 ##' @details These functions create the blank structure of groups, clusters, and units (e.g. households).
 ##' Once parameters are set via \code{\link{expsim_update_parameter}} and related functions, then data can be sampled via
@@ -29,10 +29,9 @@ create_exposure_simulation_skeleton <- function(design="parallel",...){
     if (design=="parallel"){
         obj <- create_exposure_simulation_skeleton_parallel(...)
     } else if (design=="crossover"){
-        stop("Crossover design not yet implemented.")
-        # obj <- expsim_create_study_skeleton_crossover(...)
+        obj <- create_exposure_simulation_skeleton_crossover(...)
     } else {
-        stop(paste0("Design = ", design, " is not supported. Please use 'parallel'."))
+        stop(paste0("Design = ", design, " is not supported. Please use 'parallel' or 'crossover'."))
     }
     obj
 }

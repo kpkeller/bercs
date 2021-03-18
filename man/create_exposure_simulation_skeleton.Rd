@@ -27,7 +27,7 @@ create_exposure_simulation_skeleton_crossover(
 )
 }
 \arguments{
-\item{design}{String providing the study design. Currently only \code{"parallel"} is implemented.}
+\item{design}{String providing the study design. Currently only \code{"parallel"} and \code{"crossover"} is implemented.}
 
 \item{...}{Additional arguments passed to the design-specific functions.}
 
