@@ -16,11 +16,11 @@ str(casedataA)
 #' @examples
 get_conc_hist <- function(vector){
     ggplot() +
-        geom_histogram(aes(vector)) +
+        geom_histogram(bins=20, aes(vector)) +
         ggtitle('Frequency of Concentrations') +
         labs(y='Frequency', x='Concentration')
 
 }
 
-get_conc_hist(casedataA$conc)
-?get_conc_hist
+
+
