@@ -5,7 +5,7 @@ str(casedataA)
 
 
 
-#' get_conc_hist
+#' @title get_conc_hist
 #'
 #' @param vector
 #'
