@@ -225,6 +225,7 @@ create_standata_outcome_singlestudy <- function(data=NULL,
 #' @inheritParams sample_exposure_model
 ##' @param multiple_exposure_curves Logical indicating whether exposure response curves should be estimated separately by study.
 ##' @param restrictBeta Logical indicating that model should be fit that forces a positive value for the exposure spline coefficients.
+##' @param continuous If the outcome is continuous (TRUE) or binary (FALSE)
 ##' @author Joshua Keller
 ##' @seealso \link{create_standata_outcome}, \link{outsim_sample_observations}
 ##' @export
@@ -243,6 +244,7 @@ sample_outcome_model <- function(standata,
                                               max_treedepth=12),
                                  multiple_exposure_curves=FALSE,
                                  restrictBeta=FALSE,
+                                 continuous=FALSE,
                                  ...){
 
     if (!inherits(standata, "standata_outcome")) stop("`standata` must be of class 'standata_outcome'.")
@@ -259,11 +261,14 @@ sample_outcome_model <- function(standata,
     if (multiple_exposure_curves && standata$xdf==0){
         stop("Cannot have multiple exposure curves when xdf==0. Set xdf to be >0 or multiple_exposure_curves to be FALSE")
     }
+    if(continuous){
+      model_name <- 'outcome_model_continuous'
+    }else{model_name <- "outcome_model"}
 
-    model_name <- "outcome_model"
     if (multiple_exposure_curves) model_name <- paste0(model_name, "_multipleExpCurves")
     if (is.numeric(standata$beta_lower_lim))  model_name <- paste0(model_name, "_restrictBeta")
 
+    #This is what runs the stan code
     out_stanfit <- sampling(stanmodels[[model_name]],
                             data = standata,
                             iter = B + warmup,
@@ -457,6 +462,7 @@ compute_ERC <- function (standata,
 ##' @param ylab String providing y-axis label.
 ##' @param xlab String providing x-axis label.
 ##' @param ribbon Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).
+##' @param continuous Is the outcome continuous (TRUE) or binary (FALSE)
 ##' @export
 ##' @import ggplot2
 plot_ERC <- function (obj,
@@ -464,7 +470,8 @@ plot_ERC <- function (obj,
                              expERC=TRUE,
                              ylab = "Relative Risk",
                              xlab = "Exposure",
-                             ribbon=FALSE)
+                             ribbon=FALSE,
+                             continuous=FALSE)
 {
     if (is.list(obj)){
       nS <- length(obj)
@@ -484,6 +491,10 @@ plot_ERC <- function (obj,
     fulldf <- subset(fulldf, study %in% incS)
     fulldf$study <- factor(fulldf$study)
     g <- ggplot(fulldf) + theme_bw()
+    #New code
+    if(continuous){
+      ylab <- 'outcome'
+    }
     if (ribbon){
         g <- g + geom_ribbon(aes(x = .data$exposure,
                                  ymin = .data$low,

@@ -9,3 +9,4 @@ real<lower=0> prior_sigmaDelta_sd;
 real prior_gamma_mean; // Prior mean for coefs gamma (usually zero)
 real prior_sigmaGamma_mean; // Prior for SD of coefs gamma
 real<lower=0> prior_sigmaGamma_sd;
+
