@@ -462,7 +462,7 @@ compute_ERC <- function (standata,
 ##' @param ylab String providing y-axis label.
 ##' @param xlab String providing x-axis label.
 ##' @param ribbon Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).
-##' @param continuous Is the outcome continuous (TRUE) or binary (FALSE)
+##' @param hline Optional argument that plots a horizontal line at given value.
 ##' @export
 ##' @import ggplot2
 plot_ERC <- function (obj,
@@ -471,7 +471,7 @@ plot_ERC <- function (obj,
                              ylab = "Relative Risk",
                              xlab = "Exposure",
                              ribbon=FALSE,
-                             continuous=FALSE)
+                             hline)
 {
     if (is.list(obj)){
       nS <- length(obj)
@@ -492,7 +492,7 @@ plot_ERC <- function (obj,
     fulldf$study <- factor(fulldf$study)
     g <- ggplot(fulldf) + theme_bw()
     #New code
-    if(continuous){
+    if(!expERC){
       ylab <- 'outcome'
     }
     if (ribbon){
@@ -513,14 +513,15 @@ plot_ERC <- function (obj,
                           col=.data$study),
                       data=fulldf)
     }
-      g   + geom_line(aes(x = .data$exposure,
+      g <- g   + geom_line(aes(x = .data$exposure,
                       y = .data$mean,
                       group=.data$study,
                       col=.data$study),
-                  lwd = 1.5) +
-        geom_hline(yintercept = 1,
-                   lty = 2) + xlab(xlab) + ylab(ylab)
-
+                  lwd = 1.5)
+        #If else hline code
+        if(!is.null(hline)){g <- g + geom_hline(yintercept=hline, lty=2) + xlab(xlab) + ylab(ylab)}else{g <- g + geom_hline(yintercept = 1,
+                   lty = 2) + xlab(xlab) + ylab(ylab)}
+      g
 }
 
 
