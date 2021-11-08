@@ -78,8 +78,9 @@ add_priors_exposure_model <- function(standata, etaG=0, sigmaG=c(0, 1), reK=0, s
 ##' @param sigmaDelta Prior mean and standard deviation for the standard deviation of time coefficient parameter.
 ##' @param sigmaI Prior mean and standard deviation for the standard deviation of the subject-level random effect.
 ##' @param beta_nu Prior value for the LKJ prior on the correlation between exposure coefficients from different studies.
+##' @param sigma_y Prior mean and standard deviation for continuous outcome y.
 ##' @export
-add_priors_outcome_model <- function(standata, beta=0, sigmaBeta=c(0, 1), gamma=0, sigmaGamma=c(0 ,1), delta=0, sigmaDelta=c(0, 1), sigmaI=c(0, 1), beta_nu=1, ...) {
+add_priors_outcome_model <- function(standata, beta=0, sigmaBeta=c(0, 1), gamma=0, sigmaGamma=c(0 ,1), delta=0, sigmaDelta=c(0, 1), sigmaI=c(0, 1), beta_nu=1, sigma_y=c(0, 1), ...) {
 
     standata$prior_beta_mean <- beta
     standata$prior_sigmaBeta_mean <- sigmaBeta[[1]]
@@ -96,6 +97,9 @@ add_priors_outcome_model <- function(standata, beta=0, sigmaBeta=c(0, 1), gamma=
 
     standata$prior_sigmaI_mean <- sigmaI[[1]]
     standata$prior_sigmaI_sd <- sigmaI[[2]]
+
+    standata$prior_sigma_y_mean <- sigma_y[[1]]
+    standata$prior_sigma_y_sd <- sigma_y[[2]]
 
     standata
 }

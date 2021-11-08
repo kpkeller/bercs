@@ -244,7 +244,7 @@ sample_outcome_model <- function(standata,
                                               max_treedepth=12),
                                  multiple_exposure_curves=FALSE,
                                  restrictBeta=FALSE,
-                                 continuous=FALSE,
+                                 continuous=TRUE,
                                  ...){
 
     if (!inherits(standata, "standata_outcome")) stop("`standata` must be of class 'standata_outcome'.")
@@ -471,7 +471,7 @@ plot_ERC <- function (obj,
                              ylab = "Relative Risk",
                              xlab = "Exposure",
                              ribbon=FALSE,
-                             hline)
+                             hline=NULL)
 {
     if (is.list(obj)){
       nS <- length(obj)
@@ -519,8 +519,8 @@ plot_ERC <- function (obj,
                       col=.data$study),
                   lwd = 1.5)
         #If else hline code
-        if(!is.null(hline)){g <- g + geom_hline(yintercept=hline, lty=2) + xlab(xlab) + ylab(ylab)}else{g <- g + geom_hline(yintercept = 1,
-                   lty = 2) + xlab(xlab) + ylab(ylab)}
+        if(!is.null(hline)){g <- g + geom_hline(yintercept=hline, lty=2)}
+      g <- g + xlab(xlab) + ylab(ylab)
       g
 }
 

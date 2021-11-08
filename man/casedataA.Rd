@@ -3,6 +3,11 @@
 \docType{data}
 \name{casedataA}
 \alias{casedataA}
+\alias{casedataB}
+\alias{casedataC}
+\alias{casedataD}
+\alias{casedataE}
+\alias{casedataF}
 \title{Example data giving concentration, probabilities of respiratory infection, and study information}
 \format{
 A data frame with 200 rows and 6 columns:
@@ -14,11 +19,52 @@ A data frame with 200 rows and 6 columns:
   \item{true_logit_prob}{the logit of true_prob}
   \item{study}{The study from which the data was taken}
 }
+
+An object of class \code{data.frame} with 300 rows and 6 columns.
+
+A data frame with 200 rows and 6 columns:
+\describe{
+  \item{sbp}{systolic blood pressure}
+  ...
+}
+
+An object of class \code{data.frame} with 200 rows and 6 columns.
+
+An object of class \code{data.frame} with 200 rows and 6 columns.
+
+An object of class \code{data.frame} with 200 rows and 6 columns.
 }
 \usage{
 casedataA
+
+casedataB
+
+casedataC
+
+casedataD
+
+casedataE
+
+casedataF
 }
 \description{
 Example data giving concentration, probabilities of respiratory infection, and study information
+
+Example data giving concentration, probabilities of respiratory infection, and study information
+
+Example data giving a linear relationship between conc and sbp
+
+Example data giving a logarithmic relationship between conc and sbp
+
+Example data giving an exponential relationship between conc and sbp
+
+Example data giving a piecewise relationship between conc and sbp
+}
+\details{
+detailssss here
+}
+\examples{
+data(casedataC)
+plot(x=casedataC$conc, y=casedataC$sbp)
 }
 \keyword{datasets}

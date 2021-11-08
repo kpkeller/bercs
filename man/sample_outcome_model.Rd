@@ -12,6 +12,7 @@ sample_outcome_model(
   control = list(adapt_delta = 0.9, max_treedepth = 12),
   multiple_exposure_curves = FALSE,
   restrictBeta = FALSE,
+  continuous = TRUE,
   ...
 )
 }
@@ -29,6 +30,8 @@ sample_outcome_model(
 \item{multiple_exposure_curves}{Logical indicating whether exposure response curves should be estimated separately by study.}
 
 \item{restrictBeta}{Logical indicating that model should be fit that forces a positive value for the exposure spline coefficients.}
+
+\item{continuous}{If the outcome is continuous (TRUE) or binary (FALSE)}
 
 \item{...}{Additional arguments passed to \code{\link[rstan]{sampling}}.}
 }

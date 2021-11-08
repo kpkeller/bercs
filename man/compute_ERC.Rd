@@ -33,7 +33,8 @@ plot_ERC(
   expERC = TRUE,
   ylab = "Relative Risk",
   xlab = "Exposure",
-  ribbon = FALSE
+  ribbon = FALSE,
+  hline = NULL
 )
 
 center_ERC(obj, ref_exposure = min(obj$exposure))
@@ -104,6 +105,8 @@ compute_OR(
 \item{xlab}{String providing x-axis label.}
 
 \item{ribbon}{Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).}
+
+\item{hline}{Optional argument that plots a horizontal line at given value.}
 }
 \description{
 Computes the exposure-response curve from a fitted outcome model

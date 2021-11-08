@@ -156,7 +156,45 @@ estimated_ORs <- compute_OR(standata=outcome_combo_data,
 estimated_ORs
 ```
 
+## Continuous Outcome Model
 
+1. Create the data object using `create_standata_outcome()`. This function creates a list with the named components used in model fitting.
+
+```{r}
+# Dataset C has a linear exposure-response relationship for conc and sbp
+data(casedataC)
+outcome_data <- create_standata_outcome(data=casedataC,
+                                              xdf=4)
+```
+
+2. Add the hyperparameters for the prior distributions
+```{r}
+# Use defaults for all except sigmaI
+outcome_data <- add_priors(outcome_data,
+                                 sigmaI=c(0, 0.1))
+```
+
+3. Sample from the posterior distribution of parameters using STAN. Use continuous=TRUE to specify that we have a continuous outcome.
+
+```{r}
+outcome_data_fit <- sample_outcome_model(outcome_data, 
+                                         B=2000,
+                                         cores=4,
+                                         continuous=TRUE)
+
+```
+
+```{r}
+print(outcome_data_fit, pars=c('reI_raw', 'reI', 'mui'), include=FALSE)
+```
+
+4. Fit and Plot the Exposure-Response Curve
+
+```{r}
+fitted_ERC <- compute_ERC(standata=outcome_data, stanfit=outcome_data_fit, exprange=c(5,50), inclIntercept=TRUE)
+
+plot_ERC(list(fitted_ERC), expERC=FALSE)
+```
 
 ## Community guidelines
 

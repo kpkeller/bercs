@@ -33,9 +33,9 @@ real<lower=0> prior_sigmaDelta_sd;
 real prior_gamma_mean; // Prior mean for coefs gamma (usually zero)
 real prior_sigmaGamma_mean; // Prior for SD of coefs gamma
 real<lower=0> prior_sigmaGamma_sd;
-//new parameter, sigma
-real<lower=0> prior_new_sigma_mean; //prior for new continuous sigma mean
-real<lower=0> prior_new_sigma_sd; //prior for new continuous sigma sd
+//new parameter, sigma_y
+real<lower=0> prior_sigma_y_mean; //prior for new continuous sigma mean
+real<lower=0> prior_sigma_y_sd; //prior for new continuous sigma sd
 
     real prior_beta_mean; // Prior mean for coefs beta (usually zero)
     real prior_sigmaBeta_mean; // Prior for SD of coefs beta
@@ -57,7 +57,7 @@ vector[n] reI_raw;
     real<lower=0> sigmaBeta;
     vector[xdf] beta_raw; // Coefficients for exposure spline
     //new parameter sigma
-    real<lower=0> new_sigma;
+    real<lower=0> sigma_y;
 }
 transformed parameters {
 #include tparameters/tparameters_outcome_define.stan
@@ -84,9 +84,9 @@ if (timedf > 0){
 }
 target += normal_lpdf(reI_raw | 0, 1);
 target += normal_lpdf(sigmaI | prior_sigmaI_mean, prior_sigmaI_sd);
-target += normal_lpdf(new_sigma | prior_new_sigma_mean, prior_new_sigma_sd);
-//added new_sigma to model
-target += normal_lpdf(y | mui, new_sigma);
+target += normal_lpdf(sigma_y | prior_sigma_y_mean, prior_sigma_y_sd);
+//added sigma_y to model
+target += normal_lpdf(y | mui, sigma_y);
 
     if (xdf> 0){
         target += normal_lpdf(beta_raw | 0, 1);
