@@ -32,7 +32,7 @@ add_priors_outcome_model(
   sigmaDelta = c(0, 1),
   sigmaI = c(0, 1),
   beta_nu = 1,
-  new_sigma = c(0, 1),
+  sigma_y = c(0, 1),
   ...
 )
 }
@@ -73,7 +73,7 @@ add_priors_outcome_model(
 
 \item{beta_nu}{Prior value for the LKJ prior on the correlation between exposure coefficients from different studies.}
 
-\item{new_sigma}{Prior mean and standard deviation for continuous outcome y.}
+\item{sigma_y}{Prior mean and standard deviation for continuous outcome y.}
 }
 \description{
 Sets prior distribution hyperparameters using defaults or provided values

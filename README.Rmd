@@ -179,7 +179,7 @@ outcome_data <- add_priors(outcome_data,
 ```{r}
 outcome_data_fit <- sample_outcome_model(outcome_data, 
                                          B=2000,
-                                         cores=4,
+                                         cores=1,
                                          continuous=TRUE)
 
 ```
