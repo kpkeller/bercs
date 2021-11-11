@@ -309,6 +309,12 @@ sample_outcome_model <- function(standata,
 ##' Uncertainty from the intercepts is included in the confidence bands by default, since this corresponds to a common interpretation of such intervals. This requires picking a single value for the intercept. For models fit to multiple studies, a separate set of uncertainty will be created for each study. Additionally, a set of results corresponding to "average" intercept is created. The \code{intercept_prop} argument controls the relative contribution of the intercepts from each model.
 ##'
 ##' @seealso \code{\link{sample_outcome_model}}
+##' @examples
+##' data(casedataC)
+##' outcome_data <- create_standata_outcome(data=casedataC, xdf=4)
+##' outcome_data <- add_priors(outcome_data, sigmaI=c(0, 0.1))
+##' outcome_data_fit <- sample_outcome_model(outcome_data, B=2000, cores=1, continuous=TRUE)
+##' compute_ERC(standata=outcome_data, stanfit=outcome_data_fit, exprange=c(5,50), inclIntercept=TRUE)
 ##' @export
 #' @importFrom stats quantile
 #' @importFrom utils getS3method
