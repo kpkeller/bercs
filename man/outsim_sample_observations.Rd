@@ -12,6 +12,10 @@ outsim_sample_observations(obj)
 \description{
 Draws a sample of outcome observations using provided model parameters
 }
+\examples{
+skeleton <- create_outcome_simulation_skeleton_parallel()
+outsim_sample_observations(skeleton)
+}
 \seealso{
 \code{\link{expsim_sample_observations}}
 

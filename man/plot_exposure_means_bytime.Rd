@@ -53,3 +53,18 @@ Uses \code{\link[ggplot2]{ggplot}} to create plots of concentrations using poste
 
 Both functions are wrappers around \code{\link{compute_fitted_mean()}} and first call that function to compute the posterior mean for each observation.
 }
+\examples{
+data(casedataA)
+data(casedataB)
+outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
+                                              xdf=4,
+                                              xfnargs=list(Boundary.knots=c(5, 200)))
+outcome_combo_data <- add_priors(outcome_combo_data,
+sigmaI=c(0, 0.1))
+
+outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
+B=2000,
+cores=4)
+
+plot_exposure_means_bytime(stanfit = outcome_combo_mod_fit, standata = outcome_combo_data)
+}

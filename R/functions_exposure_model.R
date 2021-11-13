@@ -173,6 +173,13 @@ sample_exposure_model <- function(standata,
 #' @param add Logical indicator of whether the modeled means should be added to \code{standata} or just returned directly (the default).
 #' @param ... Additional arugments passed to \code{\link[rstan]{extract}}.
 #' @seealso \code{\link{plot_exposure_means_bytime}}, \code{\link{sample_exposure_model}}
+#' @examples
+#' exposure_standata <- create_standata_exposure(group=rep(1:3, each=24), conc=rnorm(n=72,mean=rep(c(0, 2, 4), each=23)), unit_id=rep(1:18, each=4), time=rep(1:4, times=18))
+#' Mt <- create_spline_matrix(x=exposure_standata$time, df=3, fn="ns")
+#' exposure_standata <- add_spline_time(exposure_standata, Mt=Mt)
+#' exposure_standata <- add_priors(exposure_standata, sigmaI=c(0, 0.5))
+#' exposure_mod_fit <- sample_exposure_model(exposure_standata, B=1000, chains=4)
+#' compute_fitted_mean(stanfit=exposure_mod_fit, standata=exposure_standata)
 #' @export
 #' @importFrom rstan extract
 compute_fitted_mean <- function(stanfit,
@@ -235,6 +242,20 @@ compute_fitted_mean <- function(stanfit,
 #' @details Uses \code{\link[ggplot2]{ggplot}} to create plots of concentrations using posterior means of model parameters. The graphical object is returned and can be customized if needed.
 #'
 #' Both functions are wrappers around \code{\link{compute_fitted_mean()}} and first call that function to compute the posterior mean for each observation.
+#' @examples
+#' data(casedataA)
+#' data(casedataB)
+#' outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
+#'                                               xdf=4,
+#'                                               xfnargs=list(Boundary.knots=c(5, 200)))
+#' outcome_combo_data <- add_priors(outcome_combo_data,
+#' sigmaI=c(0, 0.1))
+#'
+#' outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
+#' B=2000,
+#' cores=4)
+#'
+#' plot_exposure_means_bytime(stanfit = outcome_combo_mod_fit, standata = outcome_combo_data)
 ##' @export
 ##' @import ggplot2
 plot_exposure_means_bytime <- function(stanfit,

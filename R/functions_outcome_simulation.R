@@ -14,6 +14,19 @@
 ##' @return A list containing two sublists: \code{structure}, which contains settings and parameters for generating data, and \code{standata} which contains the study data in a format for sampling via STAN.
 #' @family outcome simulation functions
 ##' @seealso \code{\link{sample_outcome_model}}, \code{\link{create_exposure_simulation_skeleton}}
+##' @examples
+##' create_outcome_simulation_skeleton(design='parallel',
+##' nstudies=1,
+##' nclusters=1,
+##' nunits=1,
+##' nobs=1,
+##' beta0=0,
+##' x=0,
+##' nT=NA,
+##' time=NA,
+##' verbose=TRUE,
+##' xfn=function(x) {x},
+##' timefn=function(t) {rep(0, length(t))}
 ##' @export
 create_outcome_simulation_skeleton <- function(design="parallel",...){
     if (design=="parallel"){
@@ -172,6 +185,9 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
 ##' @param obj the outcome simulation object for which to sample
 ##' @family outcome simulation functions
 ##' @seealso \code{\link{expsim_sample_observations}}
+##' @examples
+##' skeleton <- create_outcome_simulation_skeleton_parallel()
+##' outsim_sample_observations(skeleton)
 ##' @export
 ##' @importFrom stats rbinom
 outsim_sample_observations <- function(obj){
@@ -211,6 +227,9 @@ outsim_update_logitmean <- function(obj){
 #' }
 #' @family outcome simulation functions
 #' @seealso \code{\link{expsim_update_parameter}}
+#' @examples
+#' skel <- create_outcome_simulation_skeleton_parallel()
+#' outsim_update_parameter(obj=skel, param='beta0', value=2)
 ##' @export
 outsim_update_parameter <- function(obj, param, level=c("study", "unit", "time", "covariate", "exposure"), type=c("mean", "sd", "re", "coef"), value=NULL, draw=is.null(value)){
     if (!inherits(obj, c("outsim"))) stop("'obj' must be of class 'outsim'.")

@@ -40,6 +40,14 @@ Typically a list of class \code{standata_exposure}. However, it may be any list 
 \description{
 Calculates the posterior mean exposure concentrations.
 }
+\examples{
+exposure_standata <- create_standata_exposure(group=rep(1:3, each=24), conc=rnorm(n=72,mean=rep(c(0, 2, 4), each=23)), unit_id=rep(1:18, each=4), time=rep(1:4, times=18))
+Mt <- create_spline_matrix(x=exposure_standata$time, df=3, fn="ns")
+exposure_standata <- add_spline_time(exposure_standata, Mt=Mt)
+exposure_standata <- add_priors(exposure_standata, sigmaI=c(0, 0.5))
+exposure_mod_fit <- sample_exposure_model(exposure_standata, B=1000, chains=4)
+compute_fitted_mean(stanfit=exposure_mod_fit, standata=exposure_standata)
+}
 \seealso{
 \code{\link{plot_exposure_means_bytime}}, \code{\link{sample_exposure_model}}
 }

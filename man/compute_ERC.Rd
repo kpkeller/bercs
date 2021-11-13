@@ -120,11 +120,32 @@ Uncertainty from the intercepts is included in the confidence bands by default, 
 To calculate odds ratios for specific combinations of exposure values, use the `compute_OR` function, which will correctly calculate the credible intervals for the relative difference.
 }
 \examples{
-data(casedataC)
-outcome_data <- create_standata_outcome(data=casedataC, xdf=4)
-outcome_data <- add_priors(outcome_data, sigmaI=c(0, 0.1))
-outcome_data_fit <- sample_outcome_model(outcome_data, B=2000, cores=1, continuous=TRUE)
-compute_ERC(standata=outcome_data, stanfit=outcome_data_fit, exprange=c(5,50), inclIntercept=TRUE)
+
+data(casedataA)
+data(casedataB)
+outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
+                                              xdf=4,
+                                              xfnargs=list(Boundary.knots=c(5, 200)))
+
+outcome_combo_data <- add_priors(outcome_combo_data,
+sigmaI=c(0, 0.1))
+
+outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
+B=2000,
+cores=4)
+
+fitted_ERC <- compute_ERC(standata=outcome_combo_data,
+stanfit=outcome_combo_mod_fit,
+exprange=c(5,200))
+plot_ERC(fitted_ERC) + scale_y_log10()
+
+compute_OR(standata=outcome_combo_data,
+stanfit=outcome_combo_mod_fit,
+expsequence = c(5, 10, 20, 50, 100, 200),
+ref_exposure=10)
+
+center_ERC(fitted_ERC, ref_exposure = min(fitted_ERC$exposure))
+
 }
 \seealso{
 \code{\link{sample_outcome_model}}

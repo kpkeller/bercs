@@ -75,6 +75,10 @@ Only specific combinations of \code{level} and \code{type} are allowed. They are
 \item \code{"cluster"}: \code{"mean"} and \code{"sd"} set 'etaK' and 'sigK', respectively
 }
 }
+\examples{
+skel <- create_outcome_simulation_skeleton_parallel()
+outsim_update_parameter(obj=skel, param='beta0', value=2)
+}
 \seealso{
 \code{\link{expsim_update_parameter}}
 

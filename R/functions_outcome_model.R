@@ -12,6 +12,12 @@
 ##'
 ##' The matrices of adjustment variables are created using the names provided to \code{covarslist}. This is done using \code{\link[stats]{formula}} and \code{\link[stats]{model.matrix}}, so transformations and interactions can be used in the typical manner.
 ##' @seealso \code{\link{create_standata_exposure}}, \code{\link{add_spline_exposure}}, \code{\link{sample_outcome_model}}
+##' @examples
+##' data(casedataA)
+##' data(casedataB)
+##' create_standata_outcome(datalist=list(casedataA, casedataB),
+##'                                              xdf=4,
+##'                                              xfnargs=list(Boundary.knots=c(5, 200)))
 ##' @export
 ##' @importFrom Matrix bdiag
 create_standata_outcome <- function(...,
@@ -310,11 +316,32 @@ sample_outcome_model <- function(standata,
 ##'
 ##' @seealso \code{\link{sample_outcome_model}}
 ##' @examples
-##' data(casedataC)
-##' outcome_data <- create_standata_outcome(data=casedataC, xdf=4)
-##' outcome_data <- add_priors(outcome_data, sigmaI=c(0, 0.1))
-##' outcome_data_fit <- sample_outcome_model(outcome_data, B=2000, cores=1, continuous=TRUE)
-##' compute_ERC(standata=outcome_data, stanfit=outcome_data_fit, exprange=c(5,50), inclIntercept=TRUE)
+##'
+##' data(casedataA)
+##' data(casedataB)
+##' outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
+##'                                               xdf=4,
+##'                                               xfnargs=list(Boundary.knots=c(5, 200)))
+##'
+##' outcome_combo_data <- add_priors(outcome_combo_data,
+##' sigmaI=c(0, 0.1))
+##'
+##' outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
+##' B=2000,
+##' cores=4)
+##'
+##' fitted_ERC <- compute_ERC(standata=outcome_combo_data,
+##' stanfit=outcome_combo_mod_fit,
+##' exprange=c(5,200))
+##' plot_ERC(fitted_ERC) + scale_y_log10()
+##'
+##' compute_OR(standata=outcome_combo_data,
+##' stanfit=outcome_combo_mod_fit,
+##' expsequence = c(5, 10, 20, 50, 100, 200),
+##' ref_exposure=10)
+##'
+##' center_ERC(fitted_ERC, ref_exposure = min(fitted_ERC$exposure))
+##'
 ##' @export
 #' @importFrom stats quantile
 #' @importFrom utils getS3method

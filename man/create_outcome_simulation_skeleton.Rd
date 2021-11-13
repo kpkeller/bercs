@@ -71,6 +71,20 @@ and posterior parameter estimates obtained from \code{\link{sample_exposure_mode
 
 For creating a \code{standata_outcome} object from an existing 'wide' format data frame, see \code{\link{create_standata_outcome}}.
 }
+\examples{
+create_outcome_simulation_skeleton(design='parallel',
+nstudies=1,
+nclusters=1,
+nunits=1,
+nobs=1,
+beta0=0,
+x=0,
+nT=NA,
+time=NA,
+verbose=TRUE,
+xfn=function(x) {x},
+timefn=function(t) {rep(0, length(t))}
+}
 \seealso{
 \code{\link{sample_outcome_model}}, \code{\link{create_exposure_simulation_skeleton}}
 
