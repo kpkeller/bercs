@@ -33,7 +33,8 @@
 #' \describe{
 #'   \item{conc}{concentration of exposure}
 #'   \item{sbp}{systolic blood pressure}
-#'   ...
+#'   \item{unit_id}{the id corresponding to an individual from a study}
+#'   \item{study}{the study from which the observation was obtained}
 #' }
 #' @examples
 #' data(casedataC)
@@ -47,7 +48,8 @@
 #' \describe{
 #'   \item{conc}{concentration of exposure}
 #'   \item{sbp}{systolic blood pressure}
-#'   ...
+#'   \item{unit_id}{the id corresponding to an individual from a study}
+#'   \item{study}{the study from which the observation was obtained}
 #' }
 #' @examples
 #' data(casedataD)
@@ -61,7 +63,8 @@
 #' \describe{
 #'   \item{conc}{concentration of exposure}
 #'   \item{sbp}{systolic blood pressure}
-#'   ...
+#'   \item{unit_id}{the id corresponding to an individual from a study}
+#'   \item{study}{the study from which the observation was obtained}
 #' }
 #' @examples
 #' data(casedataE)
@@ -75,7 +78,8 @@
 #' \describe{
 #'   \item{conc}{concentration of exposure}
 #'   \item{sbp}{systolic blood pressure}
-#'   ...
+#'   \item{unit_id}{the id corresponding to an individual from a study}
+#'   \item{study}{the study from which the observation was obtained}
 #' }
 #' @examples
 #' data(casedataF)
