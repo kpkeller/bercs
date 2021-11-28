@@ -128,11 +128,11 @@ outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB
                                               xfnargs=list(Boundary.knots=c(5, 200)))
 
 outcome_combo_data <- add_priors(outcome_combo_data,
-sigmaI=c(0, 0.1))
+sigmaI=c(0, 0.01))
 
 outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
 B=2000,
-cores=4)
+cores=1)
 
 fitted_ERC <- compute_ERC(standata=outcome_combo_data,
 stanfit=outcome_combo_mod_fit,

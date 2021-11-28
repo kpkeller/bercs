@@ -12,7 +12,7 @@ sample_outcome_model(
   control = list(adapt_delta = 0.9, max_treedepth = 12),
   multiple_exposure_curves = FALSE,
   restrictBeta = FALSE,
-  continuous = TRUE,
+  continuous = FALSE,
   ...
 )
 }
@@ -44,7 +44,9 @@ outcome_dataA <- create_standata_outcome(data=casedataA)
 outcome_dataA <- add_priors(outcome_dataA,
                             sigmaI=c(0, 0.1))
 outcome_mod_fit1 <- sample_outcome_model(outcome_dataA)
-print(outcome_mod_fit1, pars=c("reI_raw", "reI","mui"), include=FALSE)
+print(outcome_mod_fit1,
+pars=c("reI_raw", "reI","mui"),
+include=FALSE)
 }
 \seealso{
 \link{create_standata_outcome}, \link{outsim_sample_observations}

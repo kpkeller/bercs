@@ -241,7 +241,9 @@ create_standata_outcome_singlestudy <- function(data=NULL,
 ##' outcome_dataA <- add_priors(outcome_dataA,
 ##'                             sigmaI=c(0, 0.1))
 ##' outcome_mod_fit1 <- sample_outcome_model(outcome_dataA)
-##' print(outcome_mod_fit1, pars=c("reI_raw", "reI","mui"), include=FALSE)
+##' print(outcome_mod_fit1,
+##' pars=c("reI_raw", "reI","mui"),
+##' include=FALSE)
 sample_outcome_model <- function(standata,
                                  B=1000,
                                  warmup=B,
@@ -250,7 +252,7 @@ sample_outcome_model <- function(standata,
                                               max_treedepth=12),
                                  multiple_exposure_curves=FALSE,
                                  restrictBeta=FALSE,
-                                 continuous=TRUE,
+                                 continuous=FALSE,
                                  ...){
 
     if (!inherits(standata, "standata_outcome")) stop("`standata` must be of class 'standata_outcome'.")
@@ -324,11 +326,11 @@ sample_outcome_model <- function(standata,
 ##'                                               xfnargs=list(Boundary.knots=c(5, 200)))
 ##'
 ##' outcome_combo_data <- add_priors(outcome_combo_data,
-##' sigmaI=c(0, 0.1))
+##' sigmaI=c(0, 0.01))
 ##'
 ##' outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
 ##' B=2000,
-##' cores=4)
+##' cores=1)
 ##'
 ##' fitted_ERC <- compute_ERC(standata=outcome_combo_data,
 ##' stanfit=outcome_combo_mod_fit,

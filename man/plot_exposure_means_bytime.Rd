@@ -54,17 +54,22 @@ Uses \code{\link[ggplot2]{ggplot}} to create plots of concentrations using poste
 Both functions are wrappers around \code{\link{compute_fitted_mean()}} and first call that function to compute the posterior mean for each observation.
 }
 \examples{
-data(casedataA)
-data(casedataB)
-outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
-                                              xdf=4,
-                                              xfnargs=list(Boundary.knots=c(5, 200)))
-outcome_combo_data <- add_priors(outcome_combo_data,
-sigmaI=c(0, 0.1))
+#Create simulated data
+exposure_standata <- create_standata_exposure(group=rep(1:3, each=24),
+conc=rnorm(n=72,mean=rep(c(0, 2, 4), each=23)),
+unit_id=rep(1:18, each=4),
+time=rep(1:4, times=18))
 
-outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
-B=2000,
-cores=4)
+#Add natural splines with 3 df
+Mt <- create_spline_matrix(x=exposure_standata$time, df=3, fn="ns")
 
-plot_exposure_means_bytime(stanfit = outcome_combo_mod_fit, standata = outcome_combo_data)
+#Add priors and spline
+exposure_standata <- add_spline_time(exposure_standata, Mt=Mt)
+exposure_standata <- add_priors(exposure_standata, sigmaI=c(0, 0.5))
+
+#Sample from posterior distribution using STAN
+exposure_mod_fit <- sample_exposure_model(exposure_standata, B=200, chains=2)
+
+#Plot long-term means
+plot_exposure_means_bytime(stanfit = exposure_mod_fit, standata = exposure_standata)
 }

@@ -9,7 +9,8 @@ A data frame with 200 rows and 6 columns:
 \describe{
   \item{conc}{concentration of exposure}
   \item{sbp}{systolic blood pressure}
-  ...
+  \item{unit_id}{the id corresponding to an individual from a study}
+  \item{study}{the study from which the observation was obtained}
 }
 }
 \usage{
