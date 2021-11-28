@@ -236,10 +236,16 @@ create_standata_outcome_singlestudy <- function(data=NULL,
 ##' @seealso \link{create_standata_outcome}, \link{outsim_sample_observations}
 ##' @export
 ##' @examples
+##' #load needed data set/s
 ##' data(casedataA)
+##'
 ##' outcome_dataA <- create_standata_outcome(data=casedataA)
+##'
+##' #Add hyperparamters for priors
 ##' outcome_dataA <- add_priors(outcome_dataA,
 ##'                             sigmaI=c(0, 0.1))
+##'
+##' #Sample from posterior distribution of parameters using STAN
 ##' outcome_mod_fit1 <- sample_outcome_model(outcome_dataA)
 ##' print(outcome_mod_fit1,
 ##' pars=c("reI_raw", "reI","mui"),
@@ -319,24 +325,31 @@ sample_outcome_model <- function(standata,
 ##' @seealso \code{\link{sample_outcome_model}}
 ##' @examples
 ##'
+##' #Load needed data sets
 ##' data(casedataA)
 ##' data(casedataB)
+##'
+##' #Create standata
 ##' outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
 ##'                                               xdf=4,
 ##'                                               xfnargs=list(Boundary.knots=c(5, 200)))
 ##'
+##' #Add priors
 ##' outcome_combo_data <- add_priors(outcome_combo_data,
 ##' sigmaI=c(0, 0.01))
 ##'
+##' #Sample from posterior distribution
 ##' outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
 ##' B=2000,
 ##' cores=1)
 ##'
+##' #Compute and fit the exposure response curve
 ##' fitted_ERC <- compute_ERC(standata=outcome_combo_data,
 ##' stanfit=outcome_combo_mod_fit,
 ##' exprange=c(5,200))
 ##' plot_ERC(fitted_ERC) + scale_y_log10()
 ##'
+##' #Calculate odds ratio
 ##' compute_OR(standata=outcome_combo_data,
 ##' stanfit=outcome_combo_mod_fit,
 ##' expsequence = c(5, 10, 20, 50, 100, 200),
