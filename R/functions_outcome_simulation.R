@@ -26,7 +26,7 @@
 ##' time=NA,
 ##' verbose=TRUE,
 ##' xfn=function(x) {x},
-##' timefn=function(t) {rep(0, length(t))}
+##' timefn=function(t) {rep(0, length(t))})
 ##' @export
 create_outcome_simulation_skeleton <- function(design="parallel",...){
     if (design=="parallel"){
