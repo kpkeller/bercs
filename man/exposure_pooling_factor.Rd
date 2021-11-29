@@ -23,22 +23,6 @@ Wrapper function for computing variance explained and pooling factor for a  fit 
 \details{
 This is a wrapper around \code{\link{compute_pooling_metrics}} that extracts the necessary posterior samples from \code{stanfit}.
 }
-\examples{
-data(casedataA)
-data(casedataB)
-outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
-                                              xdf=4,
-                                              xfnargs=list(Boundary.knots=c(5, 200)))
-outcome_combo_data <- add_priors(outcome_combo_data, sigmaI=c(0, 0.1))
-
-outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
-B=2000,
-cores=4)
-
-exposure_pooling_factor(stanfit = outcome_combo_mod_fit,
-standata = outcome_combo_data,
-level='observation')
-}
 \seealso{
 \code{\link{compute_pooling_metrics}} \code{\link{sample_exposure_model}}
 }

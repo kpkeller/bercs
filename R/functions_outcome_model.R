@@ -340,14 +340,14 @@ sample_outcome_model <- function(standata,
 ##'
 ##' #Sample from posterior distribution
 ##' outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
-##' B=2000,
+##' B=200,
 ##' cores=1)
 ##'
 ##' #Compute and fit the exposure response curve
 ##' fitted_ERC <- compute_ERC(standata=outcome_combo_data,
 ##' stanfit=outcome_combo_mod_fit,
 ##' exprange=c(5,200))
-##' plot_ERC(fitted_ERC) + scale_y_log10()
+##' plot_ERC(fitted_ERC) + ggplot2::scale_y_log10()
 ##'
 ##' #Calculate odds ratio
 ##' compute_OR(standata=outcome_combo_data,

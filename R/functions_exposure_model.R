@@ -253,7 +253,7 @@ compute_fitted_mean <- function(stanfit,
 #' @param group_names Names of groups to use in plot labels
 #' @details Uses \code{\link[ggplot2]{ggplot}} to create plots of concentrations using posterior means of model parameters. The graphical object is returned and can be customized if needed.
 #'
-#' Both functions are wrappers around \code{\link{compute_fitted_mean()}} and first call that function to compute the posterior mean for each observation.
+#' Both functions are wrappers around \code{\link{compute_fitted_mean}} and first call that function to compute the posterior mean for each observation.
 #' @examples
 #' #Create simulated data
 #' exposure_standata <- create_standata_exposure(group=rep(1:3, each=24),
