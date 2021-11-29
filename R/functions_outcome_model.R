@@ -379,6 +379,7 @@ compute_ERC <- function (standata,
                             xdf=standata$xdf,
                             ...)
 {
+  intercept_prop <- match.arg(intercept_prop)
     if (ciband < 0 || ciband > 1)
         stop("'ciband' must be between 0 and 1.")
     if (missing(beta_post)) {
