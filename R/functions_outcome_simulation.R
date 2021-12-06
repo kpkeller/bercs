@@ -199,6 +199,13 @@ outsim_sample_observations <- function(obj, continuous){
     obj <- outsim_update_logitmean(obj)
     obj$standata$y=stats::rbinom(n=obj$standata$N, size=obj$standata$nT, prob=expit(obj$structure$logitmean))
     obj
+
+    if(continuous){
+        obj$standata$y <- rnorm(n=obj$standata$N,
+                                mean=obj$structure$beta0[obj$structure$study_of_obs] + obj$structure$xfn(obj$structure$x) + obj$structure$timefn(obj$structure$time),
+                                sd=obj$structure$sigma_y)
+        obj
+    }
 }
 
 # Internal function to update the logitmean
@@ -252,7 +259,7 @@ outsim_update_parameter <- function(obj, param, level=c("study", "unit", "time",
                         time_mean="timefn",
                         covariate_coef="gamma",
                         exposure_mean="xfn",
-                        obs_sd="sigma_y"
+                        obs_sd="sigma_y",
                         NA)
         if (is.na(param)) stop(paste0(level, "_", type, " is not a supported parameter."))
     }
