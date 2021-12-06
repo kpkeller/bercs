@@ -204,8 +204,9 @@ outsim_sample_observations <- function(obj, continuous){
         obj$standata$y <- rnorm(n=obj$standata$N,
                                 mean=obj$structure$beta0[obj$structure$study_of_obs] + obj$structure$xfn(obj$structure$x) + obj$structure$timefn(obj$structure$time),
                                 sd=obj$structure$sigma_y)
-        obj
+
     }
+    obj
 }
 
 # Internal function to update the logitmean
