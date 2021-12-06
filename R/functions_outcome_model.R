@@ -537,7 +537,7 @@ plot_ERC <- function (obj,
     if(is.null(incS)){
         incS <- nS
     }
-    fulldf <- subset(fulldf, study %in% incS)
+    fulldf <- subset(fulldf, .data$study %in% incS)
     fulldf$study <- factor(fulldf$study)
     g <- ggplot(fulldf) + theme_bw()
     #New code
