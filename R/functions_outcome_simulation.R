@@ -147,7 +147,7 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
                             x=x,
                             xfn=xfn,
                             timefn=timefn,
-                            logitmean=rep(NA, N), # mean for generating data, updated before return
+                            mean=rep(NA, N), # mean for generating data, updated before return
                             sigma_y=sigma_y)
     study_standata <- list(S=nstudies,
                            K=K,
@@ -177,7 +177,7 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
                 standata=study_standata)
     class(obj) <- "outsim"
 
-    obj <- outsim_update_logitmean(obj)
+    obj <- outsim_update_mean(obj)
     obj
 }
 
@@ -194,10 +194,10 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
 ##' outsim_sample_observations(skeleton)
 ##' @export
 ##' @importFrom stats rbinom
-outsim_sample_observations <- function(obj, continuous){
+outsim_sample_observations <- function(obj, continuous=FALSE){
     if (!inherits(obj, "outsim")) stop("'obj' must be of class 'outsim'.")
-    obj <- outsim_update_logitmean(obj)
-    obj$standata$y=stats::rbinom(n=obj$standata$N, size=obj$standata$nT, prob=expit(obj$structure$logitmean))
+    obj <- outsim_update_mean(obj)
+    obj$standata$y=stats::rbinom(n=obj$standata$N, size=obj$standata$nT, prob=expit(obj$structure$mean))
     obj
 
     if(continuous){
@@ -209,15 +209,15 @@ outsim_sample_observations <- function(obj, continuous){
     obj
 }
 
-# Internal function to update the logitmean
-outsim_update_logitmean <- function(obj){
+# Internal function to update the mean
+outsim_update_mean <- function(obj){
     if (!inherits(obj, "outsim")) stop("'obj' must be of class 'outsim'.")
-    obj$structure$logitmean <- with(obj$structure, beta0[study_of_obs] + xfn(x) + timefn(time))
+    obj$structure$mean <- with(obj$structure, beta0[study_of_obs] + xfn(x) + timefn(time))
     if(!any(is.na(obj$structure$gamma)) && !any(is.na(obj$standata$Z))){
-        obj$structure$logitmean <- with(obj$structure, logitmean + obj$standata$Z %*% gamma)
+        obj$structure$mean <- with(obj$structure, mean + obj$standata$Z %*% gamma)
     }
     if (!any(is.na(obj$structure$reI))){
-        obj$structure$logitmean <- with(obj$structure, logitmean + reI[unit_of_obs])
+        obj$structure$mean <- with(obj$structure, mean + reI[unit_of_obs])
     }
     obj
 }

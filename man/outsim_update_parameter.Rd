@@ -11,7 +11,7 @@
 outsim_update_parameter(
   obj,
   param,
-  level = c("study", "unit", "time", "covariate", "exposure"),
+  level = c("study", "unit", "time", "covariate", "exposure", "obs"),
   type = c("mean", "sd", "re", "coef"),
   value = NULL,
   draw = is.null(value)

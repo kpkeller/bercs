@@ -21,7 +21,8 @@ create_outcome_simulation_skeleton_parallel(
   time = NA,
   verbose = TRUE,
   xfn = function(x) {     x },
-  timefn = function(t) {     rep(0, length(t)) }
+  timefn = function(t) {     rep(0, length(t)) },
+  sigma_y = 0.1
 )
 }
 \arguments{
@@ -56,6 +57,8 @@ create_outcome_simulation_skeleton_parallel(
 \item{xfn}{Exposure-response function. Can be set later via \code{\link{outsim_update_parameter}}.}
 
 \item{timefn}{Function relating time to mean outcome. Can be set later via \code{\link{outsim_update_parameter}}.}
+
+\item{sigma_y}{prior sd for continuous outcome.}
 }
 \value{
 A list containing two sublists: \code{structure}, which contains settings and parameters for generating data, and \code{standata} which contains the study data in a format for sampling via STAN.
