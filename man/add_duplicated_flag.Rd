@@ -20,3 +20,7 @@ Adds a column indicating duplicated rows
 \details{
 This is a wrapper around \code{\link{duplicated}}.
 }
+\examples{
+data(casedataA)
+add_duplicated_flag(casedataA, c('case', 'unit_id'))
+}

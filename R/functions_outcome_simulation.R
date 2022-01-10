@@ -14,6 +14,19 @@
 ##' @return A list containing two sublists: \code{structure}, which contains settings and parameters for generating data, and \code{standata} which contains the study data in a format for sampling via STAN.
 #' @family outcome simulation functions
 ##' @seealso \code{\link{sample_outcome_model}}, \code{\link{create_exposure_simulation_skeleton}}
+##' @examples
+##' create_outcome_simulation_skeleton(design='parallel',
+##' nstudies=1,
+##' nclusters=1,
+##' nunits=1,
+##' nobs=1,
+##' beta0=0,
+##' x=0,
+##' nT=NA,
+##' time=NA,
+##' verbose=TRUE,
+##' xfn=function(x) {x},
+##' timefn=function(t) {rep(0, length(t))})
 ##' @export
 create_outcome_simulation_skeleton <- function(design="parallel",...){
     if (design=="parallel"){
@@ -46,6 +59,7 @@ create_outcome_simulation_skeleton <- function(design="parallel",...){
 ##' @param xfn Exposure-response function. Can be set later via \code{\link{outsim_update_parameter}}.
 ##' @param timefn Function relating time to mean outcome. Can be set later via \code{\link{outsim_update_parameter}}.
 ##' @param verbose should messages be printed.
+##' @param sigma_y prior sd for continuous outcome.
 ##' @export
 create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
                                                   nclusters=1,
@@ -60,7 +74,8 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
                                                   time=NA,
                                                   verbose=TRUE,
                                                   xfn=function(x) {x},
-                                                  timefn=function(t) {rep(0, length(t))}){
+                                                  timefn=function(t) {rep(0, length(t))},
+                                                  sigma_y=0.1){
     # Check input
     if(!is.null(nclusters) && !check_all_nonnegative_value(nclusters)) stop("'nclusters' should be a non-negative integer and must have at least one positive element.")
     if(!check_all_nonnegative_value(nunits)) stop("'nunits' should be a non-negative integer and must have at least one positive element.")
@@ -132,7 +147,8 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
                             x=x,
                             xfn=xfn,
                             timefn=timefn,
-                            logitmean=rep(NA, N))# , # mean for generating data, updated before return
+                            mean=rep(NA, N), # mean for generating data, updated before return
+                            sigma_y=sigma_y)
     study_standata <- list(S=nstudies,
                            K=K,
                            n=n,
@@ -161,7 +177,7 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
                 standata=study_standata)
     class(obj) <- "outsim"
 
-    obj <- outsim_update_logitmean(obj)
+    obj <- outsim_update_mean(obj)
     obj
 }
 
@@ -170,26 +186,38 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
 ##' @title Sample Simulated Outcome Observations
 ##' @description Draws a sample of outcome observations using provided model parameters
 ##' @param obj the outcome simulation object for which to sample
+##' @param continuous argument that indicates a continuous outcome
 ##' @family outcome simulation functions
 ##' @seealso \code{\link{expsim_sample_observations}}
+##' @examples
+##' skeleton <- create_outcome_simulation_skeleton_parallel()
+##' outsim_sample_observations(skeleton)
 ##' @export
 ##' @importFrom stats rbinom
-outsim_sample_observations <- function(obj){
+outsim_sample_observations <- function(obj, continuous=FALSE){
     if (!inherits(obj, "outsim")) stop("'obj' must be of class 'outsim'.")
-    obj <- outsim_update_logitmean(obj)
-    obj$standata$y=stats::rbinom(n=obj$standata$N, size=obj$standata$nT, prob=expit(obj$structure$logitmean))
+    obj <- outsim_update_mean(obj)
+    obj$standata$y=stats::rbinom(n=obj$standata$N, size=obj$standata$nT, prob=expit(obj$structure$mean))
+    obj
+
+    if(continuous){
+        obj$standata$y <- rnorm(n=obj$standata$N,
+                                mean=obj$structure$beta0[obj$structure$study_of_obs] + obj$structure$xfn(obj$structure$x) + obj$structure$timefn(obj$structure$time),
+                                sd=obj$structure$sigma_y)
+
+    }
     obj
 }
 
-# Internal function to update the logitmean
-outsim_update_logitmean <- function(obj){
+# Internal function to update the mean
+outsim_update_mean <- function(obj){
     if (!inherits(obj, "outsim")) stop("'obj' must be of class 'outsim'.")
-    obj$structure$logitmean <- with(obj$structure, beta0[study_of_obs] + xfn(x) + timefn(time))
+    obj$structure$mean <- with(obj$structure, beta0[study_of_obs] + xfn(x) + timefn(time))
     if(!any(is.na(obj$structure$gamma)) && !any(is.na(obj$standata$Z))){
-        obj$structure$logitmean <- with(obj$structure, logitmean + obj$standata$Z %*% gamma)
+        obj$structure$mean <- with(obj$structure, mean + obj$standata$Z %*% gamma)
     }
     if (!any(is.na(obj$structure$reI))){
-        obj$structure$logitmean <- with(obj$structure, logitmean + reI[unit_of_obs])
+        obj$structure$mean <- with(obj$structure, mean + reI[unit_of_obs])
     }
     obj
 }
@@ -211,14 +239,17 @@ outsim_update_logitmean <- function(obj){
 #' }
 #' @family outcome simulation functions
 #' @seealso \code{\link{expsim_update_parameter}}
+#' @examples
+#' skel <- create_outcome_simulation_skeleton_parallel()
+#' outsim_update_parameter(obj=skel, param='beta0', value=2)
 ##' @export
-outsim_update_parameter <- function(obj, param, level=c("study", "unit", "time", "covariate", "exposure"), type=c("mean", "sd", "re", "coef"), value=NULL, draw=is.null(value)){
+outsim_update_parameter <- function(obj, param, level=c("study", "unit", "time", "covariate", "exposure", "obs"), type=c("mean", "sd", "re", "coef"), value=NULL, draw=is.null(value)){
     if (!inherits(obj, c("outsim"))) stop("'obj' must be of class 'outsim'.")
 
     if (!missing(param)){
-        param_list <- c("beta0", "sigI", "reI", "timefn", "gamma", "xfn") #c("etaG", "etaK", "sigG", "sigK", "sigH", "reH",  "sigW", "corHW", "timefn")
+        param_list <- c("beta0", "sigI", "reI", "timefn", "gamma", "xfn", "sigma_y") #c("etaG", "etaK", "sigG", "sigK", "sigH", "reH",  "sigW", "corHW", "timefn")
         param_check <- param %in% param_list
-        if (!param_check) stop('"param" must be one of  c("beta0", "sigI", "reI", "timefn","gamma", "xfn")')
+        if (!param_check) stop('"param" must be one of  c("beta0", "sigI", "reI", "timefn","gamma", "xfn", "sigma_y")')
     } else {
         level <- match.arg(level)
         type <- match.arg(type)
@@ -229,6 +260,7 @@ outsim_update_parameter <- function(obj, param, level=c("study", "unit", "time",
                         time_mean="timefn",
                         covariate_coef="gamma",
                         exposure_mean="xfn",
+                        obs_sd="sigma_y",
                         NA)
         if (is.na(param)) stop(paste0(level, "_", type, " is not a supported parameter."))
     }

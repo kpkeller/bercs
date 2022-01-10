@@ -4,13 +4,19 @@
 \alias{outsim_sample_observations}
 \title{Sample Simulated Outcome Observations}
 \usage{
-outsim_sample_observations(obj)
+outsim_sample_observations(obj, continuous = FALSE)
 }
 \arguments{
 \item{obj}{the outcome simulation object for which to sample}
+
+\item{continuous}{argument that indicates a continuous outcome}
 }
 \description{
 Draws a sample of outcome observations using provided model parameters
+}
+\examples{
+skeleton <- create_outcome_simulation_skeleton_parallel()
+outsim_sample_observations(skeleton)
 }
 \seealso{
 \code{\link{expsim_sample_observations}}

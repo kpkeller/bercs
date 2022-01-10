@@ -8,21 +8,18 @@
 #' @details This computes generalized versions of R^2 and pooling factor for levels of a hierarchical model, as described by Gelman and Pardoe (2006).
 #' @references Gelman, A and Pardoe, I. (2006). Bayesian Measures of Explained Variance and Pooling in Multilevel (Hierarchical) Models. \emph{Technometrics}, 48, 241-251.
 #' @seealso \code{\link{exposure_pooling_factor}}
-#' @export
 compute_pooling_metrics <- function(theta, epsilon){
     c(prop_var = prop_var_explained(theta=theta, epsilon=epsilon),
       pooling_factor = pooling_factor(epsilon=epsilon))
 }
 
 #' @rdname compute_pooling_metrics
-#' @export
 #' @importFrom stats var
 prop_var_explained <- function(theta, epsilon){
     1 - mean(apply(epsilon, 1, var))/mean(apply(theta, 1, var))
 }
 
 #' @rdname compute_pooling_metrics
-#' @export
 #' @importFrom stats var
 pooling_factor <- function(epsilon){
     1 - var(apply(epsilon, 2, mean))/mean(apply(epsilon, 1, var))
@@ -36,7 +33,6 @@ pooling_factor <- function(epsilon){
 #' @param level String indicating which level of the model to evaluate. Possible values are "cluster", "househould", "time", and "observation".
 #' @details This is a wrapper around \code{\link{compute_pooling_metrics}} that extracts the necessary posterior samples from \code{stanfit}.
 #' @seealso \code{\link{compute_pooling_metrics}} \code{\link{sample_exposure_model}}
-#' @export
 exposure_pooling_factor <- function(stanfit, standata, level=c("observation", "unit", "cluster", "group", "time")){
     if (level=="observation"){
         # Check for muWi......

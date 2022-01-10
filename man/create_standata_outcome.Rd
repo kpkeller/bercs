@@ -80,6 +80,13 @@ If using a separate temporal spline for each study, first compute the time splin
 
 The matrices of adjustment variables are created using the names provided to \code{covarslist}. This is done using \code{\link[stats]{formula}} and \code{\link[stats]{model.matrix}}, so transformations and interactions can be used in the typical manner.
 }
+\examples{
+data(casedataA)
+data(casedataB)
+create_standata_outcome(datalist=list(casedataA, casedataB),
+                                             xdf=4,
+                                             xfnargs=list(Boundary.knots=c(5, 200)))
+}
 \seealso{
 \code{\link{create_standata_exposure}}, \code{\link{add_spline_exposure}}, \code{\link{sample_outcome_model}}
 }

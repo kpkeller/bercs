@@ -12,6 +12,7 @@ sample_outcome_model(
   control = list(adapt_delta = 0.9, max_treedepth = 12),
   multiple_exposure_curves = FALSE,
   restrictBeta = FALSE,
+  continuous = FALSE,
   ...
 )
 }
@@ -30,18 +31,28 @@ sample_outcome_model(
 
 \item{restrictBeta}{Logical indicating that model should be fit that forces a positive value for the exposure spline coefficients.}
 
+\item{continuous}{If the outcome is continuous (TRUE) or binary (FALSE)}
+
 \item{...}{Additional arguments passed to \code{\link[rstan]{sampling}}.}
 }
 \description{
 Samples from the posterior distribution of outcome model parameters, using STAN
 }
 \examples{
+#load needed data set/s
 data(casedataA)
+
 outcome_dataA <- create_standata_outcome(data=casedataA)
+
+#Add hyperparamters for priors
 outcome_dataA <- add_priors(outcome_dataA,
                             sigmaI=c(0, 0.1))
+
+#Sample from posterior distribution of parameters using STAN
 outcome_mod_fit1 <- sample_outcome_model(outcome_dataA)
-print(outcome_mod_fit1, pars=c("reI_raw", "reI","mui"), include=FALSE)
+print(outcome_mod_fit1,
+pars=c("reI_raw", "reI","mui"),
+include=FALSE)
 }
 \seealso{
 \link{create_standata_outcome}, \link{outsim_sample_observations}

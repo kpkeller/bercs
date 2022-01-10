@@ -12,6 +12,12 @@
 ##'
 ##' The matrices of adjustment variables are created using the names provided to \code{covarslist}. This is done using \code{\link[stats]{formula}} and \code{\link[stats]{model.matrix}}, so transformations and interactions can be used in the typical manner.
 ##' @seealso \code{\link{create_standata_exposure}}, \code{\link{add_spline_exposure}}, \code{\link{sample_outcome_model}}
+##' @examples
+##' data(casedataA)
+##' data(casedataB)
+##' create_standata_outcome(datalist=list(casedataA, casedataB),
+##'                                              xdf=4,
+##'                                              xfnargs=list(Boundary.knots=c(5, 200)))
 ##' @export
 ##' @importFrom Matrix bdiag
 create_standata_outcome <- function(...,
@@ -225,16 +231,25 @@ create_standata_outcome_singlestudy <- function(data=NULL,
 #' @inheritParams sample_exposure_model
 ##' @param multiple_exposure_curves Logical indicating whether exposure response curves should be estimated separately by study.
 ##' @param restrictBeta Logical indicating that model should be fit that forces a positive value for the exposure spline coefficients.
+##' @param continuous If the outcome is continuous (TRUE) or binary (FALSE)
 ##' @author Joshua Keller
 ##' @seealso \link{create_standata_outcome}, \link{outsim_sample_observations}
 ##' @export
 ##' @examples
+##' #load needed data set/s
 ##' data(casedataA)
+##'
 ##' outcome_dataA <- create_standata_outcome(data=casedataA)
+##'
+##' #Add hyperparamters for priors
 ##' outcome_dataA <- add_priors(outcome_dataA,
 ##'                             sigmaI=c(0, 0.1))
+##'
+##' #Sample from posterior distribution of parameters using STAN
 ##' outcome_mod_fit1 <- sample_outcome_model(outcome_dataA)
-##' print(outcome_mod_fit1, pars=c("reI_raw", "reI","mui"), include=FALSE)
+##' print(outcome_mod_fit1,
+##' pars=c("reI_raw", "reI","mui"),
+##' include=FALSE)
 sample_outcome_model <- function(standata,
                                  B=1000,
                                  warmup=B,
@@ -243,6 +258,7 @@ sample_outcome_model <- function(standata,
                                               max_treedepth=12),
                                  multiple_exposure_curves=FALSE,
                                  restrictBeta=FALSE,
+                                 continuous=FALSE,
                                  ...){
 
     if (!inherits(standata, "standata_outcome")) stop("`standata` must be of class 'standata_outcome'.")
@@ -259,11 +275,14 @@ sample_outcome_model <- function(standata,
     if (multiple_exposure_curves && standata$xdf==0){
         stop("Cannot have multiple exposure curves when xdf==0. Set xdf to be >0 or multiple_exposure_curves to be FALSE")
     }
+    if(continuous){
+      model_name <- 'outcome_model_continuous'
+    }else{model_name <- "outcome_model"}
 
-    model_name <- "outcome_model"
     if (multiple_exposure_curves) model_name <- paste0(model_name, "_multipleExpCurves")
     if (is.numeric(standata$beta_lower_lim))  model_name <- paste0(model_name, "_restrictBeta")
 
+    #This is what runs the stan code
     out_stanfit <- sampling(stanmodels[[model_name]],
                             data = standata,
                             iter = B + warmup,
@@ -304,6 +323,40 @@ sample_outcome_model <- function(standata,
 ##' Uncertainty from the intercepts is included in the confidence bands by default, since this corresponds to a common interpretation of such intervals. This requires picking a single value for the intercept. For models fit to multiple studies, a separate set of uncertainty will be created for each study. Additionally, a set of results corresponding to "average" intercept is created. The \code{intercept_prop} argument controls the relative contribution of the intercepts from each model.
 ##'
 ##' @seealso \code{\link{sample_outcome_model}}
+##' @examples
+##'
+##' #Load needed data sets
+##' data(casedataA)
+##' data(casedataB)
+##'
+##' #Create standata
+##' outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
+##'                                               xdf=4,
+##'                                               xfnargs=list(Boundary.knots=c(5, 200)))
+##'
+##' #Add priors
+##' outcome_combo_data <- add_priors(outcome_combo_data,
+##' sigmaI=c(0, 0.01))
+##'
+##' #Sample from posterior distribution
+##' outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
+##' B=200,
+##' cores=1)
+##'
+##' #Compute and fit the exposure response curve
+##' fitted_ERC <- compute_ERC(standata=outcome_combo_data,
+##' stanfit=outcome_combo_mod_fit,
+##' exprange=c(5,200))
+##' plot_ERC(fitted_ERC) + ggplot2::scale_y_log10()
+##'
+##' #Calculate odds ratio
+##' compute_OR(standata=outcome_combo_data,
+##' stanfit=outcome_combo_mod_fit,
+##' expsequence = c(5, 10, 20, 50, 100, 200),
+##' ref_exposure=10)
+##'
+##' center_ERC(fitted_ERC, ref_exposure = min(fitted_ERC$exposure))
+##'
 ##' @export
 #' @importFrom stats quantile
 #' @importFrom utils getS3method
@@ -326,6 +379,7 @@ compute_ERC <- function (standata,
                             xdf=standata$xdf,
                             ...)
 {
+  intercept_prop <- match.arg(intercept_prop)
     if (ciband < 0 || ciband > 1)
         stop("'ciband' must be between 0 and 1.")
     if (missing(beta_post)) {
@@ -457,6 +511,7 @@ compute_ERC <- function (standata,
 ##' @param ylab String providing y-axis label.
 ##' @param xlab String providing x-axis label.
 ##' @param ribbon Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).
+##' @param hline Optional argument that plots a horizontal line at given value.
 ##' @export
 ##' @import ggplot2
 plot_ERC <- function (obj,
@@ -464,7 +519,8 @@ plot_ERC <- function (obj,
                              expERC=TRUE,
                              ylab = "Relative Risk",
                              xlab = "Exposure",
-                             ribbon=FALSE)
+                             ribbon=FALSE,
+                             hline=NULL)
 {
     if (is.list(obj)){
       nS <- length(obj)
@@ -481,9 +537,13 @@ plot_ERC <- function (obj,
     if(is.null(incS)){
         incS <- nS
     }
-    fulldf <- subset(fulldf, study %in% incS)
+    fulldf <- subset(fulldf, .data$study %in% incS)
     fulldf$study <- factor(fulldf$study)
     g <- ggplot(fulldf) + theme_bw()
+    #New code
+    if(!expERC){
+      ylab <- 'outcome'
+    }
     if (ribbon){
         g <- g + geom_ribbon(aes(x = .data$exposure,
                                  ymin = .data$low,
@@ -502,14 +562,15 @@ plot_ERC <- function (obj,
                           col=.data$study),
                       data=fulldf)
     }
-      g   + geom_line(aes(x = .data$exposure,
+      g <- g   + geom_line(aes(x = .data$exposure,
                       y = .data$mean,
                       group=.data$study,
                       col=.data$study),
-                  lwd = 1.5) +
-        geom_hline(yintercept = 1,
-                   lty = 2) + xlab(xlab) + ylab(ylab)
-
+                  lwd = 1.5)
+        #If else hline code
+        if(!is.null(hline)){g <- g + geom_hline(yintercept=hline, lty=2)}
+      g <- g + xlab(xlab) + ylab(ylab)
+      g
 }
 
 

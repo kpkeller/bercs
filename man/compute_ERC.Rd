@@ -33,7 +33,8 @@ plot_ERC(
   expERC = TRUE,
   ylab = "Relative Risk",
   xlab = "Exposure",
-  ribbon = FALSE
+  ribbon = FALSE,
+  hline = NULL
 )
 
 center_ERC(obj, ref_exposure = min(obj$exposure))
@@ -104,6 +105,8 @@ compute_OR(
 \item{xlab}{String providing x-axis label.}
 
 \item{ribbon}{Should the uncertainty be represented as a filled ribbon (TRUE) or lines without fill (FALSE).}
+
+\item{hline}{Optional argument that plots a horizontal line at given value.}
 }
 \description{
 Computes the exposure-response curve from a fitted outcome model
@@ -115,6 +118,41 @@ Currently, the fitted curve is plotted based upon the posterior means of the par
 Uncertainty from the intercepts is included in the confidence bands by default, since this corresponds to a common interpretation of such intervals. This requires picking a single value for the intercept. For models fit to multiple studies, a separate set of uncertainty will be created for each study. Additionally, a set of results corresponding to "average" intercept is created. The \code{intercept_prop} argument controls the relative contribution of the intercepts from each model.
 
 To calculate odds ratios for specific combinations of exposure values, use the `compute_OR` function, which will correctly calculate the credible intervals for the relative difference.
+}
+\examples{
+
+#Load needed data sets
+data(casedataA)
+data(casedataB)
+
+#Create standata
+outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB),
+                                              xdf=4,
+                                              xfnargs=list(Boundary.knots=c(5, 200)))
+
+#Add priors
+outcome_combo_data <- add_priors(outcome_combo_data,
+sigmaI=c(0, 0.01))
+
+#Sample from posterior distribution
+outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
+B=200,
+cores=1)
+
+#Compute and fit the exposure response curve
+fitted_ERC <- compute_ERC(standata=outcome_combo_data,
+stanfit=outcome_combo_mod_fit,
+exprange=c(5,200))
+plot_ERC(fitted_ERC) + ggplot2::scale_y_log10()
+
+#Calculate odds ratio
+compute_OR(standata=outcome_combo_data,
+stanfit=outcome_combo_mod_fit,
+expsequence = c(5, 10, 20, 50, 100, 200),
+ref_exposure=10)
+
+center_ERC(fitted_ERC, ref_exposure = min(fitted_ERC$exposure))
+
 }
 \seealso{
 \code{\link{sample_outcome_model}}

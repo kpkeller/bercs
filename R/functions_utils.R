@@ -128,6 +128,9 @@ add_spline_exposure <- function(standata, Mx){
 #' @param dupvars Character vector providing the names of variables for which duplicated observations should be checked.
 #' @details This is a wrapper around \code{\link{duplicated}}.
 #' @return The data frame \code{data}, with an additional column \code{"dupobs"} that is a logical indicator of a duplicated row.
+#' @examples
+#' data(casedataA)
+#' add_duplicated_flag(casedataA, c('case', 'unit_id'))
 ##' @export
 add_duplicated_flag <- function(data, dupvars){
     check_names_to_overwrite(data, expected_names=c("dupobs"))
