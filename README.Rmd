@@ -18,7 +18,7 @@ This R package implements a two flexible hierarchical models. The **exposure mod
 
 An application of these models to household air pollution and respiratory infections is provided in:
 
-Keller JP, Katz J, Pokhrel AK, Bates MN, Tielsch J, and Zeger SL. A Hierarchical Model for Estimating the Exposure-Response Curve by Combining Multiple Studies of Acute Lower Respiratory Infections in Children and Household Fine Particulate Matter Air Pollution.  In press. *Environmental Epidemiology.*
+Keller JP, Katz J, Pokhrel AK, Bates MN, Tielsch J, and Zeger SL. 2020. A Hierarchical Model for Estimating the Exposure-Response Curve by Combining Multiple Studies of Acute Lower Respiratory Infections in Children and Household Fine Particulate Matter Air Pollution. *Environmental Epidemiology*, 4(6):e119.
 
 ## Installation
 
