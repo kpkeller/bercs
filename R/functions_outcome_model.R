@@ -581,12 +581,16 @@ center_ERC <- function(obj, ref_exposure=min(obj$exposure)){
     obj_new <- obj
     if (is.list(obj_new)){
       for (j in 1:length(obj_new)){
-        ind_cut <- max(which(obj_new[[j]]$exposure <= ref_exposure))
+        diff <- ref_exposure - obj_new[[j]]$exposure
+        diff <- ifelse(diff>0, diff, Inf)
+        ind_cut <- which.min(diff)
         obj_new[[j]]$low <- obj_new[[j]]$low - obj_new[[j]]$mean[ind_cut]
         obj_new[[j]]$high <- obj_new[[j]]$high - obj_new[[j]]$mean[ind_cut]
         obj_new[[j]]$mean <- obj_new[[j]]$mean - obj_new[[j]]$mean[ind_cut] # do last
       }} else {
-        ind_cut <- max(which(obj_new$exposure <= ref_exposure))
+        diff <- ref_exposure - obj_new$exposure
+        diff <- ifelse(diff>0, diff, Inf)
+        ind_cut <- which.min(diff)
         obj_new$low <- obj_new$low - obj_new$mean[ind_cut]
         obj_new$high <- obj_new$high - obj_new$mean[ind_cut]
         obj_new$mean <- obj_new$mean - obj_new$mean[ind_cut] # do last
