@@ -42,9 +42,14 @@ create_exposure_simulation_skeleton <- function(design="parallel",...){
 ##' @param nclusters Number of clusters. Either a single value or a vector of length \code{ngroups}.
 ##' @param nunits Number of units (e.g. households) in each cluster. If length 1, repeated for all clusters.
 ##' @param nobs Number of observations in each unit. If length 1, repeated for all units and if length \code{sum(nclusters)}, repeated for all units within each cluster.
+##' @param etaG Group means. Optional; can be set later with \code{\link{expsim_update_parameter}}.
+##' @param sigI Standard deviation for household random effect. Optional; can be set later with \code{\link{expsim_update_parameter}}.
+##' @param sigW Standard deviation of residual variation for each observation. Optional; can be set later with \code{\link{expsim_update_parameter}}.
 ##' @param verbose Logical indicator for message printing.
+##' @param time optional times for observations. Can be set later via \code{\link{sim_update_times}}.
+##' @param timefn Function relating times to mean exposure. Can be set later via \code{\link{expsim_update_parameter}}.
 ##' @examples
-##' # Create simulation structure
+##' # Create simulation structure for parallel design
 ##' es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=3)
 ##' str(es)
 ##' @export
@@ -52,6 +57,11 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
                                                   nclusters=1,
                                                   nunits=1,
                                                   nobs=1,
+                                                  etaG=rep(NA, ngroups),
+                                                  sigI=NA,
+                                                  sigW=NA,
+                                                  time=NA,
+                                                  timefn=function(t) {rep(0, length(t))},
                                                   verbose=TRUE){
 
     # Check input
@@ -110,14 +120,14 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
                             unit_of_obs=unit_of_obs,
                             cluster_of_obs=cluster_of_obs,
                             group_of_obs=group_of_obs,
-                            etaG=rep(NA, ngroups), # Group Means
+                            etaG=etaG, # Group Means
                             sigK=rep(NA, ngroups), # Group-level standard deviations for drawing reK)
                             reK=rep(NA, K), # Cluster random effects
-                            sigI=NA, # SD for unit-level RE's. Not within cluster
+                            sigI=sigI, # SD for unit-level RE's. Not within cluster
                             reI=rep(NA, n), # unit-level random effects
-                            sigW=NA, # SD for observation residual variation
-                            time=NA,
-                            timefn=function(t) {rep(0, length(t))},
+                            sigW=sigW, # SD for observation residual variation
+                            time=time,
+                            timefn=timefn,
                             meanW=rep(NA, N), # mean for generating data. will also have time component added.
                             design="parallel")
     study_standata <- list(G=ngroups,
@@ -150,8 +160,10 @@ create_exposure_simulation_skeleton_parallel <- function(ngroups=1,
 ##' @param firstgroup Integer indicating which group a unit is in first (should have length equal to the number of units).
 ##' @details The crossover design is currently implemented with only 2 groups.
 ##' @examples
-##' # Create simulation structure
-##' es <- create_exposure_simulation_skeleton_crossover(ngroups=2, nunits=3)
+##' # Create simulation structure for crossover design
+##' # with 10 units and 3 measurements per unit under
+##' # each treatment group (60 measures total)
+##' es <- create_exposure_simulation_skeleton_crossover(ngroups=2, nunits=10, nobs1=3, nobs2=3, firstgroup=rep(1:2, each=5))
 ##' str(es)
 ##' @export
 create_exposure_simulation_skeleton_crossover <- function(ngroups=2,
@@ -160,6 +172,11 @@ create_exposure_simulation_skeleton_crossover <- function(ngroups=2,
                                                          nobs1=1,
                                                          nobs2=1,
                                                          firstgroup=1,
+                                                         etaG=rep(NA, ngroups),
+                                                         sigI=NA,
+                                                         sigW=NA,
+                                                         time=NA,
+                                                         timefn=function(t) {rep(0, length(t))},
                                                          verbose=TRUE){
 
     # Check input
@@ -241,14 +258,14 @@ create_exposure_simulation_skeleton_crossover <- function(ngroups=2,
                             unit_of_obs=unit_of_obs,
                             cluster_of_obs=cluster_of_obs,
                             group_of_obs=group_of_obs,
-                            etaG=rep(NA, ngroups), # Group Means
+                            etaG=etaG, # Group Means
                             sigK=rep(NA, ngroups), # Group-level standard deviations for drawing reK)
                             reK=rep(NA, K), # Cluster random effects
-                            sigI=NA, # SD for unit-level RE's. Not within cluster
+                            sigI=sigI, # SD for unit-level RE's. Not within cluster
                             reI=rep(NA, n), # unit-level random effects
-                            sigW=NA, # SD for observation residual variation
-                            time=NA,
-                            timefn=function(t) {rep(0, length(t))},
+                            sigW=sigW, # SD for observation residual variation
+                            time=time,
+                            timefn=timefn,
                             meanW=rep(NA, N), # mean for generating data. will also have time component added.
                             design="crossover")
     study_standata <- list(G=ngroups,
@@ -281,8 +298,8 @@ create_exposure_simulation_skeleton_crossover <- function(ngroups=2,
 
 #' @title Update Exposure Model Parameters
 #' @description Sets or overwrites data-generating parameters for an exposure model object
-#' @param obj 'expsim' object to update
-#' @param param character string giving name of parameter to update. If not provided, parameter name is taken from \code{level} and \code{type}
+#' @param obj 'expsim' object to update (see \code{\link{create_exposure_simulation_skeleton}}).
+#' @param param character string giving name of parameter to update. If not provided, parameter name is taken from \code{level} and \code{type}.
 #' @param level character string of model level being updated. Must be one of "group", "cluster", "unit", "observation", or "time". See Details.
 #' @param type character string giving type of parameter being updated. See Details.
 #' @param value value(s) to which parameter should be set
@@ -293,8 +310,9 @@ create_exposure_simulation_skeleton_crossover <- function(ngroups=2,
 #' \item \code{"cluster"}: \code{"sd"} and \code{"re"} set 'sigK' and 'reK', respectively
 #' \item \code{"unit"}: \code{"sd"} and \code{"re"} set 'sigI' and 'reI', respectively
 #' \item \code{"observation"}: \code{"sd"} sets 'sigW'.
-#' \item \code{"time"}: \code{"mean"} sets 'timefn'.
+#' \item \code{"time"}: \code{"fn"} sets 'timefn'. To update the times themselves, use \code{\link{sim_update_times}}.
 #' }
+#' After setting and/or sampling values via this funciton, use \code{\link{expsim_sample_observations}} to sample the exposure values.
 #' @family exposure simulation functions
 #' @export
 #' @importFrom stats rnorm
@@ -307,12 +325,13 @@ create_exposure_simulation_skeleton_crossover <- function(ngroups=2,
 #' # Add standard deviation parameter value
 #' es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
 #' es$structure$sigK
+#'
 #' # Sample random effect values
 #' es <- expsim_update_parameter(es, level="cluster", type="re", draw=TRUE)
 #'
 #' # Add time function
 #' es <- expsim_update_parameter(es, level="time", type="mean", value=function(w) 2*cos(w))
-expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit", "observation", "correlation","time"), type=c("mean", "sd", "re"), value=NULL, draw=is.null(value)){
+expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit", "observation", "correlation","time"), type=c("mean", "sd", "re", "fn"), value=NULL, draw=is.null(value)){
 
     if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")
     if (!missing(param)){
@@ -335,7 +354,7 @@ expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit
                observation_mean=NA,
                observation_sd="sigW",
                observation_re=NA,
-               time_mean="timefn",
+               time_fn="timefn",
                time_sd=NA,
                time_re=NA,
                NA)

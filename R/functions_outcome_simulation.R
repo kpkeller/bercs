@@ -214,7 +214,7 @@ outsim_update_mean <- function(obj){
     if (!inherits(obj, "outsim")) stop("'obj' must be of class 'outsim'.")
     obj$structure$mean <- with(obj$structure, beta0[study_of_obs] + xfn(x) + timefn(time))
     if(!any(is.na(obj$structure$gamma)) && !any(is.na(obj$standata$Z))){
-        obj$structure$mean <- with(obj$structure, mean + obj$standata$Z %*% gamma)
+        obj$structure$mean <- with(obj$structure, mean + obj$standata$Z %*% as.matrix(gamma))
     }
     if (!any(is.na(obj$structure$reI))){
         obj$structure$mean <- with(obj$structure, mean + reI[unit_of_obs])
@@ -232,10 +232,15 @@ outsim_update_mean <- function(obj){
 #' @param type character string giving type of parameter being updated. See details.
 #' @param value value(s) to which parameter should be set
 #' @param draw if \code{TRUE}, then the parameter value is sampled instead of being set to \code{value}
-#' @details Only specific combinations of \code{level} and \code{type} are allowed. They are:
+#' @details The function \code{outsim_update_parameter} can be used to set or update the values that determine the outcome observations. Only specific combinations of \code{level} and \code{type} are allowed. They are:
 #' \itemize{
-#' \item \code{"group"}: \code{"mean"} and \code{"sd"} set 'etaG' and 'sigG', respectively
-#' \item \code{"cluster"}: \code{"mean"} and \code{"sd"} set 'etaK' and 'sigK', respectively
+#' \item \code{"study"}: \code{"mean"}  sets the overall intercept (on the scale of the linear predictor), denoted as \code{beta0}.
+#' \item \code{"unit"}: \code{"sd"} sets the standard deviation for individual random effects; \code{"re"} samples the random effects themselves.
+#' \item \code{"unit"}: \code{"sd"} sets the standard deviation for individual random effects; \code{"re"} samples the random effects themselves.
+#' \item \code{"time"}: \code{"mean"} sets 'timefn'. To update the times themselves, use \code{\link{sim_update_times}}.
+#' \item \code{"covariate"}: \code{"coef"} sets the covariate (\code{Z}) coefficients.  To update the covariate values themselves, use \code{\link{outsim_update_covariate}}.
+#' \item \code{"exposure"}: \code{"fn"} sets 'xfn', the underlying exposure-response function (on the scale of the linear predictor). To update the exposure values themselves, use \code{\link{outsim_update_covariate}}.
+
 #' }
 #' @family outcome simulation functions
 #' @seealso \code{\link{expsim_update_parameter}}
@@ -243,11 +248,11 @@ outsim_update_mean <- function(obj){
 #' skel <- create_outcome_simulation_skeleton_parallel()
 #' outsim_update_parameter(obj=skel, param='beta0', value=2)
 ##' @export
-outsim_update_parameter <- function(obj, param, level=c("study", "unit", "time", "covariate", "exposure", "obs"), type=c("mean", "sd", "re", "coef"), value=NULL, draw=is.null(value)){
+outsim_update_parameter <- function(obj, param, level=c("study", "unit", "time", "covariate", "exposure", "obs"), type=c("mean", "sd", "re","fn", "coef"), value=NULL, draw=is.null(value)){
     if (!inherits(obj, c("outsim"))) stop("'obj' must be of class 'outsim'.")
 
     if (!missing(param)){
-        param_list <- c("beta0", "sigI", "reI", "timefn", "gamma", "xfn", "sigma_y") #c("etaG", "etaK", "sigG", "sigK", "sigH", "reH",  "sigW", "corHW", "timefn")
+        param_list <- c("beta0", "sigI", "reI", "timefn", "gamma", "xfn", "sigma_y")
         param_check <- param %in% param_list
         if (!param_check) stop('"param" must be one of  c("beta0", "sigI", "reI", "timefn","gamma", "xfn", "sigma_y")')
     } else {
@@ -257,9 +262,9 @@ outsim_update_parameter <- function(obj, param, level=c("study", "unit", "time",
                         study_mean="beta0",
                         unit_sd="sigI",
                         unit_re="reI",
-                        time_mean="timefn",
+                        time_fn="timefn",
                         covariate_coef="gamma",
-                        exposure_mean="xfn",
+                        exposure_fn="xfn",
                         obs_sd="sigma_y",
                         NA)
         if (is.na(param)) stop(paste0(level, "_", type, " is not a supported parameter."))
@@ -333,7 +338,11 @@ outsim_update_covariate <- function(obj, covariate=c("x","Z"), ncol=1, value=NUL
         valdim <- c(obj$standata$N, ncol)
         value <- matrix(stats::rnorm(valdim[1]*valdim[2], mean=mean, sd=sd), nrow=valdim[1], ncol=valdim[2])
     } else {
-        valdim <- ifelse(is.vector(value), c(length(value), 1), dim(value))
+        if (is.vector(value)) {
+            valdim <- c(length(value), 1)
+        } else {
+            valdim <- dim(value)
+        }
     }
     covariate_param <- switch(covariate,
                               Z="gamma",
