@@ -8,15 +8,15 @@ expsim_update_parameter(
   obj,
   param,
   level = c("group", "cluster", "unit", "observation", "correlation", "time"),
-  type = c("mean", "sd", "re"),
+  type = c("mean", "sd", "re", "fn"),
   value = NULL,
   draw = is.null(value)
 )
 }
 \arguments{
-\item{obj}{'expsim' object to update}
+\item{obj}{'expsim' object to update (see \code{\link{create_exposure_simulation_skeleton}}).}
 
-\item{param}{character string giving name of parameter to update. If not provided, parameter name is taken from \code{level} and \code{type}}
+\item{param}{character string giving name of parameter to update. If not provided, parameter name is taken from \code{level} and \code{type}.}
 
 \item{level}{character string of model level being updated. Must be one of "group", "cluster", "unit", "observation", or "time". See Details.}
 
@@ -36,8 +36,9 @@ Only specific combinations of \code{level} and \code{type} are allowed. They are
 \item \code{"cluster"}: \code{"sd"} and \code{"re"} set 'sigK' and 'reK', respectively
 \item \code{"unit"}: \code{"sd"} and \code{"re"} set 'sigI' and 'reI', respectively
 \item \code{"observation"}: \code{"sd"} sets 'sigW'.
-\item \code{"time"}: \code{"mean"} sets 'timefn'.
+\item \code{"time"}: \code{"fn"} sets 'timefn'. To update the times themselves, use \code{\link{sim_update_times}}.
 }
+After setting and/or sampling values via this funciton, use \code{\link{expsim_sample_observations}} to sample the exposure values.
 }
 \examples{
 # Create simulation structure
@@ -48,11 +49,12 @@ es$structure$sigK
 # Add standard deviation parameter value
 es <- expsim_update_parameter(es, level="cluster", type="sd", value=1)
 es$structure$sigK
+
 # Sample random effect values
 es <- expsim_update_parameter(es, level="cluster", type="re", draw=TRUE)
 
 # Add time function
-es <- expsim_update_parameter(es, level="time", type="mean", value=function(w) 2*cos(w))
+es <- expsim_update_parameter(es, level="time", type="fn", value=function(w) 2*cos(w))
 }
 \seealso{
 Other exposure simulation functions: 

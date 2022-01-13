@@ -13,6 +13,11 @@ create_exposure_simulation_skeleton_parallel(
   nclusters = 1,
   nunits = 1,
   nobs = 1,
+  etaG = rep(NA, ngroups),
+  sigI = NA,
+  sigW = NA,
+  time = NA,
+  timefn = function(t) {     rep(0, length(t)) },
   verbose = TRUE
 )
 
@@ -23,6 +28,11 @@ create_exposure_simulation_skeleton_crossover(
   nobs1 = 1,
   nobs2 = 1,
   firstgroup = 1,
+  etaG = rep(NA, ngroups),
+  sigI = NA,
+  sigW = NA,
+  time = NA,
+  timefn = function(t) {     rep(0, length(t)) },
   verbose = TRUE
 )
 }
@@ -38,6 +48,16 @@ create_exposure_simulation_skeleton_crossover(
 \item{nunits}{Number of units (e.g. households) in each cluster. If length 1, repeated for all clusters.}
 
 \item{nobs}{Number of observations in each unit. If length 1, repeated for all units and if length \code{sum(nclusters)}, repeated for all units within each cluster.}
+
+\item{etaG}{Group means. Optional; can be set later with \code{\link{expsim_update_parameter}}.}
+
+\item{sigI}{Standard deviation for household random effect. Optional; can be set later with \code{\link{expsim_update_parameter}}.}
+
+\item{sigW}{Standard deviation of residual variation for each observation. Optional; can be set later with \code{\link{expsim_update_parameter}}.}
+
+\item{time}{optional times for observations. Can be set later via \code{\link{sim_update_times}}.}
+
+\item{timefn}{Function relating times to mean exposure. Can be set later via \code{\link{expsim_update_parameter}}.}
 
 \item{verbose}{Logical indicator for message printing.}
 
@@ -63,11 +83,13 @@ See \code{\link{sample_exposure_model}} for a mathematical description of the mo
 The crossover design is currently implemented with only 2 groups.
 }
 \examples{
-# Create simulation structure
+# Create simulation structure for parallel design
 es <- create_exposure_simulation_skeleton_parallel(ngroups=2, nunits=3)
 str(es)
-# Create simulation structure
-es <- create_exposure_simulation_skeleton_crossover(ngroups=2, nunits=3)
+# Create simulation structure for crossover design
+# with 10 units and 3 measurements per unit under
+# each treatment group (60 measures total)
+es <- create_exposure_simulation_skeleton_crossover(ngroups=2, nunits=10, nobs1=3, nobs2=3, firstgroup=rep(1:2, each=5))
 str(es)
 }
 \seealso{

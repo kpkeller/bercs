@@ -12,7 +12,7 @@ outsim_update_parameter(
   obj,
   param,
   level = c("study", "unit", "time", "covariate", "exposure", "obs"),
-  type = c("mean", "sd", "re", "coef"),
+  type = c("mean", "sd", "re", "fn", "coef"),
   value = NULL,
   draw = is.null(value)
 )
@@ -69,10 +69,14 @@ outsim_update_exp_splines(obj, df = 1, fn = "ns", ...)
 Sets or overwrites outcome model parameters
 }
 \details{
-Only specific combinations of \code{level} and \code{type} are allowed. They are:
+The function \code{outsim_update_parameter} can be used to set or update the values that determine the outcome observations. Only specific combinations of \code{level} and \code{type} are allowed. They are:
 \itemize{
-\item \code{"group"}: \code{"mean"} and \code{"sd"} set 'etaG' and 'sigG', respectively
-\item \code{"cluster"}: \code{"mean"} and \code{"sd"} set 'etaK' and 'sigK', respectively
+\item \code{"study"}: \code{"mean"}  sets the overall intercept (on the scale of the linear predictor), denoted as \code{beta0}.
+\item \code{"unit"}: \code{"sd"} sets the standard deviation for individual random effects; \code{"re"} samples the random effects themselves.
+\item \code{"unit"}: \code{"sd"} sets the standard deviation for individual random effects; \code{"re"} samples the random effects themselves.
+\item \code{"time"}: \code{"mean"} sets 'timefn'. To update the times themselves, use \code{\link{sim_update_times}}.
+\item \code{"covariate"}: \code{"coef"} sets the covariate (\code{Z}) coefficients.  To update the covariate values themselves, use \code{\link{outsim_update_covariate}}.
+\item \code{"exposure"}: \code{"fn"} sets 'xfn', the underlying exposure-response function (on the scale of the linear predictor). To update the exposure values themselves, use \code{\link{outsim_update_covariate}}.
 }
 }
 \examples{

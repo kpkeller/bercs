@@ -330,7 +330,7 @@ create_exposure_simulation_skeleton_crossover <- function(ngroups=2,
 #' es <- expsim_update_parameter(es, level="cluster", type="re", draw=TRUE)
 #'
 #' # Add time function
-#' es <- expsim_update_parameter(es, level="time", type="mean", value=function(w) 2*cos(w))
+#' es <- expsim_update_parameter(es, level="time", type="fn", value=function(w) 2*cos(w))
 expsim_update_parameter <- function(obj, param, level=c("group", "cluster","unit", "observation", "correlation","time"), type=c("mean", "sd", "re", "fn"), value=NULL, draw=is.null(value)){
 
     if (!inherits(obj, "expsim")) stop("'obj' must be of class 'expsim'.")

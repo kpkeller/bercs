@@ -17,7 +17,7 @@ sample_outcome_model(
 )
 }
 \arguments{
-\item{standata}{An object of class `standata_outcome`, typically created from \code{\link{create_standata_outcome}}.}
+\item{standata}{An object of class \code{standata_outcome}, typically created from \code{\link{create_standata_outcome}}.}
 
 \item{B}{Number of post-warmup iterations.}
 

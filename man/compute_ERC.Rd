@@ -117,7 +117,7 @@ Currently, the fitted curve is plotted based upon the posterior means of the par
 
 Uncertainty from the intercepts is included in the confidence bands by default, since this corresponds to a common interpretation of such intervals. This requires picking a single value for the intercept. For models fit to multiple studies, a separate set of uncertainty will be created for each study. Additionally, a set of results corresponding to "average" intercept is created. The \code{intercept_prop} argument controls the relative contribution of the intercepts from each model.
 
-To calculate odds ratios for specific combinations of exposure values, use the `compute_OR` function, which will correctly calculate the credible intervals for the relative difference.
+To calculate odds ratios for specific combinations of exposure values, use the \code{compute_OR} function, which will correctly calculate the credible intervals for the relative difference.
 }
 \examples{
 

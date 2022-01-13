@@ -14,7 +14,7 @@ sample_exposure_model(
 )
 }
 \arguments{
-\item{standata}{An object of class `standata_exposure`, typically created from \code{\link{create_standata_exposure}}. It should also include information on prior distributions, which can be added via \code{\link{add_priors}}}
+\item{standata}{An object of class \code{standata_exposure}, typically created from \code{\link{create_standata_exposure}}. It should also include information on prior distributions, which can be added via \code{\link{add_priors}}}
 
 \item{B}{Number of post-warmup iterations.}
 

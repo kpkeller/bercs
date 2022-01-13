@@ -7,12 +7,12 @@
 \format{
 A data frame with 200 rows and 6 columns:
 \describe{
-  \item{conc}{concentration of exposure}
-  \item{case}{whether or not an infection was observed}
-  \item{unit_id}{The id corresponding to each individual in the study}
-  \item{true_prob}{true probability of observing a case}
-  \item{true_logit_prob}{the logit of true_prob}
-  \item{study}{The study from which the data was taken}
+\item{conc}{concentration of exposure}
+\item{case}{whether or not an infection was observed}
+\item{unit_id}{The id corresponding to each individual in the study}
+\item{true_prob}{true probability of observing a case}
+\item{true_logit_prob}{the logit of true_prob}
+\item{study}{The study from which the data was taken}
 }
 }
 \usage{

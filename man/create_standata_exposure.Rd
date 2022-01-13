@@ -53,10 +53,10 @@ is the \code{standata_exposure} object described above. The second element is a 
 }
 \description{
 Creates a list object that follows the structure required by
- the exposure models that are implemented in STAN.
+the exposure models that are implemented in STAN.
 }
 \details{
-This function takes as input a `long` data frame and extracts from it the information needed for fitting the exposure model in STAN.
+This function takes as input a \code{long} data frame and extracts from it the information needed for fitting the exposure model in STAN.
 
 The values of \code{group}, \code{unit_id}, and \code{clust_id} are converted to factor and then coerced to integer. The ordering of groups (units, clusters) in the output object will depend on the default ordering introduced by \code{\link{factor}}.
 }

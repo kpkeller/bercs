@@ -41,23 +41,23 @@ add_priors_outcome_model(
 
 \item{...}{Arguments passed to \code{add_priors_exposure_model} or \code{add_priors_outcome_model}. Unlisted arguments are ignored.}
 
-\item{etaG}{Prior mean and standard deviation for the group means parameter `etaG`.}
+\item{etaG}{Prior mean and standard deviation for the group means parameter \code{etaG}.}
 
-\item{sigmaG}{Prior mean and standard deviation for the group standard deviation parameter `sigmaG`.}
+\item{sigmaG}{Prior mean and standard deviation for the group standard deviation parameter \code{sigmaG}.}
 
 \item{reK}{Prior mean for cluster-level random effects.}
 
-\item{sigmaK}{Prior mean and standard deviation for the standard deviation of the cluster random effects, `sigmaK`.}
+\item{sigmaK}{Prior mean and standard deviation for the standard deviation of the cluster random effects, \code{sigmaK}.}
 
 \item{reI}{Prior mean for household-level random effects.}
 
 \item{sigmaI}{Prior mean and standard deviation for the standard deviation of the subject-level random effect.}
 
-\item{sigmaW}{Prior mean and standard deviation for the residual standard deviation parameter `sigmaW`.}
+\item{sigmaW}{Prior mean and standard deviation for the residual standard deviation parameter \code{sigmaW}.}
 
-\item{theta}{Prior mean and standard deviation for the time coefficients `thetaG`.}
+\item{theta}{Prior mean and standard deviation for the time coefficients \code{thetaG}.}
 
-\item{sigmaTheta}{Prior mean and standard deviation for the standard deviation parameter for time trends, `sigmaTheta`.}
+\item{sigmaTheta}{Prior mean and standard deviation for the standard deviation parameter for time trends, \code{sigmaTheta}.}
 
 \item{beta}{Prior mean for the exposure coefficient(s).}
 
