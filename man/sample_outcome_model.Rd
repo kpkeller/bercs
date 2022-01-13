@@ -49,7 +49,11 @@ outcome_dataA <- add_priors(outcome_dataA,
                             sigmaI=c(0, 0.1))
 
 #Sample from posterior distribution of parameters using STAN
-outcome_mod_fit1 <- sample_outcome_model(outcome_dataA)
+# In practice, use multiple chains and B>1000
+outcome_mod_fit1 <- sample_outcome_model(outcome_dataA,
+                                         chains=1,
+                                         cores=1,
+                                         B=100)
 print(outcome_mod_fit1,
 pars=c("reI_raw", "reI","mui"),
 include=FALSE)

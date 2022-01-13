@@ -116,6 +116,12 @@ create_outcome_simulation_skeleton_parallel <- function(nstudies=1,
     }
     N <- sum(nobs)
 
+    # Check variable lengths
+    if (!is.null(x)){
+        if (!length(x) %in% c(1, N)) stop("The length of 'x' must be equal to 1, the number of units, or the number of observations.")
+    }
+
+
     # Defaults
     if (missing(study_of_cluster)) study_of_cluster <- rep(1:nstudies, times=nclusters)
     if (missing(cluster_of_unit)) cluster_of_unit <- rep(1:K, times=nunits)
@@ -360,6 +366,10 @@ outsim_update_covariate <- function(obj, covariate=c("x","Z"), ncol=1, value=NUL
         }
     }
     if (covariate=="Z") obj$standata$p <- valdim[2]
+
+    if (valdim[1]!=obj$standata$N) {
+        stop("Provided covariate values should have same length as number of observations (N).")
+    }
 
     obj$structure[[covariate]] <- value
     obj$standata[[covariate]] <- value

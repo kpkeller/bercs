@@ -48,7 +48,11 @@ str(expsim_demo$structure$meanW)
 str(expsim_demo$standata$w)
 # Add priors and estimate parameters
 expsim_demo$standata <- add_priors(expsim_demo$standata)
-fit <- sample_exposure_model(expsim_demo$standata)
+# In practice, use multiple chains and B>1000
+fit <- sample_exposure_model(expsim_demo$standata,
+                             chains=1,
+                             cores=1,
+                             B=100)
 print(fit, pars=c("reI_raw", "muW", "reI", "reK", "reK_raw"), include=FALSE)
 }
 \seealso{

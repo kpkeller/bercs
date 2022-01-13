@@ -133,7 +133,11 @@ create_standata_exposure <- function(data=NULL,
 ##' exp_data <- add_priors(exp_data,
 ##'                        sigmaI=c(0, 0.1))
 ##' # Fit the model
-##' exp_mod_fit <- sample_exposure_model(exp_data)
+##' # In practice use multiple chains and B>=1000
+##' exp_mod_fit <- sample_exposure_model(exp_data,
+##'                                      chains=1,
+##'                                      cores=1,
+##'                                      B=100)
 ##' print(exp_mod_fit, pars=c("muW", "reI_raw", "etaG_raw"), include=FALSE)
 sample_exposure_model <- function(standata,
                                   B=1000,

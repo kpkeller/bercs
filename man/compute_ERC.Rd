@@ -134,9 +134,11 @@ outcome_combo_data <- create_standata_outcome(datalist=list(casedataA, casedataB
 outcome_combo_data <- add_priors(outcome_combo_data,
 sigmaI=c(0, 0.01))
 
-#Sample from posterior distribution
+# Sample from posterior distribution
+# In practice, use multiple chains and much larger B
 outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
-B=200,
+B=100,
+chains=1,
 cores=1)
 
 #Compute and fit the exposure response curve

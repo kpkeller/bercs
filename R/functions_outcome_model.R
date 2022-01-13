@@ -246,7 +246,11 @@ create_standata_outcome_singlestudy <- function(data=NULL,
 ##'                             sigmaI=c(0, 0.1))
 ##'
 ##' #Sample from posterior distribution of parameters using STAN
-##' outcome_mod_fit1 <- sample_outcome_model(outcome_dataA)
+##' # In practice, use multiple chains and B>1000
+##' outcome_mod_fit1 <- sample_outcome_model(outcome_dataA,
+##'                                          chains=1,
+##'                                          cores=1,
+##'                                          B=100)
 ##' print(outcome_mod_fit1,
 ##' pars=c("reI_raw", "reI","mui"),
 ##' include=FALSE)
@@ -338,9 +342,11 @@ sample_outcome_model <- function(standata,
 ##' outcome_combo_data <- add_priors(outcome_combo_data,
 ##' sigmaI=c(0, 0.01))
 ##'
-##' #Sample from posterior distribution
+##' # Sample from posterior distribution
+##' # In practice, use multiple chains and much larger B
 ##' outcome_combo_mod_fit <- sample_outcome_model(outcome_combo_data,
-##' B=200,
+##' B=100,
+##' chains=1,
 ##' cores=1)
 ##'
 ##' #Compute and fit the exposure response curve
